@@ -84,13 +84,13 @@ pruned tokens are passed to LLaVA for final inference.
                    fill=cgray, text width=1.30cm, align=center,
                    minimum height=0.60cm, font=\scriptsize\itshape},
   arr/.style    = {-Stealth, thick, gray!65},
-  stglbl/.style = {font=\tiny\bfseries},
+  stglbl/.style = {font=\small\bfseries},
   sublbl/.style = {font=\tiny\itshape},
 ]
 
 %% --- I/O ---
 \node[iobox]                      (img)   {Image\\{\tiny(RGB)}};
-\node[iobox, below=1.20cm of img] (txt)   {Text Prompt};
+\node[iobox, below=0.90cm of img] (txt)   {Text Prompt};
 
 %% --- Stage 1 ---
 \node[box=cblue, right=of img]   (vit)   {ViT\\Tokenizer};
@@ -99,7 +99,7 @@ pruned tokens are passed to LLaVA for final inference.
 \node[box=cblue, right=of clip]  (temb)  {Text Emb.\ $T$};
 
 %% --- Stage 2 ---
-\node[box=cred,  right=1.0cm of vtok, yshift=-0.60cm] (score) {Cosine\\Scoring};
+\node[box=cred,  right=1.0cm of vtok, yshift=-0.45cm] (score) {Cosine\\Scoring};
 \node[box=cred,  right=0.50cm of score]                (topk)  {Top-$k$ +\\Spatial Anchor};
 
 %% --- Stage 3 ---
@@ -130,9 +130,9 @@ pruned tokens are passed to LLaVA for final inference.
         fit=(score)(topk),
         label={[stglbl, red!60, yshift=2pt]above:%
                Stage 2 — Cross-Modal Pruning}] {};
-  \node[draw=green!35, fill=green!4, rounded corners=4pt,
+  \node[draw=green!60, fill=green!10, rounded corners=4pt,
         fit=(mlp)(llava)(out),
-        label={[stglbl, green!60, yshift=2pt]above:%
+        label={[stglbl, green!50!black, yshift=2pt]above:%
                Stage 3 — LLM Inference}] {};
 \end{pgfonlayer}
 
