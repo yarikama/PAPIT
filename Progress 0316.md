@@ -1,5 +1,5 @@
 
-![[Pasted image 20260316195244.png]]
+![PAPIT progress figure](Pasted%20image%2020260316195244.png)
 PAPIT（Prompt-Aware Patch/Image Token Pruning，基于提示的图像 Patch / Token 剪枝）旨在在保持回答质量的同时，降低视觉语言推理中的视觉 token 负载。
 
 核心思想：
@@ -35,7 +35,7 @@ output (selected + anchor) = [k+1, D]
     - none
     - global_mean
     - dropped_mean
-    
+
 Strategy 0:
 Strategy 1:
     anchor = mean(all_patch_embedding)
