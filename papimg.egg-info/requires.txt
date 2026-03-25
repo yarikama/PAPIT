@@ -1,0 +1,13 @@
+pillow>=10.0.0
+torch>=2.2.0
+transformers>=4.41.0
+numpy>=1.24.0
+pandas>=2.0.0
+matplotlib>=3.7.0
+
+[llava]
+accelerate>=0.30.0
+
+[ocr]
+easyocr>=1.7.0
+opencv-python-headless>=4.8.0

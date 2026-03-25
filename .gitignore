@@ -12,3 +12,6 @@
 *.synctex.gz(busy)
 
 ch218-local/
+
+.DS_Store
+__pycache__/

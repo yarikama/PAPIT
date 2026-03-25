@@ -8,7 +8,23 @@ dependencies = [
 	"pillow>=10.0.0",
 	"torch>=2.2.0",
 	"transformers>=4.41.0",
+	"numpy>=1.24.0",
+	"pandas>=2.0.0",
+	"matplotlib>=3.7.0",
+]
+
+[project.optional-dependencies]
+ocr = ["easyocr>=1.7.0", "opencv-python-headless>=4.8.0"]
+llava = ["accelerate>=0.30.0"]
+
+[dependency-groups]
+dev = [
+	"jupyterlab>=4.0",
+	"ipykernel>=6.0.0",
 ]
 
 [project.scripts]
-papit = "main:main"
+papit = "papit.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["papit*"]
