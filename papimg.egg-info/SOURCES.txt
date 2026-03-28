@@ -11,10 +11,15 @@ papit/__init__.py
 papit/__main__.py
 papit/benchmark/__init__.py
 papit/benchmark/efficiency.py
+papit/benchmark/llava_runner.py
 papit/benchmark/runner.py
 papit/core/__init__.py
 papit/core/config.py
 papit/core/pruner.py
+papit/data/__init__.py
+papit/data/gqa.py
+papit/data/textvqa.py
+papit/data/vqa_v2.py
 papit/integration/__init__.py
 papit/integration/llava.py
 papit/ocr/__init__.py
