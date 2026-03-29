@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(python:*)",
-      "Bash(.venv/bin/python -c \"import jupyter_client; kspecs = jupyter_client.kernelspec.KernelSpecManager\\(\\).get_all_specs\\(\\); [print\\(k, v[''spec''][''argv''][0]\\) for k,v in kspecs.items\\(\\)]\")"
+      "Bash(.venv/bin/python -c \"import jupyter_client; kspecs = jupyter_client.kernelspec.KernelSpecManager\\(\\).get_all_specs\\(\\); [print\\(k, v[''spec''][''argv''][0]\\) for k,v in kspecs.items\\(\\)]\")",
+      "Bash(python -c \":*)"
     ]
   }
 }
