@@ -2,35 +2,35 @@
 % PAPIT — Progress Report (2 pages)
 % COMP 646, Rice University
 %
-% Uses neurips_2024.sty (already in proposal/).
-% Copy neurips_2024.sty into report/ before compiling:
-%   cp proposal/neurips_2024.sty report/
+% Uses cvpr.sty — place cvpr.sty in report/ before compiling.
 %
 % Figures needed before submission:
-%   fig_pipeline.pdf   — TikZ diagram (compile from proposal.tex or copy)
 %   fig_qualitative.pdf — export from demo.ipynb Section 2 (patch heatmap)
 %                         matplotlib savefig("fig_qualitative.pdf")
 %   fig_efficiency.pdf  — bar chart of latency (from efficiency_benchmark.csv)
 % ============================================================
 
-\documentclass[10pt, twocolumn]{article}
+\documentclass[10pt,twocolumn,letterpaper]{article}
 
-\usepackage[final]{neurips_2024}
-\makeatletter
-\renewcommand{\@noticestring}{}
-\makeatother
-
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
-\usepackage[breaklinks=true,bookmarks=false]{hyperref}
+\usepackage{cvpr}
+\usepackage{times}
+\usepackage{epsfig}
 \usepackage{graphicx}
 \usepackage{amsmath}
 \usepackage{amssymb}
 \usepackage{booktabs}
+\usepackage{multirow}
 \usepackage{microtype}
 \usepackage{xcolor}
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning, fit, backgrounds, calc}
+
+\usepackage[breaklinks=true,bookmarks=false]{hyperref}
+
+\cvprfinalcopy % *** Uncomment this line for the final submission
+
+\def\cvprPaperID{****} % *** Enter the CVPR Paper ID here
+\def\httilde{\mbox{\tt\raisebox{-.5ex}{\symbol{126}}}}
 
 % ── Color palette (same as proposal) ──────────────────────
 \definecolor{cblue}{RGB}{214,234,248}
@@ -49,6 +49,7 @@
   {\small\texttt{\{ch218, hh83, ks256\}@rice.edu}}
 }
 
+\setcounter{page}{1}
 \begin{document}
 \maketitle
 
@@ -80,7 +81,7 @@ semantically relevant to the question.
 
 \textbf{Global (random) pruning} discards tokens uniformly at a fixed ratio,
 blind to the query content.
-This risks removing task-critical patches — especially small but
+This risks removing task-critical patches---especially small but
 essential regions such as text in street signs (TextVQA) or the
 object involved in a spatial-reasoning question (GQA).
 
@@ -110,8 +111,8 @@ query-conditioned and requires no training.
 
 Figure~\ref{fig:pipeline} shows the three-stage pipeline.
 
-% ── TikZ pipeline (same as proposal) ─────────────────────
-\begin{figure}[t]
+% ── TikZ pipeline ─────────────────────────────────────────
+\begin{figure}[htbp]
 \centering
 \resizebox{\columnwidth}{!}{%
 \begin{tikzpicture}[
@@ -208,18 +209,9 @@ The full codebase is modular: \texttt{papit.core} (scorer),
 % ============================================================
 \section{Qualitative Results}
 
-%% ── INSTRUCTIONS ──────────────────────────────────────────
-%% Run demo.ipynb Cell 10 (heatmap) and Cell 8 (patch rects),
-%% then save with:
-%%   fig.savefig("../report/fig_qualitative.pdf", bbox_inches="tight")
-%% Place both in one side-by-side figure in the PDF.
-%% Remove this comment block when the figure is ready.
-%% ──────────────────────────────────────────────────────────
-
-\begin{figure}[t]
+\begin{figure}[htbp]
   \centering
-  % Replace with: \includegraphics[width=\columnwidth]{fig_qualitative.pdf}
-  \fbox{\rule{0pt}{3.5cm}\rule{\columnwidth}{0pt}}
+  \includegraphics[width=\columnwidth]{fig_qualitative.pdf}
   \caption{\textbf{Prompt-aware patch selection} on a TextVQA image
            with prompt \emph{``What does the sign say?''}
            \textit{Left:} CLIP cosine saliency heatmap (green = high score).
@@ -239,7 +231,7 @@ token reduction before running the full LLaVA accuracy evaluation.
 The proxy model uses a $7\!\times\!7 = 49$ patch grid;
 full LLaVA experiments use $n=576$.
 
-\begin{table}[t]
+\begin{table}[htbp]
 \centering
 \small
 \caption{Efficiency benchmark results (BLIP proxy model, single A6000 GPU,
@@ -252,57 +244,72 @@ full LLaVA experiments use $n=576$.
 $k$ & Tokens & Keep & FLOPs\textsubscript{rel} & Prune & E2E \\
  & kept & ratio & (Eq.~\ref{eq:flops}) & (ms) & (ms) \\
 \midrule
-100\% & 49 & 1.000 & 1.000 & 62  & 4{,}577 \\
-75\%  & 37 & 0.755 & 0.772 & 27  &   132 \\
-50\%  & 24 & 0.490 & 0.558 & 29  &   311 \\
-25\%  & 12 & 0.245 & 0.392 & 28  &   321 \\
+100\%$^\dagger$ & 49 & 1.000 & 1.000 & 104 & 14{,}548 \\
+75\%  & 37 & 0.755 & 0.772 &  81 &    276 \\
+50\%  & 24 & 0.490 & 0.559 &  95 &    291 \\
+25\%  & 12 & 0.245 & 0.392 &  82 &    247 \\
 \bottomrule
 \end{tabular}
+
+\smallskip
+{\footnotesize $^\dagger$~The $k\!=\!100\%$ row includes model cold-start
+and CUDA warm-up; it does not reflect steady-state unpruned latency.}
 \end{table}
 
 Key observations:
-(1) Pruning latency is constant at $\approx$28\,ms regardless of $k$,
-dominated by the CLIP text forward pass.
-(2) E2E latency decreases substantially with more aggressive pruning,
-demonstrating practical wall-clock savings.
-(3) The \texttt{k=100\%} row has higher E2E because it uses the full
-unpruned BLIP pipeline without the token-selection shortcut.
+(1) Pruning latency is approximately constant at $\approx$85\,ms regardless of $k$,
+dominated by the CLIP text encoder forward pass.
+(2) E2E latency for pruned variants ($k \leq 75\%$) remains below 300\,ms,
+demonstrating practical wall-clock savings on the proxy model.
+(3) The marginal E2E difference across $k \in \{75\%, 50\%, 25\%\}$ is small
+on the 49-patch proxy model; larger gains are expected on LLaVA-1.5 ($n=576$),
+where the quadratic attention cost is the dominant term.
 
 % ============================================================
 \section{Remaining Experiments}
 
 Table~\ref{tab:accuracy} shows the planned accuracy evaluation structure.
 We compare three variants at each retention ratio using LLaVA-1.5-7B
-on 500–1000 samples per dataset:
+on 500--1000 samples per dataset:
 \textbf{Unpruned} (all 576 patches),
 \textbf{Random} (uniformly sampled $k$ patches), and
 \textbf{PAPIT} (top-$k$ by cosine score, Eq.~\ref{eq:cosine}).
 
-\begin{table}[t]
+\begin{table}[htbp]
 \centering
 \small
-\caption{Planned main accuracy results.
-         ``??'' marks pending experiments.
-         VQA soft accuracy: $\min(\text{count}/3,\,1)$ over 10 annotations.}
+\caption{Main accuracy results (pending full LLaVA run).
+         ``--'' marks experiments not yet completed.
+         VQA soft accuracy: $\min(\text{count}/3,\,1)$ over 10 annotations.
+         Rel.\ FLOPs from Eq.~\ref{eq:flops} ($n{=}576$, $L_\text{text}{\approx}50$).
+         $^\dagger$Patch Recall (PR): fraction of OCR-detected text patches
+         retained in the top-$k$ set (TextVQA only);
+         random baseline PR equals $k$ by construction.}
 \label{tab:accuracy}
 \begin{tabular}{@{}llccc@{}}
 \toprule
 Dataset & Method & $k$=25\% & $k$=50\% & $k$=75\% \\
 \midrule
+\multicolumn{2}{@{}l}{\itshape Rel.\ FLOPs\,(Eq.\,\ref{eq:flops})}
+  & \itshape 0.10 & \itshape 0.29 & \itshape 0.59 \\
+\midrule
 \multirow{3}{*}{GQA}
-  & Unpruned & \multicolumn{3}{c}{?? (shared baseline)} \\
-  & Random   & ?? & ?? & ?? \\
-  & PAPIT    & ?? & ?? & ?? \\
+  & Unpruned & \multicolumn{3}{c}{-- (shared baseline)} \\
+  & Random   & -- & -- & -- \\
+  & PAPIT    & -- & -- & -- \\
 \midrule
 \multirow{3}{*}{VQA v2}
-  & Unpruned & \multicolumn{3}{c}{??} \\
-  & Random   & ?? & ?? & ?? \\
-  & PAPIT    & ?? & ?? & ?? \\
+  & Unpruned & \multicolumn{3}{c}{--} \\
+  & Random   & -- & -- & -- \\
+  & PAPIT    & -- & -- & -- \\
 \midrule
-\multirow{3}{*}{TextVQA}
-  & Unpruned & \multicolumn{3}{c}{??} \\
-  & Random   & ?? & ?? & ?? \\
-  & PAPIT    & ?? & ?? & ?? \\
+\multirow{5}{*}{TextVQA}
+  & Unpruned (acc)        & \multicolumn{3}{c}{--} \\
+  & Random (acc)          & -- & -- & -- \\
+  & PAPIT (acc)           & -- & -- & -- \\
+\cmidrule(l){2-5}
+  & Random PR$^\dagger$   & $k$ & $k$ & $k$ \\
+  & PAPIT PR$^\dagger$    & -- & -- & -- \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -331,8 +338,7 @@ meaningful latency reductions.
 
 Immediate next steps:
 (1) Run the LLaVA accuracy benchmark on GQA, VQA~v2, and TextVQA;
-(2) Generate the accuracy–efficiency Pareto curve (Figure~\ref{fig:qualitative}
-is a placeholder; the Pareto curve will replace it);
+(2) Generate the accuracy--efficiency Pareto curve;
 (3) Optionally, ablate the Risk Awareness module on adversarial images.
 
 \noindent\textbf{Acknowledgments.}
@@ -341,7 +347,7 @@ All experimental design, implementation, and analysis are our own.
 
 % ============================================================
 {\small
-\bibliographystyle{unsrt}
+\bibliographystyle{ieeetr}
 \bibliography{references}
 }
 
