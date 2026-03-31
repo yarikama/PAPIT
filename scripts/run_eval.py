@@ -183,7 +183,7 @@ def run_benchmark(dataset: str, csv_path: Path, output_dir: Path, args, device: 
 
     # Print summary
     cols = ["vqa_acc_papit", "vqa_acc_random", "vqa_acc_unpruned"]
-    if dataset == "textvqa":
+    if dataset == "textvqa" and "papit_patch_recall" in results.columns:
         cols.append("papit_patch_recall")
     summary = results.groupby("retention_ratio")[cols].mean()
     log.info(f"\n{dataset.upper()} results:\n{summary.to_string()}\n")
