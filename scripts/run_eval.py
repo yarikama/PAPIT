@@ -177,6 +177,7 @@ def run_benchmark(dataset: str, csv_path: Path, output_dir: Path, args, device: 
         llava_model_id=args.llava_model,
         clip_model_id=args.clip_model,
         device=device,
+        max_samples=args.max_samples,
         max_new_tokens=args.max_new_tokens,
     )
 
