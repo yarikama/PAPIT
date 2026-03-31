@@ -33,7 +33,7 @@ download_gqa() {
             https://downloads.cs.stanford.edu/nlp/data/gqa/images.zip \
             -O "$dir/images.zip"
         info "Extracting GQA images..."
-        unzip -q "$dir/images.zip" -d "$dir/images"
+        unzip -q "$dir/images.zip" -d "$dir"   # zip contains images/ internally
         rm "$dir/images.zip"
         info "GQA images done."
     else
@@ -117,6 +117,8 @@ download_textvqa() {
         info "Extracting TextVQA images..."
         unzip -q "$dir/train_val_images.zip" -d "$dir"
         rm "$dir/train_val_images.zip"
+        # zip extracts to train_images/ — rename to match expected path
+        [ -d "$dir/train_images" ] && mv "$dir/train_images" "$dir/train_val_images"
         info "TextVQA images done."
     else
         info "TextVQA images already exist, skipping."
