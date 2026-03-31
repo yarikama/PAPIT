@@ -255,18 +255,19 @@ class PAPITLlavaRunner:
 
     def _format_prompt(self, prompt: str) -> str:
         """Apply LLaVA chat template if available, else fall back to legacy format."""
+        vqa_prompt = f"{prompt} Answer the question using a single word or phrase."
         try:
             conversation = [
                 {
                     "role": "user",
-                    "content": [{"type": "image"}, {"type": "text", "text": prompt}],
+                    "content": [{"type": "image"}, {"type": "text", "text": vqa_prompt}],
                 }
             ]
             return self.processor.apply_chat_template(
                 conversation, add_generation_prompt=True
             )
         except Exception:
-            return f"USER: <image>\n{prompt}\nASSISTANT:"
+            return f"USER: <image>\n{vqa_prompt}\nASSISTANT:"
 
     # ------------------------------------------------------------------
     # Public API
@@ -371,10 +372,11 @@ class PAPITLlavaRunner:
         inputs = self.processor(images=image, text=text, return_tensors="pt")
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
 
+        input_len = inputs["input_ids"].shape[1]
         output_ids = self.llava.generate(
             **inputs, max_new_tokens=max_new_tokens, **generate_kwargs
         )
-        return self.processor.decode(output_ids[0], skip_special_tokens=True)
+        return self.processor.decode(output_ids[0][input_len:], skip_special_tokens=True)
 
     def compare(
         self,
