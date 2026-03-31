@@ -244,16 +244,12 @@ full LLaVA experiments use $n=576$.
 $k$ & Tokens & Keep & FLOPs\textsubscript{rel} & Prune & E2E \\
  & kept & ratio & (Eq.~\ref{eq:flops}) & (ms) & (ms) \\
 \midrule
-100\%$^\dagger$ & 49 & 1.000 & 1.000 & 104 & 14{,}548 \\
+100\% & 49 & 1.000 & 1.000 & 104 & \textit{TBD} \\
 75\%  & 37 & 0.755 & 0.772 &  81 &    276 \\
 50\%  & 24 & 0.490 & 0.559 &  95 &    291 \\
 25\%  & 12 & 0.245 & 0.392 &  82 &    247 \\
 \bottomrule
 \end{tabular}
-
-\smallskip
-{\footnotesize $^\dagger$~The $k\!=\!100\%$ row includes model cold-start
-and CUDA warm-up; it does not reflect steady-state unpruned latency.}
 \end{table}
 
 Key observations:
@@ -261,6 +257,8 @@ Key observations:
 dominated by the CLIP text encoder forward pass.
 (2) E2E latency for pruned variants ($k \leq 75\%$) remains below 300\,ms,
 demonstrating practical wall-clock savings on the proxy model.
+The $k\!=\!100\%$ E2E value will be updated after re-running the benchmark
+with a consistent warm-up for the QA model.
 (3) The marginal E2E difference across $k \in \{75\%, 50\%, 25\%\}$ is small
 on the 49-patch proxy model; larger gains are expected on LLaVA-1.5 ($n=576$),
 where the quadratic attention cost is the dominant term.
