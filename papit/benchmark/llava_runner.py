@@ -23,6 +23,8 @@ import time
 from pathlib import Path
 from typing import Any
 
+from tqdm import tqdm
+
 import pandas as pd
 import torch
 from PIL import Image
@@ -188,7 +190,7 @@ def run_llava_benchmark(
 
     rows: list[dict[str, Any]] = []
 
-    for i, sample in samples.iterrows():
+    for i, sample in tqdm(samples.iterrows(), total=len(samples), desc="Samples", unit="sample"):
         img_path = str(sample["image_path"])
         question = str(sample["question"])
         answer_list: list[str] = json.loads(str(sample["answer_list"]))
