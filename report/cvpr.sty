@@ -48,13 +48,10 @@
 % eleven point times bold required for second-order headings
 % in some sites the name of the fonts may differ,
 % change the name here:
-\font\cvprtenhv  = phvb at 8pt % *** IF THIS FAILS, SEE cvpr.sty ***
-\font\elvbf  = ptmb scaled 1100
-
-% If the above lines give an error message, try to comment them and
-% uncomment these:
-%\font\cvprtenhv  = phvb7t at 8pt
-%\font\elvbf  = ptmb7t scaled 1100
+% Use standard LaTeX fonts that are always available
+% Define these as font switches to bold series
+\def\cvprtenhv{\fontfamily{ptm}\bfseries}
+\def\elvbf{\fontfamily{ptm}\bfseries}
 
 % set dimensions of columns, gap between columns, and paragraph indent
 \setlength{\textheight}{8.875in}
