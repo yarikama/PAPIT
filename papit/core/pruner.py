@@ -39,7 +39,11 @@ class PromptAwarePruner:
             attention_mask=inputs["attention_mask"],
         )
 
-        scores = self._compute_scores(patch_tokens, text_embedding)
+        # Hybrid scoring: GradCAM for aggressive pruning, value features otherwise
+        if self.config.retention_ratio <= 0.375:
+            scores = self._gradcam_scores(inputs["pixel_values"], text_embedding)
+        else:
+            scores = self._value_scores(inputs["pixel_values"], text_embedding)
         topk_scores, topk_indices = self._select_topk(scores)
         selected_tokens = patch_tokens[topk_indices]
         pruned_tokens = self._append_anchor(selected_tokens, patch_tokens, topk_indices)
@@ -77,6 +81,37 @@ class PromptAwarePruner:
             return_dict=True,
         )
         return self.model.text_projection(text_outputs.pooler_output).squeeze(0)
+
+    def _value_scores(
+        self,
+        pixel_values: torch.Tensor,
+        text_embedding: torch.Tensor,
+    ) -> torch.Tensor:
+        """Per-patch saliency via MaskCLIP value features.
+
+        Hooks the last CLIP attention layer's v_proj, projects V features to
+        the CLIP shared space, and computes cosine similarity with the text
+        embedding.  No backprop required.
+
+        Returns
+        -------
+        scores : [N] float32 tensor
+        """
+        saved: dict[str, torch.Tensor] = {}
+        hook = self.model.vision_model.encoder.layers[-1].self_attn.v_proj \
+            .register_forward_hook(lambda m, inp, out: saved.update({"v": out}))
+
+        with torch.no_grad():
+            self.model.vision_model(pixel_values, return_dict=True)
+        hook.remove()
+
+        v_feats = saved["v"][0, 1:, :]                             # [N, D_vit]
+        clip_feats = self.model.visual_projection(v_feats)          # [N, D_clip]
+        scores = (
+            F.normalize(clip_feats, dim=-1)
+            @ F.normalize(text_embedding, dim=-1)
+        )  # [N]
+        return scores
 
     def _compute_scores(
         self,

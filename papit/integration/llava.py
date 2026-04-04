@@ -89,16 +89,16 @@ class PAPITLlavaRunner:
         self.processor = AutoProcessor.from_pretrained(llava_model_id)
 
         # --- CLIP (scoring only) -------------------------------------------
-        # We only need visual_projection + text encoder from the full CLIP model.
-        # LLaVA's vision tower already encodes images — no duplication needed.
+        # We need the vision model for GradCAM, plus text encoder and projections.
         clip = CLIPModel.from_pretrained(clip_model_id)
+        self.clip_vision_model = clip.vision_model.to(self.device)
         self.visual_projection = clip.visual_projection.to(self.device)
         self.text_model = clip.text_model.to(self.device)
         self.text_projection = clip.text_projection.to(self.device)
         self.clip_processor = CLIPProcessor.from_pretrained(clip_model_id)
         del clip  # free the full model; we keep only the lightweight components
 
-        for m in (self.visual_projection, self.text_model, self.text_projection):
+        for m in (self.clip_vision_model, self.visual_projection, self.text_model, self.text_projection):
             m.eval()
 
     # ------------------------------------------------------------------
@@ -144,28 +144,150 @@ class PAPITLlavaRunner:
         text_out = self.text_model(**inputs, return_dict=True)
         return self.text_projection(text_out.pooler_output).squeeze(0)
 
+    def _value_scores(
+        self,
+        image: Image.Image,
+        prompt: str,
+        n_patches: int,
+    ) -> torch.Tensor:
+        """Per-patch saliency via MaskCLIP value features.
+
+        Hooks the last CLIP attention layer's v_proj to extract value (V)
+        features for each patch, projects them to the CLIP shared space, and
+        computes cosine similarity with the text embedding.  No backprop
+        required — faster than GradCAM while retaining spatial precision.
+
+        Reference: MaskCLIP (Zhou et al., ECCV 2022).
+
+        Returns
+        -------
+        scores : [n_patches] float32 tensor on self.device
+        """
+        clip_inputs = self.clip_processor(images=image, return_tensors="pt")
+        pixel_values = clip_inputs["pixel_values"].to(self.device)
+        text_emb = self._get_text_embedding(prompt)  # [D_clip]
+
+        saved: dict[str, torch.Tensor] = {}
+        hook = self.clip_vision_model.encoder.layers[-1].self_attn.v_proj \
+            .register_forward_hook(lambda m, inp, out: saved.update({"v": out}))
+
+        with torch.no_grad():
+            self.clip_vision_model(pixel_values, return_dict=True)
+        hook.remove()
+
+        # v: [1, N+1, D_vit] → drop CLS → [N_clip, D_vit]
+        v_feats = saved["v"][0, 1:, :]
+        clip_feats = self.visual_projection(v_feats)  # [N_clip, D_clip]
+
+        scores = (
+            F.normalize(clip_feats, dim=-1)
+            @ F.normalize(text_emb, dim=-1)
+        )  # [N_clip]
+
+        # Upsample to LLaVA's patch grid if CLIP uses a different image size
+        clip_n = scores.shape[0]
+        if clip_n != n_patches:
+            clip_grid = int(clip_n ** 0.5)
+            llava_grid = int(n_patches ** 0.5)
+            scores = F.interpolate(
+                scores.reshape(1, 1, clip_grid, clip_grid),
+                size=(llava_grid, llava_grid),
+                mode="bilinear",
+                align_corners=False,
+            ).reshape(n_patches)
+
+        return scores
+
+    def _gradcam_scores(
+        self,
+        image: Image.Image,
+        prompt: str,
+        n_patches: int,
+    ) -> torch.Tensor:
+        """Per-patch saliency via GradCAM on CLIP CLS text-image similarity.
+
+        Runs CLIP's vision encoder with gradient tracking, backprops through
+        the final attention layer, and computes GradCAM weights at the
+        second-to-last encoder layer output (patch tokens only, CLS dropped).
+
+        If CLIP's patch grid (e.g. 16×16 = 256) differs from LLaVA's
+        (24×24 = 576), scores are bilinearly upsampled to match ``n_patches``.
+
+        Returns
+        -------
+        scores : [n_patches] non-negative float32 tensor on self.device
+        """
+        clip_inputs = self.clip_processor(images=image, return_tensors="pt")
+        pixel_values = clip_inputs["pixel_values"].to(self.device)
+        text_emb = self._get_text_embedding(prompt)  # [D_clip]
+
+        saved: dict[str, torch.Tensor] = {}
+
+        def fwd_hook(module: Any, inp: Any, out: Any) -> None:
+            saved["act"] = out[0] if isinstance(out, tuple) else out
+
+        # Hook second-to-last layer so gradients flow through the last attention
+        hook = self.clip_vision_model.encoder.layers[-2].register_forward_hook(fwd_hook)
+        try:
+            with torch.enable_grad():
+                vision_out = self.clip_vision_model(pixel_values, return_dict=True)
+                cls_feat = self.visual_projection(vision_out.pooler_output)  # [1, D_clip]
+                sim = (
+                    F.normalize(cls_feat, dim=-1)
+                    @ F.normalize(text_emb, dim=-1)
+                ).squeeze()
+                saved["act"].retain_grad()
+                sim.backward()
+        finally:
+            hook.remove()
+
+        act = saved["act"][0, 1:].detach()  # [N_clip, D], drop CLS
+        grad = saved["act"].grad[0, 1:]      # [N_clip, D]
+        scores = (grad * act).sum(dim=-1).relu()  # [N_clip]
+
+        # Upsample to LLaVA's patch grid if CLIP uses a different image size
+        clip_n = scores.shape[0]
+        if clip_n != n_patches:
+            clip_grid = int(clip_n ** 0.5)
+            llava_grid = int(n_patches ** 0.5)
+            scores = F.interpolate(
+                scores.reshape(1, 1, clip_grid, clip_grid),
+                size=(llava_grid, llava_grid),
+                mode="bilinear",
+                align_corners=False,
+            ).reshape(n_patches)
+
+        # Fallback: if all zeros, return uniform so topk is not arbitrary
+        if scores.sum() == 0:
+            scores = torch.ones(n_patches, device=self.device)
+
+        return scores
+
+    # Retention ratio below which GradCAM outperforms value features
+    # (empirically determined on GQA: GradCAM is better at k≤0.25,
+    # value features are better at k≥0.5)
+    _GRADCAM_THRESHOLD: float = 0.375
+
     def _score_and_prune(
         self,
         patch_for_projector: torch.Tensor,
         patch_for_scoring: torch.Tensor,
         prompt: str,
-    ) -> tuple[torch.Tensor, torch.Tensor]:
-        """Return ``(pruned_vit_features [k, D_vit], selected_indices [k])``.
+        image: Image.Image,
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        """Return ``(pruned_vit_features [k+anchor, D_vit], selected_indices [k], scores [N])``.
 
-        Scoring is performed in CLIP shared space; pruned features stay in ViT
-        space so LLaVA's MLP projector can consume them unchanged.
+        Hybrid scoring: GradCAM for aggressive pruning (retention ≤ 37.5%),
+        MaskCLIP value features otherwise.  Pruned features stay in ViT space
+        so LLaVA's MLP projector can consume them unchanged.
         """
-        # Project final-layer features to CLIP shared space for scoring.
-        clip_feats = self.visual_projection(patch_for_scoring)  # [N, D_clip]
-        text_emb = self._get_text_embedding(prompt)              # [D_clip]
-
-        scores = (
-            F.normalize(clip_feats, p=2, dim=-1)
-            @ F.normalize(text_emb, p=2, dim=-1)
-        )  # [N]
-
-        N = scores.shape[0]
+        N = patch_for_projector.shape[0]
         k = max(1, int(round(N * self.config.retention_ratio)))
+
+        if self.config.retention_ratio <= self._GRADCAM_THRESHOLD:
+            scores = self._gradcam_scores(image, prompt, N)  # [N]
+        else:
+            scores = self._value_scores(image, prompt, N)    # [N]
         _, indices = torch.topk(scores, k=k, largest=True, sorted=True)
 
         selected = patch_for_projector[indices]  # [k, D_vit]
@@ -185,7 +307,7 @@ class PAPITLlavaRunner:
             )
             selected = torch.cat([selected, anchor], dim=0)
 
-        return selected, indices
+        return selected, indices, scores
 
     def _project_through_mlp(self, pruned_vit: torch.Tensor) -> torch.Tensor:
         """Apply LLaVA's MLP projector.  Returns [1, k, D_llm]."""
@@ -309,9 +431,9 @@ class PAPITLlavaRunner:
             inputs["pixel_values"]
         )
 
-        # 2. Score patches and select top-k.
-        pruned_vit, selected_indices = self._score_and_prune(
-            patch_for_proj, patch_for_score, prompt
+        # 2. Score patches and select top-k via GradCAM.
+        pruned_vit, selected_indices, all_scores = self._score_and_prune(
+            patch_for_proj, patch_for_score, prompt, image
         )
 
         # 3. Project pruned ViT features through LLaVA's MLP projector.
@@ -337,12 +459,6 @@ class PAPITLlavaRunner:
 
         N = patch_for_proj.shape[0]
         k_actual = int(selected_indices.shape[0])
-        clip_feats = self.visual_projection(patch_for_score)
-        text_emb = self._get_text_embedding(prompt)
-        all_scores = (
-            F.normalize(clip_feats, p=2, dim=-1)
-            @ F.normalize(text_emb, p=2, dim=-1)
-        )
         topk_scores = all_scores[selected_indices]
 
         return PAPITLlavaOutput(
