@@ -47,8 +47,11 @@ def measure_variant(
     cfg = PAPITConfig(retention_ratio=retention_ratio, device=device)
     pruner = PromptAwarePruner(cfg)
 
-    # Warmup
-    pruner.run(image_path, question)
+    # Warmup – both pruner and qa_fn must be warm so all k values are comparable
+    _wu_out = pruner.run(image_path, question)
+    if qa_fn is not None:
+        _wu_idx = [int(x) for x in _wu_out.topk_indices.detach().cpu().tolist()]
+        qa_fn(build_pruned_image(image_path, _wu_idx, pruner.grid_size), question)
 
     prune_times: list[float] = []
     qa_times: list[float] = []
