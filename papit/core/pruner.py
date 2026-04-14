@@ -82,6 +82,40 @@ class PromptAwarePruner:
         )
         return self.model.text_projection(text_outputs.pooler_output).squeeze(0)
 
+    def _gradcam_scores(
+        self,
+        pixel_values: torch.Tensor,
+        text_embedding: torch.Tensor,
+    ) -> torch.Tensor:
+        """Per-patch saliency via GradCAM on CLIP CLS text-image similarity."""
+        saved: dict[str, torch.Tensor] = {}
+
+        def fwd_hook(module: nn.Module, inp: object, out: object) -> None:
+            saved["act"] = out[0] if isinstance(out, tuple) else out
+
+        hook = self.model.vision_model.encoder.layers[-2].register_forward_hook(fwd_hook)
+        try:
+            with torch.enable_grad():
+                vision_out = self.model.vision_model(pixel_values, return_dict=True)
+                cls_feat = self.model.visual_projection(vision_out.pooler_output)
+                sim = (
+                    F.normalize(cls_feat, dim=-1)
+                    @ F.normalize(text_embedding, dim=-1)
+                ).squeeze()
+                saved["act"].retain_grad()
+                sim.backward()
+        finally:
+            hook.remove()
+
+        act = saved["act"][0, 1:].detach()
+        grad = saved["act"].grad[0, 1:]
+        scores = (grad * act).sum(dim=-1).relu()
+
+        if scores.sum() == 0:
+            scores = torch.ones(scores.shape[0], device=self.config.device)
+
+        return scores
+
     def _value_scores(
         self,
         pixel_values: torch.Tensor,
