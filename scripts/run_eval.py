@@ -83,6 +83,17 @@ def parse_args():
         default=32,
         help="Max new tokens for LLaVA generation (default: 32)",
     )
+    parser.add_argument(
+        "--anchor",
+        default="global_mean",
+        choices=["global_mean", "dropped_mean", "none"],
+        help="Anchor token strategy (default: global_mean)",
+    )
+    parser.add_argument(
+        "--force-ocr",
+        action="store_true",
+        help="Also run OCR-forced variant (TextVQA patch recall; requires easyocr)",
+    )
     return parser.parse_args()
 
 
@@ -179,12 +190,15 @@ def run_benchmark(dataset: str, csv_path: Path, output_dir: Path, args, device: 
         device=device,
         max_samples=args.max_samples,
         max_new_tokens=args.max_new_tokens,
+        anchor_strategy=args.anchor,
+        force_ocr=args.force_ocr,
     )
 
     # Print summary
     cols = ["vqa_acc_papit", "vqa_acc_random", "vqa_acc_unpruned"]
-    if dataset == "textvqa" and "papit_patch_recall" in results.columns:
-        cols.append("papit_patch_recall")
+    for extra in ("vqa_acc_ocr", "papit_patch_recall", "ocr_patch_recall"):
+        if extra in results.columns:
+            cols.append(extra)
     summary = results.groupby("retention_ratio")[cols].mean()
     log.info(f"\n{dataset.upper()} results:\n{summary.to_string()}\n")
 
