@@ -104,6 +104,88 @@ class _ExtendedRunner(PAPITLlavaRunner):
         answer = self.processor.decode(output_ids[0], skip_special_tokens=True)
         return answer, indices.cpu().tolist()
 
+    @torch.no_grad()
+    def generate_ocr_forced(
+        self,
+        image: Image.Image,
+        image_path: str,
+        prompt: str,
+        k: int,
+        grid_size: int,
+        max_new_tokens: int = 32,
+        **generate_kwargs: Any,
+    ) -> tuple[str, list[int]]:
+        """Generate with PAPIT scoring + OCR-forced patch retention merged.
+
+        Runs the same hybrid CLIP scoring as ``generate()``, then forces any
+        OCR-detected text patches into the selection budget before projecting
+        and generating.  This is the OCR-guided variant described in the report.
+
+        Returns
+        -------
+        (decoded_answer, final_patch_indices)
+        """
+        from papit.ocr.retention import merge_topk_with_forced, ocr_forced_indices
+
+        text = self._format_prompt(prompt)
+        inputs = self.processor(images=image, text=text, return_tensors="pt")
+        inputs = {key: val.to(self.device) for key, val in inputs.items()}
+
+        patch_for_proj, _ = self._extract_vit_features(inputs["pixel_values"])
+        N = patch_for_proj.shape[0]
+        k = min(max(k, 1), N)
+
+        # Hybrid scoring (mirrors _score_and_prune)
+        if self.config.retention_ratio <= self._GRADCAM_THRESHOLD:
+            scores = self._gradcam_scores(image, prompt, N)
+        else:
+            scores = self._value_scores(image, prompt, N)
+
+        _, topk_indices = torch.topk(scores, k=k, largest=True, sorted=True)
+
+        # OCR forced indices — fail gracefully if easyocr is not installed
+        try:
+            forced, _ = ocr_forced_indices(image_path, grid_size)
+        except Exception:
+            forced = []
+
+        # Merge: OCR-detected text patches are guaranteed to be retained
+        final_indices = merge_topk_with_forced(
+            scores, topk_indices, k=k, forced_indices=forced
+        )
+        final_tensor = torch.tensor(final_indices, device=self.device, dtype=torch.long)
+        selected = patch_for_proj[final_tensor]
+
+        # Anchor (same strategy as _score_and_prune)
+        strategy = self.config.anchor_strategy
+        if strategy == "global_mean":
+            anchor = patch_for_proj.mean(0, keepdim=True)
+            selected = torch.cat([selected, anchor], dim=0)
+        elif strategy == "dropped_mean":
+            mask = torch.ones(N, dtype=torch.bool, device=self.device)
+            mask[final_tensor] = False
+            anchor = (
+                patch_for_proj[mask].mean(0, keepdim=True)
+                if mask.any()
+                else patch_for_proj.mean(0, keepdim=True)
+            )
+            selected = torch.cat([selected, anchor], dim=0)
+
+        pruned_llm = self._project_through_mlp(selected)
+        inputs_embeds, attention_mask = self._build_inputs_embeds(
+            inputs["input_ids"], pruned_llm, inputs.get("attention_mask")
+        )
+
+        output_ids = self.llava.generate(
+            inputs_embeds=inputs_embeds,
+            attention_mask=attention_mask,
+            pixel_values=None,
+            max_new_tokens=max_new_tokens,
+            **generate_kwargs,
+        )
+        answer = self.processor.decode(output_ids[0], skip_special_tokens=True)
+        return answer, final_indices
+
 
 # ---------------------------------------------------------------------------
 # FLOPs helper
@@ -134,6 +216,8 @@ def run_llava_benchmark(
     seed: int = 42,
     device: str | None = None,
     max_new_tokens: int = 32,
+    anchor_strategy: str = "global_mean",
+    force_ocr: bool = False,
 ) -> pd.DataFrame:
     """Evaluate PAPIT, random, and unpruned LLaVA across retention ratios.
 
@@ -158,6 +242,13 @@ def run_llava_benchmark(
         Controls subsampling and per-sample random-baseline seeds.
     max_new_tokens:
         Token generation cap. 32 is sufficient for most VQA answers.
+    anchor_strategy:
+        Anchor token strategy passed to PAPITConfig: ``"global_mean"``,
+        ``"dropped_mean"``, or ``"none"``.
+    force_ocr:
+        When True, also run the OCR-forced variant (requires easyocr).
+        Adds columns ``answer_ocr``, ``vqa_acc_ocr``, ``latency_ocr_sec``,
+        and ``ocr_patch_recall`` (when OCR boxes are present).
 
     Returns
     -------
@@ -175,7 +266,11 @@ def run_llava_benchmark(
         samples = samples.sample(n=max_samples, random_state=seed).reset_index(drop=True)
 
     # Load LLaVA once and reuse across all samples / ratios.
-    cfg = PAPITConfig(retention_ratio=retention_list[0], device=device)
+    cfg = PAPITConfig(
+        retention_ratio=retention_list[0],
+        device=device,
+        anchor_strategy=anchor_strategy,
+    )
     runner = _ExtendedRunner(
         llava_model_id=llava_model_id,
         clip_model_id=clip_model_id,
@@ -232,6 +327,22 @@ def run_llava_benchmark(
             acc_papit = vqa_soft_accuracy(papit_out.answer, answer_list)
             acc_random = vqa_soft_accuracy(random_ans, answer_list)
 
+            # OCR-forced variant (optional)
+            ocr_ans: str | None = None
+            ocr_indices: list[int] = []
+            latency_ocr = float("nan")
+            if force_ocr:
+                t0 = time.perf_counter()
+                ocr_ans, ocr_indices = runner.generate_ocr_forced(
+                    image,
+                    img_path,
+                    question,
+                    k=k,
+                    grid_size=grid_size,
+                    max_new_tokens=max_new_tokens,
+                )
+                latency_ocr = time.perf_counter() - t0
+
             row: dict[str, Any] = {
                 "sample_index": int(i),  # type: ignore[arg-type]
                 "image_path": img_path,
@@ -254,6 +365,10 @@ def run_llava_benchmark(
                 "latency_unpruned_sec": latency_unpruned,
                 "latency_papit_sec": latency_papit,
                 "latency_random_sec": latency_random,
+                # OCR-forced variant
+                "answer_ocr": ocr_ans,
+                "vqa_acc_ocr": vqa_soft_accuracy(ocr_ans, answer_list) if ocr_ans is not None else float("nan"),
+                "latency_ocr_sec": latency_ocr,
             }
 
             # TextVQA patch recall (only when ocr_boxes column is present)
@@ -265,6 +380,10 @@ def run_llava_benchmark(
                 row["random_patch_recall"] = patch_recall(
                     random_indices, ocr_boxes, grid_size
                 )
+                if force_ocr and ocr_indices:
+                    row["ocr_patch_recall"] = patch_recall(
+                        ocr_indices, ocr_boxes, grid_size
+                    )
 
             rows.append(row)
 
@@ -299,7 +418,7 @@ def _aggregate(df: pd.DataFrame) -> pd.DataFrame:
             "avg_latency_papit_sec": g["latency_papit_sec"].mean(),
             "avg_latency_random_sec": g["latency_random_sec"].mean(),
         }
-        for col in ("papit_patch_recall", "random_patch_recall"):
+        for col in ("papit_patch_recall", "random_patch_recall", "vqa_acc_ocr", "ocr_patch_recall"):
             if col in g.columns:
                 row[f"avg_{col}"] = g[col].mean()
         rows.append(row)
