@@ -26,7 +26,6 @@ nohup bash scripts/download_data.sh > download.log 2>&1 &
 tail -f download.log
 
 # 5. 準備 CSVs
-source .venv/bin/activate
 python scripts/prepare_datasets.py gqa \
     --questions data/raw/gqa/val_balanced_questions.json \
     --images data/raw/gqa/images --output data/gqa_val.csv
@@ -39,14 +38,15 @@ python scripts/prepare_datasets.py textvqa \
     --images data/raw/textvqa/train_val_images \
     --max-samples 1000 --output data/textvqa_val.csv
 
-# 6. 跑實驗（背景執行，斷線不中斷）
+# 6. 跑實驗（用 tmux，斷線不中斷）
 mkdir -p logs
-nohup python scripts/run_eval.py --dataset gqa --max-samples 500 \
-    --retention 0.25 0.5 0.75 --output-dir outputs/hybrid_500 > logs/gqa.log 2>&1 &
-nohup python scripts/run_eval.py --dataset vqa_v2 --max-samples 500 \
-    --retention 0.25 0.5 0.75 --output-dir outputs/hybrid_500 > logs/vqa.log 2>&1 &
-nohup python scripts/run_eval.py --dataset textvqa --max-samples 500 \
-    --retention 0.25 0.5 0.75 --output-dir outputs/hybrid_500 > logs/textvqa.log 2>&1 &
+tmux new-session -d -s gqa     "python scripts/run_eval.py --dataset gqa     --max-samples 700 --retention 0.25 0.5 0.75 --output-dir outputs/hybrid_700 2>&1 | tee logs/gqa.log"
+tmux new-session -d -s vqa     "python scripts/run_eval.py --dataset vqa_v2  --max-samples 700 --retention 0.25 0.5 0.75 --output-dir outputs/hybrid_700 2>&1 | tee logs/vqa.log"
+tmux new-session -d -s textvqa "python scripts/run_eval.py --dataset textvqa --max-samples 700 --retention 0.25 0.5 0.75 --output-dir outputs/hybrid_700 2>&1 | tee logs/textvqa.log"
+
+# 查看所有 session / 進入看進度（Ctrl+B, D 離開）
+tmux ls
+tmux attach -t gqa
 
 # 7. 下載結果（本機執行）
 rsync -av -e "ssh -i your-key.pem" \
@@ -95,16 +95,12 @@ nvidia-smi
 ## Step 2 — 安裝環境
 
 ```bash
-# 安裝 uv
-curl -LsSf https://astral.sh/uv/install.sh | sh
-source ~/.bashrc
-
 # clone repo
 git clone https://github.com/yarikama/PAPIT.git papit
 cd papit
 
-# 安裝套件（包含 EasyOCR 和 LLaVA 依賴）
-uv sync --extra ocr --extra llava
+# 安裝套件（用系統 pip，Amazon Linux 上用 pip-3.13）
+pip-3.13 install -e ".[ocr,llava]"
 
 # HuggingFace token（避免 rate limit，可選）
 export HF_TOKEN=hf_xxx
@@ -115,14 +111,11 @@ export HF_TOKEN=hf_xxx
 ## Step 3 — 下載資料集
 
 ```bash
-source .venv/bin/activate
+# 用 tmux 背景下載，斷線不中斷（總共約 33GB，~1 小時）
+tmux new-session -d -s download "bash scripts/download_data.sh 2>&1 | tee download.log"
 
-# 用 nohup 背景下載，斷線不中斷（總共約 33GB，~1 小時）
-nohup bash scripts/download_data.sh > download.log 2>&1 &
-echo "PID: $!"
-
-# 追蹤進度
-tail -f download.log
+# 進入看進度（Ctrl+B, D 離開不中斷）
+tmux attach -t download
 
 # 確認完成
 du -sh data/raw/gqa/images/ data/raw/vqa_v2/val2014/ data/raw/textvqa/train_val_images/
@@ -134,8 +127,6 @@ du -sh data/raw/gqa/images/ data/raw/vqa_v2/val2014/ data/raw/textvqa/train_val_
 ## Step 4 — 準備 CSVs
 
 ```bash
-source .venv/bin/activate
-
 # GQA（快，~30秒）
 python scripts/prepare_datasets.py gqa \
     --questions data/raw/gqa/val_balanced_questions.json \
@@ -159,38 +150,38 @@ python scripts/prepare_datasets.py textvqa \
 
 ---
 
-## Step 5 — 主實驗：Hybrid 500 samples
+## Step 5 — 主實驗：Hybrid 700 samples
 
 **目的：** Final report 主要結果表（Table 3）。
 
 ```bash
 mkdir -p logs
 
-# 三個 dataset 同時背景執行（各自獨立的 nohup）
-nohup python scripts/run_eval.py \
-    --dataset gqa --max-samples 500 \
-    --retention 0.25 0.5 0.75 \
-    --output-dir outputs/hybrid_500 > logs/gqa.log 2>&1 &
+# 三個 dataset 各開一個 tmux session 同時跑
+tmux new-session -d -s gqa \
+    "python scripts/run_eval.py --dataset gqa --max-samples 700 \
+    --retention 0.25 0.5 0.75 --output-dir outputs/hybrid_700 2>&1 | tee logs/gqa.log"
 
-nohup python scripts/run_eval.py \
-    --dataset vqa_v2 --max-samples 500 \
-    --retention 0.25 0.5 0.75 \
-    --output-dir outputs/hybrid_500 > logs/vqa.log 2>&1 &
+tmux new-session -d -s vqa \
+    "python scripts/run_eval.py --dataset vqa_v2 --max-samples 700 \
+    --retention 0.25 0.5 0.75 --output-dir outputs/hybrid_700 2>&1 | tee logs/vqa.log"
 
-nohup python scripts/run_eval.py \
-    --dataset textvqa --max-samples 500 \
-    --retention 0.25 0.5 0.75 \
-    --output-dir outputs/hybrid_500 > logs/textvqa.log 2>&1 &
+tmux new-session -d -s textvqa \
+    "python scripts/run_eval.py --dataset textvqa --max-samples 700 \
+    --retention 0.25 0.5 0.75 --output-dir outputs/hybrid_700 2>&1 | tee logs/textvqa.log"
 
-# 追蹤進度
-tail -f logs/gqa.log
+# 查看所有 session
+tmux ls
+
+# 進入某個 session 看即時輸出（Ctrl+B, D 離開）
+tmux attach -t gqa
 ```
 
 輸出：
 ```
-outputs/hybrid_500/gqa_eval/llava_benchmark_summary.csv
-outputs/hybrid_500/vqa_v2_eval/llava_benchmark_summary.csv
-outputs/hybrid_500/textvqa_eval/llava_benchmark_summary.csv
+outputs/hybrid_700/gqa_eval/llava_benchmark_summary.csv
+outputs/hybrid_700/vqa_v2_eval/llava_benchmark_summary.csv
+outputs/hybrid_700/textvqa_eval/llava_benchmark_summary.csv
 ```
 
 ---
@@ -200,14 +191,11 @@ outputs/hybrid_500/textvqa_eval/llava_benchmark_summary.csv
 **目的：** 驗證 OCR-forced 能否補救 TextVQA accuracy gap。
 
 ```bash
-nohup python scripts/run_eval.py \
-    --dataset textvqa \
-    --force-ocr \
-    --max-samples 500 \
-    --retention 0.25 0.5 0.75 \
-    --output-dir outputs/ocr_forced_500 > logs/ocr_forced.log 2>&1 &
+tmux new-session -d -s ocr \
+    "python scripts/run_eval.py --dataset textvqa --force-ocr --max-samples 700 \
+    --retention 0.25 0.5 0.75 --output-dir outputs/ocr_forced_700 2>&1 | tee logs/ocr_forced.log"
 
-tail -f logs/ocr_forced.log
+tmux attach -t ocr
 ```
 
 ---
@@ -217,17 +205,15 @@ tail -f logs/ocr_forced.log
 **目的：** 驗證 `global_mean` 優於其他 anchor 策略。
 
 ```bash
-nohup python scripts/run_eval.py \
-    --dataset gqa --anchor dropped_mean \
-    --max-samples 300 \
-    --retention 0.25 0.5 0.75 \
-    --output-dir outputs/anchor_dropped_mean > logs/anchor_dropped.log 2>&1 &
+tmux new-session -d -s anchor_dropped \
+    "python scripts/run_eval.py --dataset gqa --anchor dropped_mean --max-samples 700 \
+    --retention 0.25 0.5 0.75 --output-dir outputs/anchor_dropped_mean 2>&1 | tee logs/anchor_dropped.log"
 
-nohup python scripts/run_eval.py \
-    --dataset gqa --anchor none \
-    --max-samples 300 \
-    --retention 0.25 0.5 0.75 \
-    --output-dir outputs/anchor_none > logs/anchor_none.log 2>&1 &
+tmux new-session -d -s anchor_none \
+    "python scripts/run_eval.py --dataset gqa --anchor none --max-samples 700 \
+    --retention 0.25 0.5 0.75 --output-dir outputs/anchor_none 2>&1 | tee logs/anchor_none.log"
+
+tmux ls  # 看所有 session 狀態
 ```
 
 ---
@@ -238,7 +224,7 @@ nohup python scripts/run_eval.py \
 
 ```bash
 python scripts/generate_figures.py \
-    --image data/raw/textvqa/train_val_images/train_images/a50551c2199738ce.jpg \
+    --image data/raw/textvqa/train_val_images/0000599864fd15b3.jpg \
     --prompt "What does the sign say?" \
     --output-dir outputs
 ```
@@ -254,8 +240,8 @@ python scripts/generate_figures.py \
 ps aux | grep run_eval | grep -v grep
 
 # 確認 CSV 存在
-ls outputs/hybrid_500/*/llava_benchmark_summary.csv
-ls outputs/ocr_forced_500/textvqa_eval/llava_benchmark_summary.csv
+ls outputs/hybrid_700/*/llava_benchmark_summary.csv
+ls outputs/ocr_forced_700/textvqa_eval/llava_benchmark_summary.csv
 ls outputs/anchor_dropped_mean/gqa_eval/llava_benchmark_summary.csv
 ls outputs/anchor_none/gqa_eval/llava_benchmark_summary.csv
 ls outputs/efficiency_benchmark.csv
@@ -267,8 +253,8 @@ ls outputs/efficiency_benchmark.csv
 
 ```bash
 # 本機執行
-rsync -av -e "ssh -i your-key.pem" \
-    ubuntu@<EC2_IP>:~/papit/outputs/ \
+rsync -av -e "ssh -i ~/kerstin_aws_key.pem" \
+    ec2-user@184.72.111.112:~/PAPIT/outputs/ \
     "/home/yuhan/workspace/comp 646/PAPIT/outputs/aws_results/"
 ```
 
@@ -277,7 +263,7 @@ rsync -av -e "ssh -i your-key.pem" \
 ```bash
 python scripts/generate_figures.py \
     --skip-efficiency \
-    --output-dir outputs/aws_results/hybrid_500
+    --output-dir outputs/aws_results/hybrid_700
 ```
 
 ---
@@ -312,8 +298,8 @@ python scripts/generate_figures.py \
 
 | 實驗 | 輸出目錄 | 用途 |
 |------|---------|------|
-| Hybrid 500 | `outputs/hybrid_500/` | Final report Table 3 主結果 |
-| OCR-forced 500 | `outputs/ocr_forced_500/` | TextVQA 分析 |
+| Hybrid 700 | `outputs/hybrid_700/` | Final report Table 3 主結果 |
+| OCR-forced 700 | `outputs/ocr_forced_700/` | TextVQA 分析 |
 | Anchor ablation | `outputs/anchor_*/` | Design choice 驗證 |
 | Efficiency | `outputs/efficiency_benchmark.csv` | Table 1 TBD 填入 |
 | 圖表 | `outputs/fig_*.pdf` | Report Figure 1/2/3 |
