@@ -100,49 +100,34 @@ if [ "$NEED_PREP" = true ]; then
     exit 0
 fi
 
-# ── Step 5: Main experiments ──────────────────────────────────────────────────
-info "=== Step 5: Main experiments (${SAMPLES} samples) ==="
+# ── Build sequential experiment commands ──────────────────────────────────────
 RUN_DIR="outputs/aws_results_${SAMPLES}_${TIMESTAMP}"
 OUT_DIR="$RUN_DIR/hybrid"
 info "Run dir: $RUN_DIR"
 
-launch "gqa" \
-    "python scripts/run_eval.py --dataset gqa --max-samples $SAMPLES \
-    --retention $RETENTION --output-dir $OUT_DIR 2>&1 | tee logs/gqa.log"
+CMDS=""
+CMDS+="python scripts/run_eval.py --dataset gqa --max-samples $SAMPLES --retention $RETENTION --output-dir $OUT_DIR 2>&1 | tee logs/gqa.log"
+CMDS+=" && python scripts/run_eval.py --dataset vqa_v2 --max-samples $SAMPLES --retention $RETENTION --output-dir $OUT_DIR 2>&1 | tee logs/vqa.log"
+CMDS+=" && python scripts/run_eval.py --dataset textvqa --max-samples $SAMPLES --retention $RETENTION --output-dir $OUT_DIR 2>&1 | tee logs/textvqa.log"
 
-launch "vqa" \
-    "python scripts/run_eval.py --dataset vqa_v2 --max-samples $SAMPLES \
-    --retention $RETENTION --output-dir $OUT_DIR 2>&1 | tee logs/vqa.log"
-
-launch "textvqa" \
-    "python scripts/run_eval.py --dataset textvqa --max-samples $SAMPLES \
-    --retention $RETENTION --output-dir $OUT_DIR 2>&1 | tee logs/textvqa.log"
-
-# ── Step 6: OCR-forced ────────────────────────────────────────────────────────
 if [ "$SKIP_OCR" = false ]; then
-    info "=== Step 6: OCR-forced TextVQA ==="
-    launch "ocr_forced" \
-        "python scripts/run_eval.py --dataset textvqa --force-ocr --max-samples $SAMPLES \
-        --retention $RETENTION --output-dir $RUN_DIR/ocr_forced 2>&1 | tee logs/ocr_forced.log"
+    CMDS+=" && python scripts/run_eval.py --dataset textvqa --force-ocr --max-samples $SAMPLES --retention $RETENTION --output-dir $RUN_DIR/ocr_forced 2>&1 | tee logs/ocr_forced.log"
 fi
 
-# ── Step 7: Anchor ablation ───────────────────────────────────────────────────
 if [ "$SKIP_ANCHOR" = false ]; then
-    info "=== Step 7: Anchor ablation ==="
-    launch "anchor_dropped" \
-        "python scripts/run_eval.py --dataset gqa --anchor dropped_mean --max-samples $SAMPLES \
-        --retention $RETENTION --output-dir $RUN_DIR/anchor_dropped_mean 2>&1 | tee logs/anchor_dropped.log"
-
-    launch "anchor_none" \
-        "python scripts/run_eval.py --dataset gqa --anchor none --max-samples $SAMPLES \
-        --retention $RETENTION --output-dir $RUN_DIR/anchor_none 2>&1 | tee logs/anchor_none.log"
+    CMDS+=" && python scripts/run_eval.py --dataset gqa --anchor dropped_mean --max-samples $SAMPLES --retention $RETENTION --output-dir $RUN_DIR/anchor_dropped_mean 2>&1 | tee logs/anchor_dropped.log"
+    CMDS+=" && python scripts/run_eval.py --dataset gqa --anchor none --max-samples $SAMPLES --retention $RETENTION --output-dir $RUN_DIR/anchor_none 2>&1 | tee logs/anchor_none.log"
 fi
+
+CMDS+=" && echo '[ALL DONE]'"
+
+# ── Launch single tmux session running all experiments sequentially ────────────
+launch "experiments" "cd $REPO_DIR && $PYTHON_ENV && $CMDS"
 
 # ── summary ───────────────────────────────────────────────────────────────────
 echo ""
-info "=== All sessions launched ==="
+info "=== Session launched ==="
 tmux ls
 echo ""
-echo "Monitor:   tmux attach -t <session>   (Ctrl+B, D to detach)"
-echo "Kill all:  tmux kill-server"
-echo "Results:   ls outputs/"
+echo "Monitor:  tmux attach -t experiments   (Ctrl+B, D to detach)"
+echo "Results:  ls $RUN_DIR/"
