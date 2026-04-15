@@ -18,6 +18,7 @@ SKIP_OCR=false
 SKIP_ANCHOR=false
 RETENTION="0.25 0.5 0.75"
 REPO_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+TIMESTAMP="$(date '+%m%d_%H%M')"
 
 # ── parse args ─────────────────────────────────────────────────────────────────
 while [[ $# -gt 0 ]]; do
@@ -101,7 +102,9 @@ fi
 
 # ── Step 5: Main experiments ──────────────────────────────────────────────────
 info "=== Step 5: Main experiments (${SAMPLES} samples) ==="
-OUT_DIR="outputs/hybrid_${SAMPLES}"
+RUN_DIR="outputs/aws_results_${SAMPLES}_${TIMESTAMP}"
+OUT_DIR="$RUN_DIR/hybrid"
+info "Run dir: $RUN_DIR"
 
 launch "gqa" \
     "python scripts/run_eval.py --dataset gqa --max-samples $SAMPLES \
@@ -120,7 +123,7 @@ if [ "$SKIP_OCR" = false ]; then
     info "=== Step 6: OCR-forced TextVQA ==="
     launch "ocr_forced" \
         "python scripts/run_eval.py --dataset textvqa --force-ocr --max-samples $SAMPLES \
-        --retention $RETENTION --output-dir outputs/ocr_forced_${SAMPLES} 2>&1 | tee logs/ocr_forced.log"
+        --retention $RETENTION --output-dir $RUN_DIR/ocr_forced 2>&1 | tee logs/ocr_forced.log"
 fi
 
 # ── Step 7: Anchor ablation ───────────────────────────────────────────────────
@@ -128,11 +131,11 @@ if [ "$SKIP_ANCHOR" = false ]; then
     info "=== Step 7: Anchor ablation ==="
     launch "anchor_dropped" \
         "python scripts/run_eval.py --dataset gqa --anchor dropped_mean --max-samples $SAMPLES \
-        --retention $RETENTION --output-dir outputs/anchor_dropped_mean 2>&1 | tee logs/anchor_dropped.log"
+        --retention $RETENTION --output-dir $RUN_DIR/anchor_dropped_mean 2>&1 | tee logs/anchor_dropped.log"
 
     launch "anchor_none" \
         "python scripts/run_eval.py --dataset gqa --anchor none --max-samples $SAMPLES \
-        --retention $RETENTION --output-dir outputs/anchor_none 2>&1 | tee logs/anchor_none.log"
+        --retention $RETENTION --output-dir $RUN_DIR/anchor_none 2>&1 | tee logs/anchor_none.log"
 fi
 
 # ── summary ───────────────────────────────────────────────────────────────────
