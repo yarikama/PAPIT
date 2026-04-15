@@ -131,15 +131,15 @@ class _ExtendedRunner(PAPITLlavaRunner):
         inputs = self.processor(images=image, text=text, return_tensors="pt")
         inputs = {key: val.to(self.device) for key, val in inputs.items()}
 
-        patch_for_proj, _ = self._extract_vit_features(inputs["pixel_values"])
+        patch_for_proj, patch_for_scoring = self._extract_vit_features(inputs["pixel_values"])
         N = patch_for_proj.shape[0]
         k = min(max(k, 1), N)
 
         # Hybrid scoring (mirrors _score_and_prune)
         if self.config.retention_ratio <= self._GRADCAM_THRESHOLD:
-            scores = self._gradcam_scores(image, prompt, N)
+            scores = self._gradcam_scores(inputs["pixel_values"], prompt, N)
         else:
-            scores = self._value_scores(image, prompt, N)
+            scores = self._cosine_scores(patch_for_scoring, prompt)
 
         _, topk_indices = torch.topk(scores, k=k, largest=True, sorted=True)
 
