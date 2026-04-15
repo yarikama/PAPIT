@@ -227,7 +227,7 @@ class PAPITLlavaRunner:
     # Retention ratio below which GradCAM outperforms value features
     # (empirically determined on GQA: GradCAM is better at k≤0.25,
     # value features are better at k≥0.5)
-    _GRADCAM_THRESHOLD: float = 0.375
+    _GRADCAM_THRESHOLD: float = 1.0
 
     def _score_and_prune(
         self,
