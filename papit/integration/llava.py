@@ -118,31 +118,21 @@ class PAPITLlavaRunner:
             Hidden state from the layer configured for LLaVA's MLP projector
             (usually -2).  CLS token removed.
         patch_for_scoring : [N, D_vit]
-            Value features from the second-to-last encoder layer's v_proj.
-            These provide better patch-level alignment with text than final
-            hidden states (cf. MaskCLIP).  CLS token removed.
+            Final-layer hidden state.  Used with CLIP visual_projection for
+            cross-modal cosine scoring.  CLS token removed.
         """
         vision_tower = self.llava.model.vision_tower
         feat_layer: int = getattr(self.llava.config, "vision_feature_layer", -2)
         llava_dtype = next(self.llava.parameters()).dtype
-        saved: dict[str, torch.Tensor] = {}
 
-        def _v_hook(module: Any, inp: Any, out: Any) -> None:
-            saved["v"] = out[0] if isinstance(out, tuple) else out
-
-        hook = vision_tower.vision_model.encoder.layers[-2].self_attn.v_proj.register_forward_hook(_v_hook)
-        try:
-            out = vision_tower(
-                pixel_values.to(dtype=llava_dtype),
-                output_hidden_states=True,
-                return_dict=True,
-            )
-        finally:
-            hook.remove()
-
+        out = vision_tower(
+            pixel_values.to(dtype=llava_dtype),
+            output_hidden_states=True,
+            return_dict=True,
+        )
         # [1, N+1, D_vit] → drop CLS → [N, D_vit]
         patch_for_projector = out.hidden_states[feat_layer][:, 1:].squeeze(0).float()
-        patch_for_scoring = saved["v"][0, 1:].float()  # value feats, drop CLS
+        patch_for_scoring = out.last_hidden_state[:, 1:].squeeze(0).float()
         return patch_for_projector, patch_for_scoring
 
     @torch.no_grad()
@@ -160,11 +150,11 @@ class PAPITLlavaRunner:
         patch_for_scoring: torch.Tensor,
         prompt: str,
     ) -> torch.Tensor:
-        """Per-patch cosine similarity using value features from the second-to-last ViT layer.
+        """Per-patch cosine similarity using LLaVA's own ViT last-layer features.
 
-        Projects patch_for_scoring (v_proj output captured in _extract_vit_features)
-        into the CLIP shared embedding space and computes cosine similarity with
-        the CLIP text embedding.
+        Projects patch_for_scoring (already computed by LLaVA's ViT) into the
+        CLIP shared embedding space and computes cosine similarity with the CLIP
+        text embedding.  No second vision forward pass or interpolation needed.
 
         Returns
         -------
@@ -234,9 +224,10 @@ class PAPITLlavaRunner:
 
         return scores
 
-    # Retention ratio below which GradCAM is used instead of cosine scoring.
-    # Set to 0.0 to always use value-feature cosine scoring (current experiment).
-    _GRADCAM_THRESHOLD: float = 0.0
+    # Retention ratio below which GradCAM outperforms value features
+    # (empirically determined on GQA: GradCAM is better at k≤0.25,
+    # value features are better at k≥0.5)
+    _GRADCAM_THRESHOLD: float = 1.0
 
     def _score_and_prune(
         self,
