@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python:*)",
+      "Bash(.venv/bin/python -c \"import jupyter_client; kspecs = jupyter_client.kernelspec.KernelSpecManager\\(\\).get_all_specs\\(\\); [print\\(k, v[''spec''][''argv''][0]\\) for k,v in kspecs.items\\(\\)]\")",
+      "Bash(python -c \":*)",
+      "Bash(ls \"/home/yuhan/workspace/comp 646/PAPIT/outputs/\"*.csv)",
+      "Bash(du -sh \"/home/yuhan/workspace/comp 646/PAPIT/data/raw/gqa/\"*)"
+    ]
+  }
+}

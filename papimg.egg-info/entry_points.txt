@@ -1,0 +1,2 @@
+[console_scripts]
+papit = papit.__main__:main
