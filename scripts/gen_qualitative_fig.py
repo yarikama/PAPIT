@@ -26,16 +26,28 @@ import torch
 from PIL import Image
 
 ROOT   = Path(__file__).resolve().parent.parent
-REPORT = ROOT / "report"
 sys.path.insert(0, str(ROOT))
 
 FONT = 11
 
-# ── Primary results directory (700-sample GradCAM run) ────────────────────────
-RESULTS_DIR = ROOT / "outputs" / "aws_results_700_0415_2355" / "hybrid"
 
-# ── Efficiency CSV (BLIP proxy) ───────────────────────────────────────────────
-EFFICIENCY_CSV = ROOT / "outputs" / "outputs" / "efficiency_benchmark.csv"
+def parse_args():
+    p = argparse.ArgumentParser()
+    p.add_argument("--results-dir", type=Path,
+                   default=ROOT / "outputs" / "aws_results_700_0415_2355" / "hybrid",
+                   help="Directory containing {gqa,vqa_v2,textvqa}_eval/ subdirs")
+    p.add_argument("--efficiency-csv", type=Path,
+                   default=ROOT / "outputs" / "aws_results_0413" / "hybrid_700" / "efficiency_benchmark.csv",
+                   help="Path to efficiency_benchmark.csv")
+    p.add_argument("--output-dir", type=Path,
+                   default=ROOT / "report",
+                   help="Directory to write output PDFs (default: report/)")
+    p.add_argument("--skip-qualitative", action="store_true",
+                   help="Skip fig_qualitative (avoids loading LLaVA)")
+    p.add_argument("--skip-efficiency",  action="store_true")
+    p.add_argument("--skip-pareto",      action="store_true")
+    p.add_argument("--device", default=None, help="cuda | cpu (default: auto)")
+    return p.parse_args()
 
 # ── Qualitative examples ──────────────────────────────────────────────────────
 # Edit to change which images appear.
@@ -87,11 +99,11 @@ def make_pruned_image(image: Image.Image, kept_indices: list[int],
 # Figure 1: fig_qualitative.pdf
 # ─────────────────────────────────────────────────────────────────────────────
 
-def gen_qualitative(device: str) -> None:
+def gen_qualitative(device: str, output_dir: Path) -> None:
     from papit.core.config import PAPITConfig
     from papit.integration.llava import PAPITLlavaRunner
 
-    out_path = REPORT / "fig_qualitative.pdf"
+    out_path = output_dir / "fig_qualitative.pdf"
     print("\n[qualitative] Loading LLaVA …")
     config = PAPITConfig(retention_ratio=RETENTION, anchor_strategy="global_mean", device=device)
     runner = PAPITLlavaRunner(config=config, device=device)
@@ -168,13 +180,13 @@ def gen_qualitative(device: str) -> None:
 # Figure 2: fig_efficiency.pdf
 # ─────────────────────────────────────────────────────────────────────────────
 
-def gen_efficiency() -> None:
-    out_path = REPORT / "fig_efficiency.pdf"
-    if not EFFICIENCY_CSV.exists():
-        print(f"[efficiency] {EFFICIENCY_CSV} not found — skipping")
+def gen_efficiency(efficiency_csv: Path, output_dir: Path) -> None:
+    out_path = output_dir / "fig_efficiency.pdf"
+    if not efficiency_csv.exists():
+        print(f"[efficiency] {efficiency_csv} not found — skipping")
         return
 
-    df = pd.read_csv(EFFICIENCY_CSV)
+    df = pd.read_csv(efficiency_csv)
     df = df[(df["force_ocr"] == 0) & (df["risk_aware"] == 0)].copy()
     df = df.sort_values("retention_ratio").reset_index(drop=True)
 
@@ -210,13 +222,37 @@ _DATASETS = {"gqa": "GQA", "vqa_v2": "VQA v2", "textvqa": "TextVQA"}
 _COLORS   = {"papit": "#e63946", "random": "#457b9d", "unpruned": "#2d6a4f"}
 
 
-def gen_pareto() -> None:
-    out_path  = REPORT / "fig_pareto.pdf"
+def _plot_pareto_ax(ax, df: "pd.DataFrame", label: str) -> None:
+    unpruned = df["avg_vqa_acc_unpruned"].iloc[0]
+    ax.axhline(unpruned * 100, color=_COLORS["unpruned"], linestyle="--",
+               linewidth=1.5, label=f"Unpruned ({unpruned*100:.1f}%)")
+    ax.plot(df["avg_relative_flops"], df["avg_vqa_acc_papit"]  * 100,
+            "o-",  color=_COLORS["papit"],  linewidth=2, markersize=6, label="PAPIT")
+    ax.plot(df["avg_relative_flops"], df["avg_vqa_acc_random"] * 100,
+            "s--", color=_COLORS["random"], linewidth=2, markersize=6, label="Random")
+    for _, row in df.iterrows():
+        k_pct = int(round(row["avg_token_keep_ratio"] * 100))
+        ax.annotate(f"{k_pct}%",
+                    xy=(row["avg_relative_flops"], row["avg_vqa_acc_papit"] * 100),
+                    xytext=(4, 4), textcoords="offset points",
+                    fontsize=9, color=_COLORS["papit"])
+    ax.set_xlabel("Relative attention FLOPs", fontsize=FONT)
+    ax.set_ylabel("VQA accuracy (%)",          fontsize=FONT)
+    ax.set_title(label,                        fontsize=FONT)
+    ax.legend(fontsize=FONT - 1)
+    ax.xaxis.grid(True, linestyle="--", alpha=0.5)
+    ax.yaxis.grid(True, linestyle="--", alpha=0.5)
+    ax.set_axisbelow(True)
+    ax.set_xlim(left=0)
+    ax.tick_params(labelsize=FONT)
+
+
+def gen_pareto(results_dir: Path, output_dir: Path) -> None:
     available = []
     for ds, label in _DATASETS.items():
-        csv = RESULTS_DIR / f"{ds}_eval" / "llava_benchmark_summary.csv"
+        csv = results_dir / f"{ds}_eval" / "llava_benchmark_summary.csv"
         if csv.exists():
-            available.append((label, csv))
+            available.append((ds, label, csv))
         else:
             print(f"[pareto] Missing {csv} — skipping {label}")
 
@@ -224,75 +260,55 @@ def gen_pareto() -> None:
         print("[pareto] No CSVs found — skipping")
         return
 
-    fig, axes = plt.subplots(1, len(available), figsize=(4.5 * len(available), 4))
-    if len(available) == 1:
-        axes = [axes]
+    # One PDF per dataset
+    for ds, label, csv in available:
+        df = pd.read_csv(csv).sort_values("avg_relative_flops")
+        fig, ax = plt.subplots(figsize=(4.5, 4))
+        _plot_pareto_ax(ax, df, label)
+        fig.suptitle("Accuracy–Efficiency Pareto (LLaVA-1.5-7B, 700 samples/dataset)",
+                     fontsize=FONT)
+        fig.tight_layout()
+        out_path = output_dir / f"fig_pareto_{ds}.pdf"
+        fig.savefig(out_path, bbox_inches="tight", dpi=150)
+        plt.close(fig)
+        print(f"[pareto] Saved → {out_path}")
 
-    for ax, (label, csv) in zip(axes, available):
-        df       = pd.read_csv(csv).sort_values("avg_relative_flops")
-        unpruned = df["avg_vqa_acc_unpruned"].iloc[0]
-
-        ax.axhline(unpruned * 100, color=_COLORS["unpruned"], linestyle="--",
-                   linewidth=1.5, label=f"Unpruned ({unpruned*100:.1f}%)")
-        ax.plot(df["avg_relative_flops"], df["avg_vqa_acc_papit"]  * 100,
-                "o-",  color=_COLORS["papit"],  linewidth=2, markersize=6, label="PAPIT")
-        ax.plot(df["avg_relative_flops"], df["avg_vqa_acc_random"] * 100,
-                "s--", color=_COLORS["random"], linewidth=2, markersize=6, label="Random")
-
-        for _, row in df.iterrows():
-            k_pct = int(round(row["avg_token_keep_ratio"] * 100))
-            ax.annotate(f"{k_pct}%",
-                        xy=(row["avg_relative_flops"], row["avg_vqa_acc_papit"] * 100),
-                        xytext=(4, 4), textcoords="offset points",
-                        fontsize=9, color=_COLORS["papit"])
-
-        ax.set_xlabel("Relative attention FLOPs", fontsize=FONT)
-        ax.set_ylabel("VQA accuracy (%)",          fontsize=FONT)
-        ax.set_title(label,                        fontsize=FONT)
-        ax.legend(fontsize=FONT - 1)
-        ax.xaxis.grid(True, linestyle="--", alpha=0.5)
-        ax.yaxis.grid(True, linestyle="--", alpha=0.5)
-        ax.set_axisbelow(True)
-        ax.set_xlim(left=0)
-        ax.tick_params(labelsize=FONT)
-
-    fig.suptitle("Accuracy–Efficiency Pareto (LLaVA-1.5-7B, 700 samples/dataset)",
-                 fontsize=FONT)
-    fig.tight_layout()
-    fig.savefig(out_path, bbox_inches="tight", dpi=150)
-    plt.close(fig)
-    print(f"[pareto] Saved → {out_path}")
+    # Combined 3-panel PDF
+    if len(available) > 1:
+        fig, axes = plt.subplots(1, len(available), figsize=(4.5 * len(available), 4))
+        for ax, (ds, label, csv) in zip(axes, available):
+            df = pd.read_csv(csv).sort_values("avg_relative_flops")
+            _plot_pareto_ax(ax, df, label)
+        fig.suptitle("Accuracy–Efficiency Pareto (LLaVA-1.5-7B, 700 samples/dataset)",
+                     fontsize=FONT)
+        fig.tight_layout()
+        out_path = output_dir / "fig_pareto.pdf"
+        fig.savefig(out_path, bbox_inches="tight", dpi=150)
+        plt.close(fig)
+        print(f"[pareto] Saved → {out_path}")
 
 
 # ─────────────────────────────────────────────────────────────────────────────
 # CLI
 # ─────────────────────────────────────────────────────────────────────────────
 
-def parse_args():
-    p = argparse.ArgumentParser()
-    p.add_argument("--skip-qualitative", action="store_true",
-                   help="Skip fig_qualitative (avoids loading LLaVA)")
-    p.add_argument("--skip-efficiency",  action="store_true")
-    p.add_argument("--skip-pareto",      action="store_true")
-    p.add_argument("--device", default=None, help="cuda | cpu (default: auto)")
-    return p.parse_args()
-
-
 def main():
     args   = parse_args()
     device = args.device or ("cuda" if torch.cuda.is_available() else "cpu")
-    REPORT.mkdir(parents=True, exist_ok=True)
-    print(f"Device : {device}")
-    print(f"Output : {REPORT}/")
+    args.output_dir.mkdir(parents=True, exist_ok=True)
+    print(f"Device     : {device}")
+    print(f"Results    : {args.results_dir}")
+    print(f"Efficiency : {args.efficiency_csv}")
+    print(f"Output     : {args.output_dir}/")
 
     if not args.skip_efficiency:
-        gen_efficiency()
+        gen_efficiency(args.efficiency_csv, args.output_dir)
 
     if not args.skip_pareto:
-        gen_pareto()
+        gen_pareto(args.results_dir, args.output_dir)
 
     if not args.skip_qualitative:
-        gen_qualitative(device)
+        gen_qualitative(device, args.output_dir)
 
     print("\nAll done.")
 

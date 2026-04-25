@@ -119,6 +119,8 @@ if [ "$SKIP_ANCHOR" = false ]; then
     CMDS+=" && python scripts/run_eval.py --dataset gqa --anchor none --max-samples $SAMPLES --retention $RETENTION --output-dir $RUN_DIR/anchor_none 2>&1 | tee logs/anchor_none.log"
 fi
 
+CMDS+=" && python scripts/run_efficiency_benchmark.py --output-dir $OUT_DIR 2>&1 | tee logs/efficiency.log"
+CMDS+=" && python scripts/gen_qualitative_fig.py --results-dir $OUT_DIR --efficiency-csv $OUT_DIR/efficiency_benchmark.csv --output-dir $OUT_DIR 2>&1 | tee logs/figures.log"
 CMDS+=" && echo '[ALL DONE]'"
 
 # ── Launch single tmux session running all experiments sequentially ────────────
