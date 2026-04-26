@@ -60,9 +60,9 @@ EXAMPLES = [
         "black",
     ),
     (
-        str(ROOT / "data/raw/gqa/images/2383075.jpg"),
-        "What is the color of the large umbrella?",
-        "orange",
+        str(ROOT / "data/raw/gqa/images/2372357.jpg"),
+        "What is the animal that is walking on the ground?",
+        "giraffe",
     ),
 ]
 
