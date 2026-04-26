@@ -55,18 +55,18 @@ def parse_args():
 # GQA:     data/raw/gqa/images/<id>.jpg
 EXAMPLES = [
     (
-        str(ROOT / "data/raw/textvqa/train_images/fa9ffd5aca1e4e51.jpg"),
-        "What does the sign in the right window say?",
-        "bud light",
+        str(ROOT / "data/raw/gqa/images/2349976.jpg"),
+        "What color is the jersey the boy is wearing?",
+        "black",
     ),
     (
-        str(ROOT / "data/raw/textvqa/train_images/de1abfcce50ab798.jpg"),
-        "What is the top word on the sign on the left?",
-        "krainerwurst",
+        str(ROOT / "data/raw/gqa/images/2383075.jpg"),
+        "What is the color of the large umbrella?",
+        "orange",
     ),
 ]
 
-RETENTION = 0.75
+RETENTION = 0.50
 
 
 # ─────────────────────────────────────────────────────────────────────────────
