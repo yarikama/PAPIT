@@ -55,14 +55,14 @@ def parse_args():
 # GQA:     data/raw/gqa/images/<id>.jpg
 EXAMPLES = [
     (
-        str(ROOT / "data/raw/gqa/images/2349976.jpg"),
-        "What color is the jersey the boy is wearing?",
-        "black",
+        str(ROOT / "data/raw/textvqa/train_val_images/train_images/fa9ffd5aca1e4e51.jpg"),
+        "What does the sign in the right window say?",
+        "bud light",
     ),
     (
-        str(ROOT / "data/raw/gqa/images/2371845.jpg"),
-        "What vegetable is to the right of the tomato?",
-        "lettuce",
+        str(ROOT / "data/raw/textvqa/train_val_images/train_images/de1abfcce50ab798.jpg"),
+        "What is the top word on the sign on the left?",
+        "krainerwurst",
     ),
 ]
 
@@ -110,7 +110,8 @@ def gen_qualitative(device: str, output_dir: Path) -> None:
 
     n = len(EXAMPLES)
     plt.rcParams.update({"font.size": FONT})
-    fig, axes = plt.subplots(n * 2, 2, figsize=(7, 4.5 * n))
+    # Layout: 2 rows × (n*2) cols — examples side by side
+    fig, axes = plt.subplots(2, n * 2, figsize=(7 * n, 5))
 
     for ex_idx, (img_path, prompt, answer) in enumerate(EXAMPLES):
         image = Image.open(img_path).convert("RGB")
@@ -134,40 +135,40 @@ def gen_qualitative(device: str, output_dir: Path) -> None:
         random.seed(42)
         rand_indices = random.sample(range(N), k)
 
-        row0, row1 = ex_idx * 2, ex_idx * 2 + 1
+        col0, col1 = ex_idx * 2, ex_idx * 2 + 1
 
-        axes[row0, 0].imshow(image)
-        axes[row0, 0].set_title("Original image", fontsize=FONT, fontweight="bold")
-        axes[row0, 0].axis("off")
+        axes[0, col0].imshow(image)
+        axes[0, col0].set_title("Original image", fontsize=FONT, fontweight="bold")
+        axes[0, col0].axis("off")
 
         hmap = scores_to_heatmap(scores_gc, grid_size, grid_size)
-        axes[row0, 1].imshow(image)
-        im = axes[row0, 1].imshow(
+        axes[0, col1].imshow(image)
+        im = axes[0, col1].imshow(
             hmap, cmap="jet", alpha=0.55,
             extent=[0, image.width, image.height, 0], aspect="auto",
         )
-        axes[row0, 1].set_title("GradCAM saliency", fontsize=FONT, fontweight="bold")
-        axes[row0, 1].axis("off")
-        plt.colorbar(im, ax=axes[row0, 1], fraction=0.046, pad=0.02)
+        axes[0, col1].set_title("GradCAM saliency", fontsize=FONT, fontweight="bold")
+        axes[0, col1].axis("off")
+        plt.colorbar(im, ax=axes[0, col1], fraction=0.046, pad=0.02)
 
-        axes[row1, 0].imshow(make_pruned_image(image, info.selected_indices, grid_size))
-        axes[row1, 0].set_title(
+        axes[1, col0].imshow(make_pruned_image(image, info.selected_indices, grid_size))
+        axes[1, col0].set_title(
             f"PAPIT  (k={RETENTION:.0%}, {k}/{N} patches)",
             fontsize=FONT, fontweight="bold",
         )
-        axes[row1, 0].axis("off")
+        axes[1, col0].axis("off")
 
-        axes[row1, 1].imshow(make_pruned_image(image, rand_indices, grid_size))
-        axes[row1, 1].set_title(
+        axes[1, col1].imshow(make_pruned_image(image, rand_indices, grid_size))
+        axes[1, col1].set_title(
             f"Random (k={RETENTION:.0%}, {k}/{N} patches)",
             fontsize=FONT, fontweight="bold",
         )
-        axes[row1, 1].axis("off")
+        axes[1, col1].axis("off")
 
         fig.text(
-            0.5, 1.0 - ex_idx / n - 0.01,
+            0.25 + ex_idx * 0.5, 1.01,
             f'Prompt: "{prompt}"  →  PAPIT: {out.answer!r}',
-            ha="center", va="top", fontsize=FONT, style="italic", color="#333333",
+            ha="center", va="bottom", fontsize=FONT, style="italic", color="#333333",
         )
 
     plt.tight_layout(rect=[0, 0, 1, 0.97])
