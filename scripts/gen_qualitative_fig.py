@@ -60,9 +60,9 @@ EXAMPLES = [
         "black",
     ),
     (
-        str(ROOT / "data/raw/gqa/images/2372357.jpg"),
-        "What is the animal that is walking on the ground?",
-        "giraffe",
+        str(ROOT / "data/raw/gqa/images/2371845.jpg"),
+        "What vegetable is to the right of the tomato?",
+        "lettuce",
     ),
 ]
 
@@ -145,7 +145,7 @@ def gen_qualitative(device: str, output_dir: Path) -> None:
         axes[0, col1].imshow(image)
         im = axes[0, col1].imshow(
             hmap, cmap="jet", alpha=0.55,
-            extent=[0, image.width, image.height, 0], aspect="auto",
+            extent=[0, image.width, image.height, 0],
         )
         axes[0, col1].set_title("GradCAM saliency", fontsize=FONT, fontweight="bold")
         axes[0, col1].axis("off")
