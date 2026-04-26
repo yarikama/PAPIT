@@ -55,12 +55,12 @@ def parse_args():
 # GQA:     data/raw/gqa/images/<id>.jpg
 EXAMPLES = [
     (
-        str(ROOT / "data/raw/textvqa/train_val_images/train_images/fa9ffd5aca1e4e51.jpg"),
+        str(ROOT / "data/raw/textvqa/train_images/fa9ffd5aca1e4e51.jpg"),
         "What does the sign in the right window say?",
         "bud light",
     ),
     (
-        str(ROOT / "data/raw/textvqa/train_val_images/train_images/de1abfcce50ab798.jpg"),
+        str(ROOT / "data/raw/textvqa/train_images/de1abfcce50ab798.jpg"),
         "What is the top word on the sign on the left?",
         "krainerwurst",
     ),
