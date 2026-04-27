@@ -105,59 +105,66 @@ query-conditioned and requires no training.
 \subsection{Pipeline Overview}
 
 Figure~\ref{fig:pipeline} shows the three-stage pipeline.
+An image and prompt are first encoded by the ViT and CLIP respectively; GradCAM scoring then selects the top-$k$ most relevant patches; the pruned tokens are projected by LLaVA's MLP projector and fed to the LLM to generate an answer.
 
 % ── TikZ pipeline ─────────────────────────────────────────
-\begin{figure*}[t]
+\begin{figure}[htbp]
 \centering
-\resizebox{\textwidth}{!}{%
 \begin{tikzpicture}[
-  node distance = 0.40cm and 0.40cm,
+  node distance = 0.45cm and 0.65cm,
   box/.style    = {rectangle, rounded corners=2pt, draw=gray!55,
-                   fill=#1, text width=1.60cm, align=center,
-                   minimum height=0.58cm, font=\scriptsize},
+                   fill=#1, text width=1.55cm, align=center,
+                   minimum height=0.55cm, font=\scriptsize},
   iobox/.style  = {rectangle, rounded corners=2pt, draw=gray!55,
-                   fill=cgray, text width=1.20cm, align=center,
-                   minimum height=0.58cm, font=\scriptsize\itshape},
+                   fill=cgray, text width=1.30cm, align=center,
+                   minimum height=0.55cm, font=\scriptsize\itshape},
   arr/.style    = {-Stealth, thick, gray!65},
   sublbl/.style = {font=\tiny\itshape},
 ]
-\node[iobox]                      (img)   {Image};
-\node[iobox, below=0.80cm of img] (txt)   {Prompt};
-\node[box=cblue, right=of img]    (vit)   {ViT\\Tokenizer};
-\node[box=cblue, right=of txt]    (clip)  {CLIP\\Encoder};
-\node[box=cblue, right=of vit]    (vtok)  {Patch\\Tokens $V$};
-\node[box=cblue, right=of clip]   (temb)  {Text Emb.\ $T$};
-\node[box=cred,  right=1.0cm of vtok, yshift=-0.40cm] (score){GradCAM\\Score};
-\node[box=cred,  right=0.45cm of score]               (topk) {Top-$k$\\+ Anchor};
-\node[box=cgreen, right=0.45cm of topk]               (mlp)  {MLP\\Proj.};
-\node[box=cgreen, right=0.40cm of mlp]                (llava){LLaVA};
-\node[iobox,      right=0.40cm of llava]              (out)  {Answer};
+% Row 1: inputs
+\node[iobox]                       (img)  {Image};
+\node[iobox, right=0.65cm of img]  (txt)  {Prompt};
+% Row 2: encoders
+\node[box=cblue, below=0.45cm of img]  (vit)  {ViT\\Encoder};
+\node[box=cblue, below=0.45cm of txt]  (clip) {CLIP\\Encoder};
+% Row 3: embeddings
+\node[box=cblue, below=0.45cm of vit]  (vtok) {Patch\\Tokens $V$};
+\node[box=cblue, below=0.45cm of clip] (temb) {Text Emb.\ $T$};
+% Row 4–5: pruning (centred between the two columns)
+\node[box=cred, below=1.1cm of $(vtok)!0.5!(temb)$] (score){GradCAM\\Score};
+\node[box=cred, below=0.45cm of score]               (topk) {Top-$k$\\+ Anchor};
+% Row 6–8: LLM
+\node[box=cgreen, below=1.1cm of topk]  (mlp)  {MLP\\Proj.};
+\node[box=cgreen, below=0.45cm of mlp]   (llava){LLaVA};
+\node[iobox,      below=0.45cm of llava] (out)  {Answer};
+% Arrows
 \draw[arr] (img)  -- (vit);
 \draw[arr] (vit)  -- (vtok);
 \draw[arr] (txt)  -- (clip);
 \draw[arr] (clip) -- (temb);
-\draw[arr] (vtok.east) to[out=0,in=135] (score.north west);
-\draw[arr] (temb.east) to[out=0,in=225] (score.south west);
+\draw[arr] (vtok.south) to[out=270,in=135] (score.north west);
+\draw[arr] (temb.south) to[out=270,in=45]  (score.north east);
 \draw[arr] (score) -- (topk);
-\draw[arr] (topk)  -- node[above, sublbl]{$V_{\text{pruned}}$} (mlp);
+\draw[arr] (topk)  -- node[right, font=\scriptsize\itshape]{$V_{\text{pruned}}$} (mlp);
 \draw[arr] (mlp)   -- (llava);
 \draw[arr] (llava) -- (out);
+% Background stage boxes
 \begin{pgfonlayer}{background}
   \node[draw=blue!30, fill=blue!4, rounded corners=4pt,
         fit=(img)(vit)(vtok)(txt)(clip)(temb),
-        label={[font=\scriptsize\bfseries, blue!60]above:Stage 1 — Feature Extraction}] {};
+        label={[font=\scriptsize\bfseries, blue!60]right:Stage 1 — Feature Extraction}] {};
   \node[draw=red!30, fill=red!4, rounded corners=4pt,
         fit=(score)(topk),
-        label={[font=\scriptsize\bfseries, red!60]above:Stage 2 — Pruning}] {};
+        label={[font=\scriptsize\bfseries, red!60]right:Stage 2 — Pruning}] {};
   \node[draw=green!50, fill=green!6, rounded corners=4pt,
         fit=(mlp)(llava)(out),
-        label={[font=\scriptsize\bfseries, green!50!black]above:Stage 3 — LLM}] {};
+        label={[font=\scriptsize\bfseries, green!50!black]right:Stage 3 — LLM}] {};
 \end{pgfonlayer}
-\end{tikzpicture}}
+\end{tikzpicture}
 \caption{PAPIT pipeline. Pruning happens between the ViT and the LLaVA
          MLP projector, requiring no modification to the LLM weights.}
 \label{fig:pipeline}
-\end{figure*}
+\end{figure}
 
 \subsection{Cross-Modal Scoring: GradCAM Saliency}
 
