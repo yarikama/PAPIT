@@ -71,6 +71,7 @@ class PAPITLlavaRunner:
         clip_model_id: str = "openai/clip-vit-large-patch14",
         config: PAPITConfig | None = None,
         device: str | None = None,
+        quantization_config=None,
     ) -> None:
         from transformers import AutoProcessor, LlavaForConditionalGeneration
 
@@ -79,11 +80,16 @@ class PAPITLlavaRunner:
 
         # --- LLaVA ---------------------------------------------------------
         dtype = torch.float16 if self.device == "cuda" else torch.float32
+        load_kwargs: dict = dict(
+            torch_dtype=dtype,
+            device_map="auto" if self.device == "cuda" else None,
+        )
+        if quantization_config is not None:
+            load_kwargs["quantization_config"] = quantization_config
         self.llava: LlavaForConditionalGeneration = (
             LlavaForConditionalGeneration.from_pretrained(
                 llava_model_id,
-                torch_dtype=dtype,
-                device_map="auto" if self.device == "cuda" else None,
+                **load_kwargs,
             ).eval()
         )
         self.processor = AutoProcessor.from_pretrained(llava_model_id)
@@ -109,8 +115,8 @@ class PAPITLlavaRunner:
     @torch.no_grad()
     def _extract_vit_features(
         self, pixel_values: torch.Tensor
-    ) -> tuple[torch.Tensor, torch.Tensor]:
-        """Run LLaVA's vision tower once and return two feature sets.
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        """Run LLaVA's vision tower once and return three feature sets.
 
         Returns
         -------
@@ -120,20 +126,33 @@ class PAPITLlavaRunner:
         patch_for_scoring : [N, D_vit]
             Final-layer hidden state.  Used with CLIP visual_projection for
             cross-modal cosine scoring.  CLS token removed.
+        v_feats : [N, D_vit]
+            Value-projection outputs from the last ViT attention layer.
+            Captured for free during the same forward pass; used by
+            ``scoring_mode="value_free"`` to avoid an extra forward pass.
+            CLS token removed.
         """
         vision_tower = self.llava.model.vision_tower
         feat_layer: int = getattr(self.llava.config, "vision_feature_layer", -2)
         llava_dtype = next(self.llava.parameters()).dtype
 
-        out = vision_tower(
-            pixel_values.to(dtype=llava_dtype),
-            output_hidden_states=True,
-            return_dict=True,
-        )
+        saved_v: dict[str, torch.Tensor] = {}
+        v_hook = vision_tower.vision_model.encoder.layers[-1].self_attn.v_proj \
+            .register_forward_hook(lambda m, inp, out: saved_v.update({"v": out}))
+        try:
+            out = vision_tower(
+                pixel_values.to(dtype=llava_dtype),
+                output_hidden_states=True,
+                return_dict=True,
+            )
+        finally:
+            v_hook.remove()
+
         # [1, N+1, D_vit] → drop CLS → [N, D_vit]
         patch_for_projector = out.hidden_states[feat_layer][:, 1:].squeeze(0).float()
         patch_for_scoring = out.last_hidden_state[:, 1:].squeeze(0).float()
-        return patch_for_projector, patch_for_scoring
+        v_feats = saved_v["v"][0, 1:, :].float()  # drop CLS token
+        return patch_for_projector, patch_for_scoring, v_feats
 
     @torch.no_grad()
     def _get_text_embedding(self, prompt: str) -> torch.Tensor:
@@ -144,6 +163,29 @@ class PAPITLlavaRunner:
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
         text_out = self.text_model(**inputs, return_dict=True)
         return self.text_projection(text_out.pooler_output).squeeze(0)
+
+    @torch.no_grad()
+    def _value_scores_free(
+        self, v_feats: torch.Tensor, prompt: str
+    ) -> torch.Tensor:
+        """Per-patch scoring using v_proj values captured during the existing ViT forward.
+
+        Projects the value vectors through CLIP's visual_projection into the
+        shared embedding space and computes cosine similarity with the text
+        embedding.  No extra forward pass is required — v_feats are produced
+        for free as a side-effect of ``_extract_vit_features``.
+
+        Returns
+        -------
+        scores : [N] float32 tensor on self.device
+        """
+        text_emb = self._get_text_embedding(prompt)  # [D_clip]
+        proj_dtype = next(self.visual_projection.parameters()).dtype
+        clip_feats = self.visual_projection(v_feats.to(proj_dtype))  # [N, D_clip]
+        return (
+            F.normalize(clip_feats.float(), dim=-1)
+            @ F.normalize(text_emb.float(), dim=-1)
+        )  # [N]
 
     def _cosine_scores(
         self,
@@ -233,20 +275,23 @@ class PAPITLlavaRunner:
         self,
         patch_for_projector: torch.Tensor,
         patch_for_scoring: torch.Tensor,
+        v_feats: torch.Tensor,
         pixel_values: torch.Tensor,
         prompt: str,
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         """Return ``(pruned_vit_features [k+anchor, D_vit], selected_indices [k], scores [N])``.
 
-        Hybrid scoring: GradCAM on LLaVA's own ViT for aggressive pruning
-        (retention ≤ 37.5%), cosine similarity on patch_for_scoring otherwise.
-        Both methods operate at LLaVA's native patch resolution — no separate
-        CLIP vision encoder and no interpolation required.
+        Scoring strategy is selected by ``config.scoring_mode``:
+        - ``"gradcam"``    : GradCAM backward on LLaVA's own ViT (~100 ms extra overhead).
+        - ``"value_free"`` : value-feature cosine scoring using v_feats captured during the
+                             existing ViT forward pass (~0 ms extra overhead).
         """
         N = patch_for_projector.shape[0]
         k = max(1, int(round(N * self.config.retention_ratio)))
 
-        if self.config.retention_ratio <= self._GRADCAM_THRESHOLD:
+        if self.config.scoring_mode == "value_free":
+            scores = self._value_scores_free(v_feats, prompt)  # [N]
+        elif self.config.retention_ratio <= self._GRADCAM_THRESHOLD:
             scores = self._gradcam_scores(pixel_values, prompt, N)  # [N]
         else:
             scores = self._cosine_scores(patch_for_scoring, prompt)  # [N]
@@ -353,6 +398,11 @@ class PAPITLlavaRunner:
         except Exception:
             return f"USER: <image>\n{vqa_prompt}\nASSISTANT:"
 
+    def _decode_generated_tokens(self, output_ids: torch.Tensor, input_len: int) -> str:
+        """Decode only newly generated tokens, excluding prompt/image prefix."""
+        answer = self.processor.decode(output_ids[0][input_len:], skip_special_tokens=True)
+        return answer.strip()
+
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
@@ -389,13 +439,13 @@ class PAPITLlavaRunner:
         inputs = {k: v.to(self.device) for k, v in inputs.items()}
 
         # 1. Extract ViT features (vision tower runs once).
-        patch_for_proj, patch_for_score = self._extract_vit_features(
+        patch_for_proj, patch_for_score, v_feats = self._extract_vit_features(
             inputs["pixel_values"]
         )
 
-        # 2. Score patches and select top-k via GradCAM / cosine similarity.
+        # 2. Score patches and select top-k.
         pruned_vit, selected_indices, all_scores = self._score_and_prune(
-            patch_for_proj, patch_for_score, inputs["pixel_values"], prompt
+            patch_for_proj, patch_for_score, v_feats, inputs["pixel_values"], prompt
         )
 
         # 3. Project pruned ViT features through LLaVA's MLP projector.
@@ -416,8 +466,8 @@ class PAPITLlavaRunner:
             max_new_tokens=max_new_tokens,
             **generate_kwargs,
         )
-
-        answer = self.processor.decode(output_ids[0], skip_special_tokens=True)
+        input_len = int(attention_mask.shape[1])
+        answer = self._decode_generated_tokens(output_ids, input_len)
 
         N = patch_for_proj.shape[0]
         k_actual = int(selected_indices.shape[0])
@@ -454,7 +504,7 @@ class PAPITLlavaRunner:
         output_ids = self.llava.generate(
             **inputs, max_new_tokens=max_new_tokens, **generate_kwargs
         )
-        return self.processor.decode(output_ids[0][input_len:], skip_special_tokens=True)
+        return self._decode_generated_tokens(output_ids, int(input_len))
 
     def compare(
         self,

@@ -53,11 +53,25 @@ def vqa_soft_accuracy(pred: str, answer_list: list[str]) -> float:
     """VQA soft accuracy.
 
     For multi-annotator datasets (VQA v2, TextVQA): min(count_matching / 3, 1.0).
-    For single-answer datasets (GQA): exact match (answer_list has 1 element).
+    For single-answer datasets (GQA): lenient match — counts as correct if the
+    expected answer word(s) appear as a token sequence inside the prediction.
+    This handles LLMs that answer in full sentences ("The car is blue.") rather
+    than single words ("blue"), which is common with 4-bit quantised models.
     """
     pred_norm = normalize_text(pred)
     if len(answer_list) == 1:
-        return 1.0 if pred_norm == normalize_text(answer_list[0]) else 0.0
+        gold_norm = normalize_text(answer_list[0])
+        # Exact match first (fast path)
+        if pred_norm == gold_norm:
+            return 1.0
+        # Lenient: gold tokens appear as a contiguous substring in prediction
+        gold_tokens = gold_norm.split()
+        pred_tokens = pred_norm.split()
+        n = len(gold_tokens)
+        for i in range(len(pred_tokens) - n + 1):
+            if pred_tokens[i:i + n] == gold_tokens:
+                return 1.0
+        return 0.0
     count = sum(1 for a in answer_list if normalize_text(a) == pred_norm)
     return min(count / 3.0, 1.0)
 

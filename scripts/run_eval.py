@@ -11,8 +11,12 @@ Usage:
 """
 
 import argparse
+import json
 import logging
+import platform
+import subprocess
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 # ── logging ──────────────────────────────────────────────────────────────────
@@ -25,6 +29,48 @@ logging.basicConfig(
     ],
 )
 log = logging.getLogger(__name__)
+
+
+def _git_revision(repo_dir: Path) -> str:
+    """Return git commit hash for traceability; empty if unavailable."""
+    try:
+        return subprocess.check_output(
+            ["git", "-C", str(repo_dir), "rev-parse", "HEAD"],
+            text=True,
+        ).strip()
+    except Exception:
+        return ""
+
+
+def _write_run_metadata(
+    output_eval_dir: Path,
+    dataset: str,
+    csv_path: Path,
+    args: argparse.Namespace,
+    device: str,
+) -> None:
+    """Persist run config so summary CSVs are unambiguous and reproducible."""
+    repo_dir = Path(__file__).parent.parent.resolve()
+    metadata = {
+        "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+        "dataset": dataset,
+        "dataset_csv": str(csv_path),
+        "output_dir": str(output_eval_dir),
+        "retention": [float(r) for r in args.retention],
+        "max_samples": args.max_samples,
+        "llava_model": args.llava_model,
+        "clip_model": args.clip_model,
+        "anchor": args.anchor,
+        "force_ocr": bool(args.force_ocr),
+        "max_new_tokens": int(args.max_new_tokens),
+        "device": device,
+        "platform": platform.platform(),
+        "python": sys.version,
+        "git_commit": _git_revision(repo_dir),
+        "argv": sys.argv,
+    }
+    with (output_eval_dir / "run_metadata.json").open("w", encoding="utf-8") as f:
+        json.dump(metadata, f, indent=2)
 
 
 # ── args ─────────────────────────────────────────────────────────────────────
@@ -180,6 +226,8 @@ def run_benchmark(dataset: str, csv_path: Path, output_dir: Path, args, device: 
     log.info(f"  Output:    {out}")
     log.info(f"  Retention: {args.retention}")
     log.info(f"  Samples:   {args.max_samples or 'all'}")
+
+    _write_run_metadata(out, dataset, csv_path, args, device)
 
     results = run_llava_benchmark(
         dataset_csv=str(csv_path),

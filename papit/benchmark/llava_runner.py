@@ -63,7 +63,7 @@ class _ExtendedRunner(PAPITLlavaRunner):
         inputs = self.processor(images=image, text=text, return_tensors="pt")
         inputs = {key: val.to(self.device) for key, val in inputs.items()}
 
-        patch_for_proj, _ = self._extract_vit_features(inputs["pixel_values"])
+        patch_for_proj, _, _v = self._extract_vit_features(inputs["pixel_values"])
         N = patch_for_proj.shape[0]
         k = min(max(k, 1), N)
 
@@ -101,7 +101,8 @@ class _ExtendedRunner(PAPITLlavaRunner):
             max_new_tokens=max_new_tokens,
             **generate_kwargs,
         )
-        answer = self.processor.decode(output_ids[0], skip_special_tokens=True)
+        input_len = int(attention_mask.shape[1])
+        answer = self._decode_generated_tokens(output_ids, input_len)
         return answer, indices.cpu().tolist()
 
     @torch.no_grad()
@@ -131,7 +132,7 @@ class _ExtendedRunner(PAPITLlavaRunner):
         inputs = self.processor(images=image, text=text, return_tensors="pt")
         inputs = {key: val.to(self.device) for key, val in inputs.items()}
 
-        patch_for_proj, patch_for_scoring = self._extract_vit_features(inputs["pixel_values"])
+        patch_for_proj, patch_for_scoring, v_feats = self._extract_vit_features(inputs["pixel_values"])
         N = patch_for_proj.shape[0]
         k = min(max(k, 1), N)
 
@@ -183,7 +184,8 @@ class _ExtendedRunner(PAPITLlavaRunner):
             max_new_tokens=max_new_tokens,
             **generate_kwargs,
         )
-        answer = self.processor.decode(output_ids[0], skip_special_tokens=True)
+        input_len = int(attention_mask.shape[1])
+        answer = self._decode_generated_tokens(output_ids, input_len)
         return answer, final_indices
 
 

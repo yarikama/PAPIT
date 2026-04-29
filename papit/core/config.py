@@ -6,6 +6,10 @@ from typing import Literal
 import torch
 
 AnchorStrategy = Literal["none", "global_mean", "dropped_mean"]
+# gradcam    : GradCAM backward through LLaVA's ViT (~100 ms overhead, highest accuracy at k≤25%)
+# value_free : value-feature cosine scoring using v_proj values captured during the
+#              already-running ViT forward pass (~0 ms extra overhead beyond text encoding)
+ScoringMode = Literal["gradcam", "value_free"]
 
 
 @dataclass(slots=True)
@@ -14,6 +18,7 @@ class PAPITConfig:
     retention_ratio: float = 0.5
     anchor_strategy: AnchorStrategy = "global_mean"
     device: str = "cuda" if torch.cuda.is_available() else "cpu"
+    scoring_mode: ScoringMode = "gradcam"
 
 
 @dataclass(slots=True)
