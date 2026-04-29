@@ -273,9 +273,14 @@ text tokens,
   \label{eq:flops}
 \end{equation}
 giving a $10\times$ attention-FLOP reduction at $k{=}25\%$ ($n{=}576$).
-The PAPIT-Distill predictor itself adds $\approx1.5$\,ms per image
-on g5.2xlarge (single CPU-GPU MLP forward), making total
-scoring overhead negligible compared to the ViT forward.
+\textbf{Wall-clock scoring latency} on g5.2xlarge (A10G, 20 samples,
+mean $\pm$\,std, retention $0.5$): random $0.07{\pm}0.00$\,ms,
+PAPIT-Distill $\mathbf{0.43{\pm}0.00}$\,ms, PAPIT-CLIP
+(GradCAM) $65.23{\pm}6.08$\,ms, two-pass Oracle L=16
+$216.17{\pm}1.17$\,ms. PAPIT-Distill is therefore
+$\sim\!150\times$ faster than PAPIT-CLIP and $\sim\!500\times$ faster
+than the oracle, while delivering an accuracy gain comparable to the
+oracle (Section~\ref{sec:results-distill}).
 
 % ============================================================
 \section{Experiments}
