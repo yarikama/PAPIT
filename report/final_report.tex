@@ -339,6 +339,18 @@ layer-$16$ attention, prune, re-generate.
   \label{fig:qualitative}
 \end{figure}
 
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth]{fig_pareto.pdf}
+  \caption{\textbf{Accuracy--FLOPs Pareto on LLaVA-1.5-7B}, $N{=}100$
+  per dataset. PAPIT-Distill (red diamond) dominates random and
+  PAPIT-CLIP across all retentions and benchmarks; on TextVQA at
+  $k\!=\!25\%$ ($\sim\!10\times$ FLOP reduction) it essentially
+  recovers Unpruned. Annotations on each x-tick give the
+  retention $k$.}
+  \label{fig:pareto}
+\end{figure*}
+
 \begin{table}[t]
 \centering
 \small
