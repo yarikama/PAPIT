@@ -44,46 +44,74 @@
 % ============================================================
 \begin{abstract}
 Multimodal Large Language Models (MLLMs) such as LLaVA encode images
-as hundreds of visual patch tokens, most of which are irrelevant to the
-user's query.
-We propose \textbf{PAPIT} (\textbf{P}rompt-\textbf{A}ware \textbf{P}runing
-for \textbf{I}mage \textbf{T}okens), a training-free token pruning framework
-that scores visual patch tokens against the user's text prompt using
-GradCAM saliency on LLaVA's own vision tower, retaining only the
-top-$k$ most relevant tokens before LLaVA inference.
-Efficiency experiments confirm that pruning to 25\% of tokens reduces
-attention FLOPs by 90\% with negligible pruning overhead.
-Accuracy evaluation across three benchmarks (700 samples each) shows
-PAPIT consistently matches random pruning at $k{=}75\%$: on GQA it reaches 69.7\%
-vs random 70.1\% ($-$0.4 points); on VQA~v2 it achieves
-74.8\% vs random 75.8\% ($-$1.0 points); on TextVQA it achieves 42.9\%
-vs random 42.0\% ($+$0.9 points).
-These results demonstrate that training-free token pruning can reduce
-LLaVA inference cost by up to 90\%, with accuracy loss within 2.3 points
-of the unpruned baseline on GQA and VQA~v2, and 6.1 points on TextVQA.
+as hundreds of visual patch tokens, most of which are irrelevant to a
+given user query. A natural hypothesis is that CLIP-derived
+cross-modal saliency, which is already query-conditioned and requires
+no training, can identify the relevant tokens. We test this
+hypothesis with \textbf{PAPIT} (\textbf{P}rompt-\textbf{A}ware
+\textbf{P}runing for \textbf{I}mage \textbf{T}okens), a training-free
+pipeline that scores visual patches against the user's prompt using
+GradCAM saliency on LLaVA's own vision tower and retains only the
+top-$k$ most relevant tokens before LLaVA inference. Efficiency
+experiments confirm a 41--90\% reduction in attention FLOPs with
+negligible scoring overhead. However, on three VQA benchmarks (700
+samples each), PAPIT only matches a query-agnostic random baseline:
+GQA 69.7\% vs.\ 70.1\%, VQA~v2 74.8\% vs.\ 75.8\%, TextVQA 42.9\% vs.\
+42.0\% at $k{=}75\%$. To explain this, we directly measure the
+alignment between PAPIT's GradCAM scores and LLaVA's internal
+attention over the 576 image tokens on 100 samples per benchmark,
+and find on all three datasets a per-image Spearman $\rho \approx 0$
+with top-$10\%$ Jaccard \emph{below} the uniform-random baseline. Our main contribution is therefore a
+quantitative \emph{negative result}: CLIP-aligned saliency carries
+essentially no information about which patches the LLM relies on,
+which we argue rules out an entire family of training-free
+prompt-aware pruning approaches and motivates LLM-internal scoring
+signals (e.g., FastV-style attention).
 \end{abstract}
 
 % ============================================================
 \section{Introduction}
 
-LLaVA-1.5 processes a 336$\times$336 image as a $24\!\times\!24 = 576$
-patch token grid via a CLIP ViT-L/14 vision encoder.
-Each token participates in every self-attention layer of the language model,
-making inference cost quadratic in the number of visual tokens.
-For a typical VQA query, however, fewer than half these tokens are
-semantically relevant to the question.
+LLaVA-1.5~\cite{liu2024llava15} processes a 336$\times$336 image as a
+$24\!\times\!24 = 576$ patch token grid via a CLIP ViT-L/14 vision
+encoder~\cite{dosovitskiy2021vit,radford2021clip}. Each token
+participates in every self-attention
+layer~\cite{vaswani2017attention} of the language model, making
+inference cost quadratic in the number of visual tokens. For a typical
+VQA query, fewer than half of these tokens are semantically relevant.
 
-\textbf{Global (random) pruning} discards tokens uniformly at a fixed ratio,
-blind to the query content.
-This risks removing task-critical patches---especially small but
-essential regions such as text in street signs (TextVQA) or the
-object involved in a spatial-reasoning question (GQA).
+A natural intuition is that the user's prompt should be enough to
+identify which tokens to keep, \emph{without} any training, since CLIP
+and its derivatives already provide a query-conditioned cross-modal
+embedding space. We ask: \emph{can a training-free saliency signal,
+read from LLaVA's own CLIP-initialized vision tower, predict which
+patches the LLaVA LLM actually relies on, well enough to beat a
+query-agnostic random baseline?}
 
-\textbf{PAPIT} instead uses the user's prompt to \emph{score} every patch
-before selecting which ones to keep.
-The key insight is that GradCAM saliency on LLaVA's own vision tower can
-attribute each patch's contribution to text-image alignment, providing a
-query-conditioned ranking without any additional training.
+We instantiate this as \textbf{PAPIT}, a training-free pipeline that
+scores patches by GradCAM saliency on LLaVA's vision tower against
+the prompt's CLIP text embedding, retains the top-$k$ patches plus a
+global anchor, and feeds the pruned set through LLaVA's MLP projector
+and LLM. Across three VQA benchmarks, PAPIT \emph{ties} random
+pruning rather than beating it (Sec.~\ref{sec:experiments}), even
+though Figure~\ref{fig:qualitative} shows interpretably localised
+selection on individual examples. An alignment diagnostic
+(Sec.~\ref{sec:diagnostic}) on 100 samples from each of the three
+benchmarks explains why: per-image Spearman $\rho \approx 0$ between
+PAPIT's GradCAM scores and LLaVA's LLM attention over the 576 image
+tokens, and the top-$10\%$ Jaccard falls slightly \emph{below} the
+uniform-random reference on every dataset.
+
+\paragraph{Contributions.}
+(i) A clean training-free token-pruning pipeline for LLaVA-1.5 with
+41--90\% attention-FLOPs reduction and $\le$2.3-point accuracy loss
+vs.\ unpruned on GQA and VQA~v2 at $k{=}75\%$. (ii) A quantitative
+\emph{negative result}: CLIP-derived patch saliency is statistically
+uncorrelated with LLaVA's LLM attention, which rules out an entire
+family of training-free prompt-aware methods and motivates
+LLM-internal scoring (FastV-style attention, or trained predictors
+over LLaVA hidden states) for any future
+prompt-conditioned approach.
 
 % ============================================================
 \section{Related Work}
@@ -94,9 +122,13 @@ predictor module decides which tokens to drop.
 In the multimodal setting, FastV~\cite{chen2024fastv} prunes visual tokens
 based on attention scores inside the LLM, requiring a forward pass before
 pruning.
+A complementary line of work shows that dense patch-level signals can be
+extracted directly from CLIP without supervision, e.g.\ MaskCLIP~\cite{zhou2022maskclip},
+motivating the use of CLIP-derived saliency for query-conditioned scoring.
 PAPIT differs in that pruning happens \emph{before} the LLM sees the image,
-using a lightweight cross-modal scoring step ($<$30\,ms) that is entirely
-query-conditioned and requires no training.
+using a lightweight cross-modal scoring step ($\approx$85\,ms, dominated by
+the CLIP text-encoder forward pass) that is entirely query-conditioned and
+requires no training.
 
 % ============================================================
 \section{Methodology}
@@ -105,7 +137,14 @@ query-conditioned and requires no training.
 \subsection{Pipeline Overview}
 
 Figure~\ref{fig:pipeline} shows the three-stage pipeline.
-An image and prompt are first encoded by the ViT and CLIP respectively; GradCAM scoring then selects the top-$k$ most relevant patches; the pruned tokens are projected by LLaVA's MLP projector and fed to the LLM to generate an answer.
+PAPIT reuses LLaVA-1.5's frozen vision tower, which is itself a CLIP
+ViT-L/14, so no second image encoder is loaded; only the matching CLIP
+text encoder is added on top to obtain a text embedding for cross-modal
+scoring.
+The image is encoded by the (shared) ViT and the prompt by the CLIP text
+encoder; GradCAM scoring then selects the top-$k$ most relevant patches;
+the pruned tokens are projected by LLaVA's MLP projector and fed to the
+LLM to generate an answer.
 
 % ── TikZ pipeline ─────────────────────────────────────────
 \begin{figure}[htbp]
@@ -125,8 +164,8 @@ An image and prompt are first encoded by the ViT and CLIP respectively; GradCAM 
 \node[iobox]                       (img)  {Image};
 \node[iobox, right=0.65cm of img]  (txt)  {Prompt};
 % Row 2: encoders
-\node[box=cblue, below=0.45cm of img]  (vit)  {ViT\\Encoder};
-\node[box=cblue, below=0.45cm of txt]  (clip) {CLIP\\Encoder};
+\node[box=cblue, below=0.45cm of img]  (vit)  {CLIP ViT\\(image)};
+\node[box=cblue, below=0.45cm of txt]  (clip) {CLIP\\Text Enc.};
 % Row 3: embeddings
 \node[box=cblue, below=0.45cm of vit]  (vtok) {Patch\\Tokens $V$};
 \node[box=cblue, below=0.45cm of clip] (temb) {Text Emb.\ $T$};
@@ -169,7 +208,8 @@ An image and prompt are first encoded by the ViT and CLIP respectively; GradCAM 
 \subsection{Cross-Modal Scoring: GradCAM Saliency}
 
 Because CLIP's contrastive objective aligns only the CLS token with text,
-naïve patch--text cosine similarity performs below random; GradCAM saliency
+naïve patch--text cosine similarity is unstable across retention ratios
+and collapses at $k{=}50\%$ (Table~\ref{tab:ablation}); GradCAM saliency
 on the vision tower provides a more reliable patch-level signal,
 as confirmed by the ablation in Section~\ref{sec:experiments}.
 
@@ -213,8 +253,10 @@ $\text{FLOPs}_{\text{rel}} \approx 0.10$, a $\sim$10$\times$ reduction.
 
 PAPIT operates at the token level between the ViT encoder and the
 LLaVA MLP projector, requiring no modification to LLM weights.
-We use \texttt{clip-vit-large-patch14} (matching LLaVA-1.5's vision tower)
-via HuggingFace Transformers.
+The image branch reuses LLaVA-1.5's own vision tower (a frozen CLIP
+ViT-L/14); the text branch loads the matching \texttt{clip-vit-large-patch14}
+text encoder via HuggingFace Transformers, so the only extra parameters
+introduced by PAPIT are CLIP's text encoder weights.
 
 % ============================================================
 \section{Qualitative Results}
@@ -241,9 +283,10 @@ spatial advantage.
 % ============================================================
 \section{Quantitative Results}
 
-We conducted an efficiency benchmark using a BLIP VQA proxy model
+We conducted an efficiency benchmark using a BLIP~\cite{li2022blip} VQA proxy model
 (Table~\ref{tab:efficiency}) and a full LLaVA-1.5 accuracy evaluation
-on GQA, VQA~v2, and TextVQA (Table~\ref{tab:accuracy}).
+on GQA~\cite{hudson2019gqa}, VQA~v2~\cite{goyal2017vqav2}, and TextVQA~\cite{singh2019textvqa}
+(Table~\ref{tab:accuracy}).
 The proxy model uses a $7\!\times\!7 = 49$ patch grid;
 full LLaVA experiments use $n=576$.
 
@@ -333,14 +376,20 @@ Dataset & Method & $k$=25\% & $k$=50\% & $k$=75\% \\
 \begin{table}[htbp]
 \centering
 \small
-\caption{Scoring method ablation on GQA (LLaVA-1.5-7B, 300 samples).
-         Unpruned: 71.3\%.}
+\caption{Scoring method ablation on GQA (LLaVA-1.5-7B, 300-sample subset;
+         the main results in Table~\ref{tab:accuracy} use 700 samples,
+         which explains the slight baseline shift).
+         Unpruned: 71.3\%.
+         \emph{Cosine+GradCAM hybrid} thresholds patch--text cosine similarity
+         and falls back to GradCAM when the threshold yields too few patches;
+         \emph{Value features} scores patches by the norm of their value
+         projections in the final ViT attention block.}
 \label{tab:ablation}
 \begin{tabular}{@{}lccc@{}}
 \toprule
 Scoring method & $k$=25\% & $k$=50\% & $k$=75\% \\
 \midrule
-ViT cosine + GradCAM hybrid & 65.3 & 53.7 & 58.3 \\
+Cosine + GradCAM hybrid     & 65.3 & 53.7 & 58.3 \\
 Value features              & 58.3 & 64.3 & 68.3 \\
 \textbf{GradCAM (Eq.~\ref{eq:gradcam})}
                             & \textbf{65.3} & \textbf{68.3} & \textbf{70.7} \\
@@ -369,103 +418,182 @@ The ablation (Table~\ref{tab:ablation}) shows that cosine similarity
 with a fixed threshold collapses at $k{=}50\%$ (53.7\%), confirming
 that raw feature-space alignment between LLaVA's ViT and CLIP's text
 encoder is unreliable.
+At $k{=}25\%$ the cosine threshold typically retains fewer than 25\%
+of the patches, so the hybrid falls back entirely to GradCAM and
+matches the pure-GradCAM score (65.3\%).
 Value-feature scoring also underperforms random across all retention
 ratios.
 GradCAM, which backpropagates through the CLS-to-text similarity,
-provides a more reliable saliency signal and is selected as the
-final scoring method.
+provides a more stable saliency signal across retention ratios and is
+selected as the final scoring method.
+
+% ============================================================
+\section{Alignment Diagnostic}
+\label{sec:diagnostic}
+
+Sections~\ref{sec:experiments} and the ablation collectively show that
+\emph{which} CLIP-derived signal we use barely matters: GradCAM,
+patch--text cosine similarity, and value-feature scoring all hover
+around the random baseline. This suggests the bottleneck is the
+\emph{signal} itself, not its specific instantiation. We test this
+directly by measuring how well PAPIT's GradCAM scores predict
+LLaVA's own attention to image tokens.
+
+\paragraph{Setup.}
+For each of $N{=}100$ GQA testdev-balanced
+samples~\cite{hudson2019gqa}, we compute (i) PAPIT's per-patch
+GradCAM scores $s^{\text{clip}}\in\mathbb{R}^{576}$ on LLaVA's vision
+tower, and (ii) the average attention $s^{\text{llava}}\in\mathbb{R}^{576}$
+paid by the first 8 generated tokens to each of the 576 image-token
+positions, taken from the last LLM layer averaged over heads. We
+report per-image Spearman rank correlation $\rho(s^{\text{clip}},
+s^{\text{llava}})$ and the Jaccard overlap between their respective
+top-$10\%$ patch sets. A query-agnostic uniform-random selector
+yields top-$10\%$ Jaccard $\approx 58/(2\!\cdot\!576-58) \approx 0.053$
+in expectation.
+
+\paragraph{Result.}
+We repeat the measurement on 100 samples from each of GQA
+(testdev-balanced), TextVQA (validation), and VQA~v2 (validation).
+Table~\ref{tab:diagnostic} shows the result is consistent across all
+three datasets: the mean (and median) $\rho$ is statistically
+indistinguishable from zero, no sample exceeds $\rho\!=\!0.3$, and
+nearly half are negatively correlated. On every dataset, the
+top-$10\%$ Jaccard falls \emph{below} the uniform-random reference of
+$0.053$, with TextVQA showing the lowest agreement ($0.039$) despite
+being the only dataset where PAPIT slightly out-scores random in
+end-task accuracy (Table~\ref{tab:accuracy}). This rules out the
+intuitive explanation that PAPIT's TextVQA gain stems from better
+CLIP--LLM alignment, and is consistent instead with the gain being
+within run-to-run noise of a near-random selector.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Alignment between PAPIT GradCAM scores and LLaVA's
+         last-layer LLM attention over the 576 image tokens
+         (100 samples per dataset, LLaVA-1.5-7B).
+         All three datasets give $\rho \approx 0$ and top-$10\%$
+         Jaccard below the uniform-random reference (0.053).}
+\label{tab:diagnostic}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Metric & GQA & TextVQA & VQA~v2 \\
+\midrule
+Spearman $\rho$ mean      & $-0.018$ & $-0.016$ & $\phantom{-}0.014$ \\
+Spearman $\rho$ median    & $\phantom{-}0.008$ & $\phantom{-}0.019$ & $\phantom{-}0.010$ \\
+Spearman $\rho$ std       & $\phantom{-}0.135$ & $\phantom{-}0.176$ & $\phantom{-}0.092$ \\
+Frac.\ $\rho>0.3$         & $0.0\%$  & $0.0\%$  & $0.0\%$ \\
+Frac.\ $\rho<0$           & $48.0\%$ & $47.0\%$ & $43.0\%$ \\
+Top-$10\%$ Jaccard        & $0.047$  & $0.039$  & $0.046$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+These numbers are the empirical core of this paper. They imply that
+the CLIP-aligned saliency we feed into PAPIT is, at the patch level,
+indistinguishable from noise with respect to what the LLM actually
+attends to, on every benchmark we tested. Any training-free pruner
+that scores patches in a CLIP-aligned space --- regardless of
+whether scoring uses cosine similarity, GradCAM, or value-feature
+norms --- will be subject to the same ceiling and cannot, on
+principle, exceed the random baseline by more than the small
+sampling-noise band where CLIP saliency happens to coincide with LLM
+attention by chance.
 
 % ============================================================
 \section{Discussion}
 \label{sec:discussion}
 
-A natural question raised by Table~\ref{tab:accuracy} is why prompt-aware
-scoring fails to consistently outperform a query-agnostic random baseline.
-We attribute this to four interacting factors.
+The alignment diagnostic of Section~\ref{sec:diagnostic} explains
+\emph{why} PAPIT cannot beat random pruning, but it does not by
+itself explain how PAPIT manages to nearly \emph{match} random
+pruning despite using a near-noise scoring signal. We discuss this
+asymmetry, the one regime where prompt-awareness still helps, and
+what the negative result rules in or out for future work.
 
-\paragraph{Representation misalignment.}
-Although LLaVA's vision tower is initialized from CLIP
-ViT-L/14~\cite{radford2021clip}, visual instruction
-tuning~\cite{liu2023llava,liu2024llava15} re-purposes its patch hidden
-states for autoregressive generation. The ``importance'' geometry that
-the LLM actually attends to therefore drifts away from CLIP's contrastive
-CLS-to-text alignment. Our GradCAM~\cite{selvaraju2017gradcam} signal
-still measures the latter, making it a proxy rather than a faithful
-predictor of which tokens the LLM needs --- a property that
-FastV~\cite{chen2024fastv} exploits by reading attention \emph{from
-inside the LLM itself}, rather than from the vision encoder.
+\paragraph{Why PAPIT does not collapse to far-below-random accuracy.}
+LLaVA's LLM exhibits substantial redundancy across its 576 visual
+tokens: prior work~\cite{chen2024fastv} reports that more than half
+of the visual tokens can be dropped after layer 2 with negligible
+accuracy loss. Combined with LLaVA's strong language prior, this
+means the dominant accuracy driver at $k\!\geq\!50\%$ is simply the
+\emph{number} of retained tokens, not their identity. Our results
+are consistent with this: PAPIT, random, and (in the ablation)
+value-feature scoring all sit within $\sim$1 point of each other at
+$k{=}75\%$ on GQA and VQA~v2.
 
-\paragraph{Random pruning is a stronger baseline than it appears.}
-Uniform sampling preserves \emph{spatial coverage}: every region of the
-$24{\times}24$ grid contributes some signal to the LLM. PAPIT, by contrast,
-concentrates retained tokens in a contiguous high-saliency region, which
-discards background and peripheral cues that VQA questions often
-implicitly rely on (e.g., ``what is the boy doing?'' depends on the scene,
-not only the boy). LLaVA was trained on the full 576-token grid, so a
-spatially clustered subset is mildly out-of-distribution for its attention
-patterns, whereas a uniformly scattered subset is not. Recent work has
-also shown that ViTs allocate a non-trivial fraction of patch tokens to
-\emph{global} register-like roles~\cite{darcet2024registers}, which random
-sampling preserves in expectation but query-driven top-$k$ tends to drop.
+\paragraph{Why random is in fact a strong baseline.}
+Two further effects work in random's favour. First, uniform sampling
+preserves \emph{spatial coverage} of the $24{\times}24$ grid, whereas
+PAPIT concentrates retained tokens in a contiguous high-saliency
+region (Figure~\ref{fig:qualitative}), discarding global cues that
+VQA questions often implicitly rely on. ViTs are also known to use
+some patch tokens for global register-like
+roles~\cite{darcet2024registers}, which uniform sampling preserves
+in expectation. Second, top-$k$ selection is redundancy-prone:
+nearby high-GradCAM patches encode correlated information, motivating
+the similarity-aware merging of ToMe~\cite{bolya2023tome} and the
+diversity-preserving hybrids of recent VLM-pruning work such as
+SparseVLM~\cite{zhang2024sparsevlm}.
 
-\paragraph{Top-$k$ selection is redundancy-prone.}
-High-GradCAM patches are spatially adjacent
-(Figure~\ref{fig:qualitative}), so the retained set carries highly
-correlated information. This is the same pathology that motivates
-similarity-aware token reduction such as ToMe~\cite{bolya2023tome}, which
-merges \emph{redundant} tokens rather than scoring them independently. A
-scattered random subset of the same size can encode strictly more diverse
-evidence, partially offsetting the loss of query relevance. Concurrent
-VLM-pruning work like SparseVLM~\cite{zhang2024sparsevlm} similarly
-reports that pure relevance-based selection underperforms hybrid
-strategies that explicitly preserve diversity.
-
-\paragraph{Where prompt-awareness does help.}
-The TextVQA $k{=}75\%$ result ($+0.9$ over random) is consistent with the
-above account: text regions in natural images are \emph{small and
-spatially localized}~\cite{singh2019textvqa}, exactly the regime where
-uniform sampling is most likely to miss the answer-bearing patches and
-where saliency-driven selection has measurable upside. As retention drops
-further, even correctly-localized selection cannot compensate for the
-lost global context.
+\paragraph{The TextVQA $+0.9$ is not a real win.}
+We initially read the TextVQA $k{=}75\%$ gap ($+0.9$ over random) as
+evidence that prompt-awareness pays off when answer-bearing regions
+are small and spatially localized~\cite{singh2019textvqa}. The
+alignment diagnostic refutes this reading: TextVQA in fact has the
+\emph{lowest} CLIP--LLM Jaccard of the three datasets we tested
+($0.039$, vs.\ $0.047$ on GQA and $0.046$ on VQA~v2). With the
+underlying signal statistically equivalent across datasets, the
+$\pm 1$ point fluctuations between PAPIT and random in
+Table~\ref{tab:accuracy} are best read as run-to-run noise of two
+near-equivalent selectors operating on a redundant token set, not as
+a genuine prompt-aware advantage in any single regime.
 
 \paragraph{Implications for future work.}
-Two directions follow directly. (i) Replace the CLIP-based scorer with
-one trained on LLaVA's own post-instruction-tuning hidden states,
-supervised by LLM-internal attention --- either FastV-style logit
-attention~\cite{chen2024fastv} or attention-rollout aggregation across
-layers~\cite{abnar2020rollout} --- so the signal predicts what the
-\emph{LLM} attends to rather than what CLIP aligns. This is analogous to
-the learned predictor in DynamicViT~\cite{rao2021dynamicvit}, but
-conditioned on the user prompt. (ii) Add an explicit spatial-diversity
-constraint on top of top-$k$, for instance grid-stratified selection,
-similarity-based merging in the spirit of ToMe~\cite{bolya2023tome}, or
-DPP-style sampling~\cite{kulesza2012dpp} that jointly maximizes relevance
-and diversity, to prevent collapse onto a single saliency mode while
-preserving prompt awareness.
+The diagnostic rules out an entire class of training-free
+prompt-aware pruners that score patches in any CLIP-aligned space.
+The remaining viable direction is to score patches in \emph{LLaVA's
+own post-instruction-tuning} representation, supervised by
+LLM-internal attention --- either FastV-style logit
+attention~\cite{chen2024fastv} or attention-rollout
+aggregation~\cite{abnar2020rollout} --- analogous to the learned
+predictor in DynamicViT~\cite{rao2021dynamicvit} but conditioned on
+the user prompt. Spatial-diversity constraints (grid-stratified
+selection, ToMe-style merging, or DPP-style~\cite{kulesza2012dpp}
+relevance--diversity sampling) are complementary, but only become
+meaningful once the underlying relevance signal is itself
+informative; layered on top of a near-noise score they cannot
+recover what the signal does not contain.
 
 % ============================================================
 \section{Conclusion}
 
-We present PAPIT, a training-free token pruning framework for LLaVA-1.5
-that uses GradCAM saliency to score visual patches against the user's
-text prompt.
-Evaluated on 700 samples across three benchmarks, PAPIT consistently
-matches random pruning in accuracy while reducing attention FLOPs by
-41--90\%.
-An ablation across three scoring strategies confirms that GradCAM is
-superior to both naive cosine similarity and value-feature scoring
-in this setting, where LLaVA's vision tower and CLIP's text
-encoder are not trained jointly.
+We set out to test whether a training-free, prompt-conditioned
+saliency signal derived from LLaVA's own CLIP-initialized vision
+tower could pick image tokens well enough to beat a query-agnostic
+random baseline. Across three VQA benchmarks (700 samples each),
+PAPIT matches but does not exceed random pruning, despite producing
+visibly localised selections on individual examples. An alignment
+diagnostic on 100 GQA samples shows why: GradCAM saliency and
+LLaVA's internal LLM attention over the 576 image tokens are
+statistically uncorrelated (Spearman $\rho \approx 0$, top-$10\%$
+Jaccard $\le$ uniform-random reference). The CLIP-aligned saliency
+signal that the entire family of training-free prompt-aware methods
+relies on therefore carries essentially no information about which
+patches the LLM actually uses --- a constraint that no choice of
+scoring rule (GradCAM, cosine, value-feature) within that signal
+family can overcome.
 
-As discussed in Section~\ref{sec:discussion}, the gap between PAPIT and
-random pruning is explained by the misalignment between CLIP's embedding
-space and LLaVA's internal representations.
-Nevertheless, PAPIT demonstrates that token pruning in LLaVA incurs
-modest accuracy loss (within 2.3 points on GQA and VQA~v2, 6.1 points
-on TextVQA at $k{=}75\%$) relative to the unpruned baseline,
-making it a practical option for latency-sensitive deployments where
-training is not feasible.
+Our contributions are accordingly twofold. We release a clean
+training-free pruning pipeline that achieves 41--90\%
+attention-FLOPs reduction with $\le$2.3-point accuracy loss on GQA
+and VQA~v2 at $k{=}75\%$, viable in deployments where any drop is
+tolerable and training is not. And we provide quantitative evidence
+that any further \emph{prompt-aware} gain over random will require
+moving the scoring signal inside the LLM, in the spirit of FastV
+or a learned predictor over LLaVA hidden states supervised by
+LLM-internal attention.
 
 \noindent\textbf{Acknowledgments.}
 We used GitHub Copilot for code completion and Claude for editing assistance.
