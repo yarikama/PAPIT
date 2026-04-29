@@ -104,9 +104,15 @@ object involved in a spatial-reasoning question (GQA).
 
 \textbf{PAPIT} instead uses the user's prompt to \emph{score} every patch
 before selecting which ones to keep.
-The key insight is that CLIP's shared vision-language embedding space allows
-direct comparison between a text query and individual visual patches via
-cosine similarity, without any additional training.
+A naïve approach---cosine similarity between CLIP's output patch embeddings
+and the text embedding---performs \emph{below random} (50.3\% vs.\ 64.3\%
+on GQA at $k{=}25\%$), because CLIP's contrastive objective aligns only
+the global CLS token with text, not individual patch tokens.
+We instead exploit the internal structure of the transformer: in the final
+ViT attention layer, the CLS output is a weighted sum over \emph{value}
+projections, so each value vector directly encodes that patch's contribution
+to the global image representation---making it comparable to the text
+embedding without any extra forward pass.
 
 % ============================================================
 \section{Related Work}
@@ -188,7 +194,9 @@ An image and prompt are independently encoded by LLaVA's ViT and the CLIP text e
 Naïve patch--text cosine similarity in CLIP's output space performs
 \emph{below random} because CLIP's contrastive objective aligns only the
 CLS (global) token with text; individual patch tokens are not explicitly
-aligned.  We evaluate two principled alternatives and combine them.
+aligned (see Table~\ref{tab:ablation}, row 1: 50.3\% at $k{=}25\%$ vs.\
+random 64.3\%).  We evaluate two principled alternatives grounded in
+how transformers form their CLS representation.
 
 \paragraph{GradCAM scoring.}
 Let $H^{(L-1)} = \{h_1,\ldots,h_n\}$ denote patch activations at the
@@ -206,9 +214,12 @@ Backpropagating through the final attention layer captures each patch's
 
 \paragraph{Value-feature scoring (MaskCLIP).}
 Let $V = \{v_1,\ldots,v_n\}$ be the value vectors from the last CLIP
-attention layer (CLS excluded).  Because the CLS representation is formed
-as a weighted sum over value vectors, $v_i$ directly encodes the
-``content'' contributed by patch~$i$~\cite{zhou2022maskclip}:
+attention layer (CLS excluded).  In standard self-attention, the CLS
+output is $\sum_j \alpha_{0j}\,W_V v_j$: a weighted sum of projected value
+vectors.  Therefore $W_V v_i$ encodes exactly what patch~$i$ contributes
+to the global CLS representation---it is already in the visual output
+space and directly comparable to the text embedding~$T$
+\cite{zhou2022maskclip}:
 \begin{equation}
   s^{\text{val}}_i =
   \frac{\langle\, \mathbf{W}_v\,v_i,\; T \rangle}
@@ -216,7 +227,9 @@ as a weighted sum over value vectors, $v_i$ directly encodes the
   \label{eq:value}
 \end{equation}
 where $\mathbf{W}_v$ is the CLIP visual projection.
-No backpropagation is required.
+No backpropagation is required; $v_i$ is captured for free via a hook
+during the already-running ViT forward pass ($\approx$18\,ms overhead
+for text encoding only).
 
 \paragraph{Hybrid routing.}
 On GQA, GradCAM outperforms value features at aggressive retention
