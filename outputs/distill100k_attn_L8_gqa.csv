@@ -1,0 +1,301 @@
+idx,question,gold,retention,k,ans_unpruned,ans_random,ans_papit,ans_distill,acc_unpruned,acc_random,acc_papit,acc_distill
+0,Is it overcast?,no,0.25,144,No,No,No,No,1.0,1.0,1.0,1.0
+0,Is it overcast?,no,0.5,288,No,No,No,No,1.0,1.0,1.0,1.0
+0,Is it overcast?,no,0.75,432,No,No,No,No,1.0,1.0,1.0,1.0
+1,Who is wearing the dress?,women,0.25,144,Lady,Lady,Woman,Lady,0.0,0.0,0.0,0.0
+1,Who is wearing the dress?,women,0.5,288,Lady,Lady,Lady,Lady,0.0,0.0,0.0,0.0
+1,Who is wearing the dress?,women,0.75,432,Lady,Lady,Lady,Lady,0.0,0.0,0.0,0.0
+2,Does the utensil on top of the table look clean and black?,no,0.25,144,No,No,No,Yes,1.0,1.0,1.0,0.0
+2,Does the utensil on top of the table look clean and black?,no,0.5,288,No,No,No,No,1.0,1.0,1.0,1.0
+2,Does the utensil on top of the table look clean and black?,no,0.75,432,No,No,No,No,1.0,1.0,1.0,1.0
+3,Is the surfer that looks wet wearing a wetsuit?,yes,0.25,144,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+3,Is the surfer that looks wet wearing a wetsuit?,yes,0.5,288,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+3,Is the surfer that looks wet wearing a wetsuit?,yes,0.75,432,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+4,How tall is the chair in the bottom of the photo?,short,0.25,144,Tall,Tall,Short,Tall,0.0,0.0,1.0,0.0
+4,How tall is the chair in the bottom of the photo?,short,0.5,288,Tall,Tall,Short,Tall,0.0,0.0,1.0,0.0
+4,How tall is the chair in the bottom of the photo?,short,0.75,432,Tall,Short,Short,Tall,0.0,1.0,1.0,0.0
+5,What kind of device is on top of the desk?,keyboard,0.25,144,Computer,Computer,Computer,Computer,0.0,0.0,0.0,0.0
+5,What kind of device is on top of the desk?,keyboard,0.5,288,Computer,Computer,Computer,Computer,0.0,0.0,0.0,0.0
+5,What kind of device is on top of the desk?,keyboard,0.75,432,Computer,Computer,Computer,Computer,0.0,0.0,0.0,0.0
+6,What is the airplane flying above?,ocean,0.25,144,Beach,Beach,Water,Beach,0.0,0.0,0.0,0.0
+6,What is the airplane flying above?,ocean,0.5,288,Beach,Beach,Beach,Beach,0.0,0.0,0.0,0.0
+6,What is the airplane flying above?,ocean,0.75,432,Beach,Beach,Beach,Beach,0.0,0.0,0.0,0.0
+7,What color are the pants?,red,0.25,144,Red,Red,Black,Red,1.0,1.0,0.0,1.0
+7,What color are the pants?,red,0.5,288,Red,Red,Red,Red,1.0,1.0,1.0,1.0
+7,What color are the pants?,red,0.75,432,Red,Red,Red,Red,1.0,1.0,1.0,1.0
+8,Is the ground blue or brown?,brown,0.25,144,Brown,Brown,Brown,Brown,1.0,1.0,1.0,1.0
+8,Is the ground blue or brown?,brown,0.5,288,Brown,Brown,Brown,Brown,1.0,1.0,1.0,1.0
+8,Is the ground blue or brown?,brown,0.75,432,Brown,Brown,Brown,Brown,1.0,1.0,1.0,1.0
+9,What is around the open window?,drapes,0.25,144,Curtain,Curtain,Curtain,Curtain,0.0,0.0,0.0,0.0
+9,What is around the open window?,drapes,0.5,288,Curtain,Curtain,Curtain,Curtain,0.0,0.0,0.0,0.0
+9,What is around the open window?,drapes,0.75,432,Curtain,Curtain,Curtain,Curtain,0.0,0.0,0.0,0.0
+10,What's around the window?,drapes,0.25,144,Curtain,Curtain,Curtain,Curtain,0.0,0.0,0.0,0.0
+10,What's around the window?,drapes,0.5,288,Curtain,Curtain,Curtain,Curtain,0.0,0.0,0.0,0.0
+10,What's around the window?,drapes,0.75,432,Curtain,Curtain,Curtain,Curtain,0.0,0.0,0.0,0.0
+11,Who is standing at the table?,woman,0.25,144,Man,People,People,People,0.0,0.0,0.0,0.0
+11,Who is standing at the table?,woman,0.5,288,Man,People,Man,Man,0.0,0.0,0.0,0.0
+11,Who is standing at the table?,woman,0.75,432,Man,Man,Man,Man,0.0,0.0,0.0,0.0
+12,Are there drapes to the right of the bed?,yes,0.25,144,Yes,Yes,No,No,1.0,1.0,0.0,0.0
+12,Are there drapes to the right of the bed?,yes,0.5,288,Yes,Yes,No,No,1.0,1.0,0.0,0.0
+12,Are there drapes to the right of the bed?,yes,0.75,432,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+13,What is hanging above the chalkboard?,picture,0.25,144,Picture,Picture,Painting,Paint,1.0,1.0,0.0,0.0
+13,What is hanging above the chalkboard?,picture,0.5,288,Picture,Picture,Painting,Painting,1.0,1.0,0.0,0.0
+13,What is hanging above the chalkboard?,picture,0.75,432,Picture,Picture,Painting,Painting,1.0,1.0,0.0,0.0
+14,Is the cake on a platter?,no,0.25,144,Yes,Yes,Yes,Yes,0.0,0.0,0.0,0.0
+14,Is the cake on a platter?,no,0.5,288,Yes,Yes,Yes,Yes,0.0,0.0,0.0,0.0
+14,Is the cake on a platter?,no,0.75,432,Yes,Yes,Yes,Yes,0.0,0.0,0.0,0.0
+15,Is the person to the right of the cup wearing jeans?,yes,0.25,144,Yes,Yes,Yes,No,1.0,1.0,1.0,0.0
+15,Is the person to the right of the cup wearing jeans?,yes,0.5,288,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+15,Is the person to the right of the cup wearing jeans?,yes,0.75,432,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+16,What device is sitting next to the mouse pad?,keyboard,0.25,144,Keyboard,Computer,Keyboard,Keyboard,1.0,0.0,1.0,1.0
+16,What device is sitting next to the mouse pad?,keyboard,0.5,288,Keyboard,Computer,Keyboard,Keyboard,1.0,0.0,1.0,1.0
+16,What device is sitting next to the mouse pad?,keyboard,0.75,432,Keyboard,Speaker,Speaker,Keyboard,1.0,0.0,0.0,1.0
+17,Does the sweater look open and blue?,yes,0.25,144,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+17,Does the sweater look open and blue?,yes,0.5,288,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+17,Does the sweater look open and blue?,yes,0.75,432,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+18,Is the jacket long sleeved and black?,yes,0.25,144,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+18,Is the jacket long sleeved and black?,yes,0.5,288,Yes,Yes,No,Yes,1.0,1.0,0.0,1.0
+18,Is the jacket long sleeved and black?,yes,0.75,432,Yes,Yes,No,Yes,1.0,1.0,0.0,1.0
+19,Are there beds next to the small outlet?,yes,0.25,144,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+19,Are there beds next to the small outlet?,yes,0.5,288,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+19,Are there beds next to the small outlet?,yes,0.75,432,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+20,On which side of the picture is the leather bag?,right,0.25,144,Left,Left,Left,Left,0.0,0.0,0.0,0.0
+20,On which side of the picture is the leather bag?,right,0.5,288,Left,Left,Left,Left,0.0,0.0,0.0,0.0
+20,On which side of the picture is the leather bag?,right,0.75,432,Left,Left,Left,Right,0.0,0.0,0.0,1.0
+21,Is the blue pillow square and large?,no,0.25,144,No,No,No,No,1.0,1.0,1.0,1.0
+21,Is the blue pillow square and large?,no,0.5,288,No,No,No,No,1.0,1.0,1.0,1.0
+21,Is the blue pillow square and large?,no,0.75,432,No,No,No,No,1.0,1.0,1.0,1.0
+22,Which color is the cake?,white,0.25,144,White,White,White,White,1.0,1.0,1.0,1.0
+22,Which color is the cake?,white,0.5,288,White,White,White,White,1.0,1.0,1.0,1.0
+22,Which color is the cake?,white,0.75,432,White,White,White,White,1.0,1.0,1.0,1.0
+23,What is the name of the cooking utensil that is hang from the hook?,pan,0.25,144,Pan,Cutting board,Pan,Pan,1.0,0.0,1.0,1.0
+23,What is the name of the cooking utensil that is hang from the hook?,pan,0.5,288,Pan,Pan,Pan,Pan,1.0,1.0,1.0,1.0
+23,What is the name of the cooking utensil that is hang from the hook?,pan,0.75,432,Pan,Pan,Pan,Pan,1.0,1.0,1.0,1.0
+24,Where is the skinny person standing?,table,0.25,144,Left,Left,Kitchen,Kitchen,0.0,0.0,0.0,0.0
+24,Where is the skinny person standing?,table,0.5,288,Left,Left,Left,Left,0.0,0.0,0.0,0.0
+24,Where is the skinny person standing?,table,0.75,432,Left,Left,Left,Left,0.0,0.0,0.0,0.0
+25,Are the plates on top of an ottoman?,no,0.25,144,No,No,No,No,1.0,1.0,1.0,1.0
+25,Are the plates on top of an ottoman?,no,0.5,288,No,No,No,No,1.0,1.0,1.0,1.0
+25,Are the plates on top of an ottoman?,no,0.75,432,No,No,No,No,1.0,1.0,1.0,1.0
+26,Is the freezer near the wall small or large?,large,0.25,144,Small,Small,Small,Large,0.0,0.0,0.0,1.0
+26,Is the freezer near the wall small or large?,large,0.5,288,Small,Small,Small,Large,0.0,0.0,0.0,1.0
+26,Is the freezer near the wall small or large?,large,0.75,432,Small,Small,Small,Large,0.0,0.0,0.0,1.0
+27,What type of food is to the left of the baby that is sitting atop the woman?,marshmallow,0.25,144,Marshmallows,Marshmallows,Dessert,Marshmallows,0.0,0.0,0.0,0.0
+27,What type of food is to the left of the baby that is sitting atop the woman?,marshmallow,0.5,288,Marshmallows,Marshmallows,Dessert,Marshmallows,0.0,0.0,0.0,0.0
+27,What type of food is to the left of the baby that is sitting atop the woman?,marshmallow,0.75,432,Marshmallows,Marshmallows,Dessert,Marshmallows,0.0,0.0,0.0,0.0
+28,Is the fence made of cement or aluminum?,aluminum,0.25,144,Aluminum,Aluminum,Aluminum,Aluminum,1.0,1.0,1.0,1.0
+28,Is the fence made of cement or aluminum?,aluminum,0.5,288,Aluminum,Aluminum,Aluminum,Aluminum,1.0,1.0,1.0,1.0
+28,Is the fence made of cement or aluminum?,aluminum,0.75,432,Aluminum,Aluminum,Aluminum,Aluminum,1.0,1.0,1.0,1.0
+29,Which side are the white houses on?,left,0.25,144,Left,Left,Left,Left,1.0,1.0,1.0,1.0
+29,Which side are the white houses on?,left,0.5,288,Left,Left,Left,Left,1.0,1.0,1.0,1.0
+29,Which side are the white houses on?,left,0.75,432,Left,Left,Left,Left,1.0,1.0,1.0,1.0
+30,Are both the phone and the coffee cup the same color?,yes,0.25,144,No,No,No,No,0.0,0.0,0.0,0.0
+30,Are both the phone and the coffee cup the same color?,yes,0.5,288,No,No,No,No,0.0,0.0,0.0,0.0
+30,Are both the phone and the coffee cup the same color?,yes,0.75,432,No,No,No,No,0.0,0.0,0.0,0.0
+31,Are there either any small refrigerators or microwaves in the picture?,no,0.25,144,No,No,No,No,1.0,1.0,1.0,1.0
+31,Are there either any small refrigerators or microwaves in the picture?,no,0.5,288,No,No,No,No,1.0,1.0,1.0,1.0
+31,Are there either any small refrigerators or microwaves in the picture?,no,0.75,432,No,No,No,No,1.0,1.0,1.0,1.0
+32,"How does that car look like, orange or maybe white?",white,0.25,144,White,White,Orange,White,1.0,1.0,0.0,1.0
+32,"How does that car look like, orange or maybe white?",white,0.5,288,White,White,White,White,1.0,1.0,1.0,1.0
+32,"How does that car look like, orange or maybe white?",white,0.75,432,White,White,White,White,1.0,1.0,1.0,1.0
+33,What color is the book?,white,0.25,144,Black,Black,Black,Black,0.0,0.0,0.0,0.0
+33,What color is the book?,white,0.5,288,Black,Black,Black,Black,0.0,0.0,0.0,0.0
+33,What color is the book?,white,0.75,432,Black,Black,Black,Black,0.0,0.0,0.0,0.0
+34,What color is the dirt?,red,0.25,144,Brown,Brown,Brown,Brown,0.0,0.0,0.0,0.0
+34,What color is the dirt?,red,0.5,288,Brown,Brown,Brown,Red,0.0,0.0,0.0,1.0
+34,What color is the dirt?,red,0.75,432,Brown,Brown,Brown,Brown,0.0,0.0,0.0,0.0
+35,Is the bag made of leather lying on top of a sofa?,no,0.25,144,Yes,Yes,Yes,Yes,0.0,0.0,0.0,0.0
+35,Is the bag made of leather lying on top of a sofa?,no,0.5,288,Yes,Yes,No,Yes,0.0,0.0,1.0,0.0
+35,Is the bag made of leather lying on top of a sofa?,no,0.75,432,Yes,Yes,Yes,Yes,0.0,0.0,0.0,0.0
+36,What are the drapes around of?,window,0.25,144,Window,Window,Window,Mirror,1.0,1.0,1.0,0.0
+36,What are the drapes around of?,window,0.5,288,Window,Window,Window,Window,1.0,1.0,1.0,1.0
+36,What are the drapes around of?,window,0.75,432,Window,Window,Window,Fireplace,1.0,1.0,1.0,0.0
+37,On which side is the picture?,left,0.25,144,Left,Left,Left,Left,1.0,1.0,1.0,1.0
+37,On which side is the picture?,left,0.5,288,Left,Left,Left,Left,1.0,1.0,1.0,1.0
+37,On which side is the picture?,left,0.75,432,Left,Left,Left,Left,1.0,1.0,1.0,1.0
+38,What material is the crosswalk in front of the stores?,concrete,0.25,144,Concrete,Concrete,Concrete,Concrete,1.0,1.0,1.0,1.0
+38,What material is the crosswalk in front of the stores?,concrete,0.5,288,Concrete,Concrete,Concrete,Concrete,1.0,1.0,1.0,1.0
+38,What material is the crosswalk in front of the stores?,concrete,0.75,432,Concrete,Concrete,Concrete,Concrete,1.0,1.0,1.0,1.0
+39,How large are the sprinkles that are sprinkled on the cupcakes?,small,0.25,144,Large,Small,Small,Large,0.0,1.0,1.0,0.0
+39,How large are the sprinkles that are sprinkled on the cupcakes?,small,0.5,288,Large,Small,Small,Large,0.0,1.0,1.0,0.0
+39,How large are the sprinkles that are sprinkled on the cupcakes?,small,0.75,432,Large,Small,Large,Small,0.0,1.0,0.0,1.0
+40,What type of material is the crosswalk near the street lamp made of?,concrete,0.25,144,Concrete,Metal,Concrete,Concrete,1.0,0.0,1.0,1.0
+40,What type of material is the crosswalk near the street lamp made of?,concrete,0.5,288,Concrete,Metal,Concrete,Concrete,1.0,0.0,1.0,1.0
+40,What type of material is the crosswalk near the street lamp made of?,concrete,0.75,432,Concrete,Concrete,Concrete,Concrete,1.0,1.0,1.0,1.0
+41,Which kind of clothing is pink?,tank top,0.25,144,Tank top,Tank top,Outfit,Tank top,1.0,1.0,0.0,1.0
+41,Which kind of clothing is pink?,tank top,0.5,288,Tank top,Tank top,Tank top,Tank top,1.0,1.0,1.0,1.0
+41,Which kind of clothing is pink?,tank top,0.75,432,Tank top,Tank top,Tank top,Tank top,1.0,1.0,1.0,1.0
+42,How is the clothing item that is pink called?,tank top,0.25,144,Tank top,Tank top,Dress,Tank top,1.0,1.0,0.0,1.0
+42,How is the clothing item that is pink called?,tank top,0.5,288,Tank top,Tank top,Shirt,Tank top,1.0,1.0,0.0,1.0
+42,How is the clothing item that is pink called?,tank top,0.75,432,Tank top,Tank top,Shirt,Tank top,1.0,1.0,0.0,1.0
+43,Which kind of clothing is not pink?,hat,0.25,144,Hat,Cap,Cap,Cap,1.0,0.0,0.0,0.0
+43,Which kind of clothing is not pink?,hat,0.5,288,Hat,Cap,Cap,Cap,1.0,0.0,0.0,0.0
+43,Which kind of clothing is not pink?,hat,0.75,432,Hat,Cap,Cap,Cap,1.0,0.0,0.0,0.0
+44,Is this helicopter on or off?,off,0.25,144,Off,Off,Off,Off,1.0,1.0,1.0,1.0
+44,Is this helicopter on or off?,off,0.5,288,Off,Off,Off,Off,1.0,1.0,1.0,1.0
+44,Is this helicopter on or off?,off,0.75,432,Off,Off,Off,Off,1.0,1.0,1.0,1.0
+45,Do you see any cats?,yes,0.25,144,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+45,Do you see any cats?,yes,0.5,288,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+45,Do you see any cats?,yes,0.75,432,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+46,Is that shoe behind a dog?,no,0.25,144,Yes,No,No,No,0.0,1.0,1.0,1.0
+46,Is that shoe behind a dog?,no,0.5,288,Yes,No,No,No,0.0,1.0,1.0,1.0
+46,Is that shoe behind a dog?,no,0.75,432,Yes,No,No,No,0.0,1.0,1.0,1.0
+47,What kind of clothing is sleeveless?,tank top,0.25,144,Tank top,Tank top,Tank top,Tank top,1.0,1.0,1.0,1.0
+47,What kind of clothing is sleeveless?,tank top,0.5,288,Tank top,Tank top,Tank top,Tank top,1.0,1.0,1.0,1.0
+47,What kind of clothing is sleeveless?,tank top,0.75,432,Tank top,Tank top,Tank top,Tank top,1.0,1.0,1.0,1.0
+48,Is the field soft and snowy?,no,0.25,144,No,No,No,No,1.0,1.0,1.0,1.0
+48,Is the field soft and snowy?,no,0.5,288,No,No,No,No,1.0,1.0,1.0,1.0
+48,Is the field soft and snowy?,no,0.75,432,No,No,No,No,1.0,1.0,1.0,1.0
+49,What fruits are beneath the microwave?,bananas,0.25,144,Bananas,Bananas,Bananas,Bananas,1.0,1.0,1.0,1.0
+49,What fruits are beneath the microwave?,bananas,0.5,288,Bananas,Bananas,Bananas,Bananas,1.0,1.0,1.0,1.0
+49,What fruits are beneath the microwave?,bananas,0.75,432,Bananas,Bananas,Bananas,Bananas,1.0,1.0,1.0,1.0
+50,Which color is the shirt?,white,0.25,144,White,White,White,Black,1.0,1.0,1.0,0.0
+50,Which color is the shirt?,white,0.5,288,White,Black,Black,Black,1.0,0.0,0.0,0.0
+50,Which color is the shirt?,white,0.75,432,White,White,Black,White,1.0,1.0,0.0,1.0
+51,What is beneath the microwave?,bananas,0.25,144,Counter,Cabinet,Cabinet,Counter,0.0,0.0,0.0,0.0
+51,What is beneath the microwave?,bananas,0.5,288,Counter,Cabinet,Counter,Counter,0.0,0.0,0.0,0.0
+51,What is beneath the microwave?,bananas,0.75,432,Counter,Cabinet,Counter,Counter,0.0,0.0,0.0,0.0
+52,On which side of the picture is the chair?,right,0.25,144,Right,Right,Right,Right,1.0,1.0,1.0,1.0
+52,On which side of the picture is the chair?,right,0.5,288,Right,Right,Right,Right,1.0,1.0,1.0,1.0
+52,On which side of the picture is the chair?,right,0.75,432,Right,Right,Right,Right,1.0,1.0,1.0,1.0
+53,Is the happy man to the left or to the right of the woman in the center?,right,0.25,144,Right,Right,Right,Right,1.0,1.0,1.0,1.0
+53,Is the happy man to the left or to the right of the woman in the center?,right,0.5,288,Right,Right,Left,Right,1.0,1.0,0.0,1.0
+53,Is the happy man to the left or to the right of the woman in the center?,right,0.75,432,Right,Right,Right,Right,1.0,1.0,1.0,1.0
+54,Who is wearing a wristband?,woman,0.25,144,Girl,Girl,Woman,Girl,0.0,0.0,1.0,0.0
+54,Who is wearing a wristband?,woman,0.5,288,Girl,Girl,Girl,Girl,0.0,0.0,0.0,0.0
+54,Who is wearing a wristband?,woman,0.75,432,Girl,Girl,Girl,Girl,0.0,0.0,0.0,0.0
+55,Is there a pear beneath the appliance that looks silver and black?,no,0.25,144,No,No,No,No,1.0,1.0,1.0,1.0
+55,Is there a pear beneath the appliance that looks silver and black?,no,0.5,288,No,No,No,No,1.0,1.0,1.0,1.0
+55,Is there a pear beneath the appliance that looks silver and black?,no,0.75,432,No,No,No,No,1.0,1.0,1.0,1.0
+56,Is this a bed or a cabinet?,cabinet,0.25,144,Cabinet,Cabinet,Cabinet,Cabinet,1.0,1.0,1.0,1.0
+56,Is this a bed or a cabinet?,cabinet,0.5,288,Cabinet,Cabinet,Cabinet,Cabinet,1.0,1.0,1.0,1.0
+56,Is this a bed or a cabinet?,cabinet,0.75,432,Cabinet,Cabinet,Cabinet,Cabinet,1.0,1.0,1.0,1.0
+57,On which side is the router?,left,0.25,144,Left,Left,Left,Left,1.0,1.0,1.0,1.0
+57,On which side is the router?,left,0.5,288,Left,Left,Left,Left,1.0,1.0,1.0,1.0
+57,On which side is the router?,left,0.75,432,Left,Left,Left,Left,1.0,1.0,1.0,1.0
+58,What is the color of the pants?,gray,0.25,144,Gray,Black,Black,Gray,1.0,0.0,0.0,1.0
+58,What is the color of the pants?,gray,0.5,288,Gray,Black,Black,Black,1.0,0.0,0.0,0.0
+58,What is the color of the pants?,gray,0.75,432,Gray,Black,Black,Black,1.0,0.0,0.0,0.0
+59,Who is wearing the shirt?,girl,0.25,144,Woman,Woman,Man,Woman,0.0,0.0,0.0,0.0
+59,Who is wearing the shirt?,girl,0.5,288,Woman,Woman,Woman,Woman,0.0,0.0,0.0,0.0
+59,Who is wearing the shirt?,girl,0.75,432,Woman,Woman,Woman,Woman,0.0,0.0,0.0,0.0
+60,Who is wearing a shirt?,girl,0.25,144,Woman,Woman,Woman,Woman,0.0,0.0,0.0,0.0
+60,Who is wearing a shirt?,girl,0.5,288,Woman,Woman,Woman,Woman,0.0,0.0,0.0,0.0
+60,Who is wearing a shirt?,girl,0.75,432,Woman,Woman,Woman,Woman,0.0,0.0,0.0,0.0
+61,What's the man doing?,standing,0.25,144,Waiting,Waiting,Walking,Waiting,0.0,0.0,0.0,0.0
+61,What's the man doing?,standing,0.5,288,Waiting,Waiting,Waiting,Waiting,0.0,0.0,0.0,0.0
+61,What's the man doing?,standing,0.75,432,Waiting,Waiting,Waiting,Waiting,0.0,0.0,0.0,0.0
+62,Are there rivers or oceans that are not calm?,no,0.25,144,No,No,No,No,1.0,1.0,1.0,1.0
+62,Are there rivers or oceans that are not calm?,no,0.5,288,No,No,No,No,1.0,1.0,1.0,1.0
+62,Are there rivers or oceans that are not calm?,no,0.75,432,No,No,No,No,1.0,1.0,1.0,1.0
+63,What is the picture frame hanging from?,wall,0.25,144,Wall,Wall,Wall,Wall,1.0,1.0,1.0,1.0
+63,What is the picture frame hanging from?,wall,0.5,288,Wall,Wall,Wall,Wall,1.0,1.0,1.0,1.0
+63,What is the picture frame hanging from?,wall,0.75,432,Wall,Wall,Wall,Wall,1.0,1.0,1.0,1.0
+64,"How do the cars look like, dense or sparse?",dense,0.25,144,Sparse,Sparse,Dense,Dense,0.0,0.0,1.0,1.0
+64,"How do the cars look like, dense or sparse?",dense,0.5,288,Sparse,Sparse,Sparse,Dense,0.0,0.0,0.0,1.0
+64,"How do the cars look like, dense or sparse?",dense,0.75,432,Sparse,Sparse,Sparse,Sparse,0.0,0.0,0.0,0.0
+65,What food isn't baked?,cookies,0.25,144,Carrot,Carrot,Rice,Cookie,0.0,0.0,0.0,0.0
+65,What food isn't baked?,cookies,0.5,288,Carrot,Carrot,Rice,Rice,0.0,0.0,0.0,0.0
+65,What food isn't baked?,cookies,0.75,432,Carrot,Carrot,Carrot,Rice,0.0,0.0,0.0,0.0
+66,Which kind of vehicle is in front of the flag?,van,0.25,144,Van,Van,Van,Van,1.0,1.0,1.0,1.0
+66,Which kind of vehicle is in front of the flag?,van,0.5,288,Van,Van,Van,Van,1.0,1.0,1.0,1.0
+66,Which kind of vehicle is in front of the flag?,van,0.75,432,Van,Van,Van,Van,1.0,1.0,1.0,1.0
+67,What is the vehicle that is in front of the flag?,van,0.25,144,Van,Van,Van,Truck,1.0,1.0,1.0,0.0
+67,What is the vehicle that is in front of the flag?,van,0.5,288,Van,Van,Van,Van,1.0,1.0,1.0,1.0
+67,What is the vehicle that is in front of the flag?,van,0.75,432,Van,Van,Van,Van,1.0,1.0,1.0,1.0
+68,What is hanging from the wall?,picture frame,0.25,144,Picture,Picture,Mirror,Picture,0.0,0.0,0.0,0.0
+68,What is hanging from the wall?,picture frame,0.5,288,Picture,Mirror,Picture,Picture,0.0,0.0,0.0,0.0
+68,What is hanging from the wall?,picture frame,0.75,432,Picture,Picture,Picture,Picture,0.0,0.0,0.0,0.0
+69,What's the skateboarder jumping off of?,pavement,0.25,144,Ramp,Ramp,Ramp,Ramp,0.0,0.0,0.0,0.0
+69,What's the skateboarder jumping off of?,pavement,0.5,288,Ramp,Ramp,Ramp,Ramp,0.0,0.0,0.0,0.0
+69,What's the skateboarder jumping off of?,pavement,0.75,432,Ramp,Ramp,Ramp,Ramp,0.0,0.0,0.0,0.0
+70,Is the van in front of a balloon?,no,0.25,144,Yes,No,No,No,0.0,1.0,1.0,1.0
+70,Is the van in front of a balloon?,no,0.5,288,Yes,Yes,Yes,Yes,0.0,0.0,0.0,0.0
+70,Is the van in front of a balloon?,no,0.75,432,Yes,Yes,Yes,Yes,0.0,0.0,0.0,0.0
+71,What is the color of this bench?,beige,0.25,144,Brown,Blue,Brown,Brown,0.0,0.0,0.0,0.0
+71,What is the color of this bench?,beige,0.5,288,Brown,Brown,Brown,Brown,0.0,0.0,0.0,0.0
+71,What is the color of this bench?,beige,0.75,432,Brown,Brown,Brown,Brown,0.0,0.0,0.0,0.0
+72,Are the cabinets below the stove wooden and open?,no,0.25,144,Yes,Yes,Yes,Yes,0.0,0.0,0.0,0.0
+72,Are the cabinets below the stove wooden and open?,no,0.5,288,Yes,Yes,Yes,Yes,0.0,0.0,0.0,0.0
+72,Are the cabinets below the stove wooden and open?,no,0.75,432,Yes,Yes,Yes,Yes,0.0,0.0,0.0,0.0
+73,How is the item of furniture that is plaid called?,bed,0.25,144,Bed,Bed,Bed,Bed,1.0,1.0,1.0,1.0
+73,How is the item of furniture that is plaid called?,bed,0.5,288,Bed,Bed,Bed,Bed,1.0,1.0,1.0,1.0
+73,How is the item of furniture that is plaid called?,bed,0.75,432,Bed,Bed,Bed,Bed,1.0,1.0,1.0,1.0
+74,Are the boxes to the right of the man full and square?,yes,0.25,144,No,No,Yes,No,0.0,0.0,1.0,0.0
+74,Are the boxes to the right of the man full and square?,yes,0.5,288,No,No,No,No,0.0,0.0,0.0,0.0
+74,Are the boxes to the right of the man full and square?,yes,0.75,432,No,No,No,No,0.0,0.0,0.0,0.0
+75,Is the horse next to the other horse both baby and brown?,no,0.25,144,Yes,Yes,Yes,Yes,0.0,0.0,0.0,0.0
+75,Is the horse next to the other horse both baby and brown?,no,0.5,288,Yes,Yes,Yes,Yes,0.0,0.0,0.0,0.0
+75,Is the horse next to the other horse both baby and brown?,no,0.75,432,Yes,Yes,Yes,Yes,0.0,0.0,0.0,0.0
+76,Is the river wide or is it narrow?,narrow,0.25,144,Narrow,Narrow,Narrow,Narrow,1.0,1.0,1.0,1.0
+76,Is the river wide or is it narrow?,narrow,0.5,288,Narrow,Narrow,Narrow,Narrow,1.0,1.0,1.0,1.0
+76,Is the river wide or is it narrow?,narrow,0.75,432,Narrow,Narrow,Narrow,Narrow,1.0,1.0,1.0,1.0
+77,What appliance is the refrigerator larger than?,stove,0.25,144,Stove,Microwave,Stove,Stove,1.0,0.0,1.0,1.0
+77,What appliance is the refrigerator larger than?,stove,0.5,288,Stove,Stove,Stove,Stove,1.0,1.0,1.0,1.0
+77,What appliance is the refrigerator larger than?,stove,0.75,432,Stove,Stove,Stove,Stove,1.0,1.0,1.0,1.0
+78,Is the umbrella in the bottom part of the picture?,no,0.25,144,No,No,No,No,1.0,1.0,1.0,1.0
+78,Is the umbrella in the bottom part of the picture?,no,0.5,288,No,No,No,No,1.0,1.0,1.0,1.0
+78,Is the umbrella in the bottom part of the picture?,no,0.75,432,No,No,No,No,1.0,1.0,1.0,1.0
+79,What is inside the bowl to the right of the beans?,cookies,0.25,144,Cookie,Rice,Rice,Cookie,0.0,0.0,0.0,0.0
+79,What is inside the bowl to the right of the beans?,cookies,0.5,288,Cookie,Rice,Rice,Cookie,0.0,0.0,0.0,0.0
+79,What is inside the bowl to the right of the beans?,cookies,0.75,432,Cookie,Rice,Cookie,Cookie,0.0,0.0,0.0,0.0
+80,How clean do you think is the face mask the catcher is wearing?,clean,0.25,144,Dirty,Dirty,Dirty,Dirty,0.0,0.0,0.0,0.0
+80,How clean do you think is the face mask the catcher is wearing?,clean,0.5,288,Dirty,Dirty,Dirty,Dirty,0.0,0.0,0.0,0.0
+80,How clean do you think is the face mask the catcher is wearing?,clean,0.75,432,Dirty,Dirty,Dirty,Dirty,0.0,0.0,0.0,0.0
+81,Where is the catcher standing on?,field,0.25,144,Home plate,Home plate,Home plate,Home plate,0.0,0.0,0.0,0.0
+81,Where is the catcher standing on?,field,0.5,288,Home plate,Home plate,Home plate,Home plate,0.0,0.0,0.0,0.0
+81,Where is the catcher standing on?,field,0.75,432,Home plate,Home plate,Home plate,Home plate,0.0,0.0,0.0,0.0
+82,What is the color of the glove?,black,0.25,144,Black,Black,Black,Black,1.0,1.0,1.0,1.0
+82,What is the color of the glove?,black,0.5,288,Black,Black,Black,Black,1.0,1.0,1.0,1.0
+82,What is the color of the glove?,black,0.75,432,Black,Black,Black,Black,1.0,1.0,1.0,1.0
+83,Does the blanket look soft and white?,yes,0.25,144,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+83,Does the blanket look soft and white?,yes,0.5,288,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+83,Does the blanket look soft and white?,yes,0.75,432,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+84,What color are the drawers?,light brown,0.25,144,Brown,Brown,Brown,Brown,0.0,0.0,0.0,0.0
+84,What color are the drawers?,light brown,0.5,288,Brown,Brown,Brown,Brown,0.0,0.0,0.0,0.0
+84,What color are the drawers?,light brown,0.75,432,Brown,Brown,Brown,Brown,0.0,0.0,0.0,0.0
+85,Are there refrigerators to the left of the stove?,yes,0.25,144,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+85,Are there refrigerators to the left of the stove?,yes,0.5,288,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+85,Are there refrigerators to the left of the stove?,yes,0.75,432,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+86,Which kind of clothing is bright?,gown,0.25,144,Dress,Dress,Shirt,Dress,0.0,0.0,0.0,0.0
+86,Which kind of clothing is bright?,gown,0.5,288,Dress,Dress,Dress,Dress,0.0,0.0,0.0,0.0
+86,Which kind of clothing is bright?,gown,0.75,432,Dress,Dress,Dress,Dress,0.0,0.0,0.0,0.0
+87,Is there an elephant near the person that is wearing a coat?,no,0.25,144,No,No,No,No,1.0,1.0,1.0,1.0
+87,Is there an elephant near the person that is wearing a coat?,no,0.5,288,No,No,No,No,1.0,1.0,1.0,1.0
+87,Is there an elephant near the person that is wearing a coat?,no,0.75,432,No,No,No,No,1.0,1.0,1.0,1.0
+88,What is the woman wearing?,gloves,0.25,144,Pants,Pants,Jacket,Pants,0.0,0.0,0.0,0.0
+88,What is the woman wearing?,gloves,0.5,288,Pants,Pants,Skis,Jacket,0.0,0.0,0.0,0.0
+88,What is the woman wearing?,gloves,0.75,432,Pants,Pants,Jacket,Pants,0.0,0.0,0.0,0.0
+89,What do you think is the standing person near the man wearing?,gloves,0.25,144,Jacket,Pants,Pants,Hat,0.0,0.0,0.0,0.0
+89,What do you think is the standing person near the man wearing?,gloves,0.5,288,Jacket,Pants,Glove,Jacket,0.0,0.0,0.0,0.0
+89,What do you think is the standing person near the man wearing?,gloves,0.75,432,Jacket,Skis,Skis,Skis,0.0,0.0,0.0,0.0
+90,Which type of clothing is pink?,gown,0.25,144,Dress,Dress,Dress,Dress,0.0,0.0,0.0,0.0
+90,Which type of clothing is pink?,gown,0.5,288,Dress,Dress,Dress,Dress,0.0,0.0,0.0,0.0
+90,Which type of clothing is pink?,gown,0.75,432,Dress,Dress,Dress,Dress,0.0,0.0,0.0,0.0
+91,What is the person that is sitting down sitting atop?,stairs,0.25,144,Stairs,Stairs,Stairs,Stairs,1.0,1.0,1.0,1.0
+91,What is the person that is sitting down sitting atop?,stairs,0.5,288,Stairs,Stairs,Stairs,Stairs,1.0,1.0,1.0,1.0
+91,What is the person that is sitting down sitting atop?,stairs,0.75,432,Stairs,Stairs,Stairs,Stairs,1.0,1.0,1.0,1.0
+92,What's standing on the floor?,shelf,0.25,144,Shelf,Bookshelf,Book,Shelf,1.0,0.0,0.0,1.0
+92,What's standing on the floor?,shelf,0.5,288,Shelf,Bookshelf,Bookshelf,Shelf,1.0,0.0,0.0,1.0
+92,What's standing on the floor?,shelf,0.75,432,Shelf,Bookshelf,Bookshelf,Bookshelf,1.0,0.0,0.0,0.0
+93,What items of furniture are to the left of the boy?,tables,0.25,144,Chairs,Chairs,Chairs,Chairs,0.0,0.0,0.0,0.0
+93,What items of furniture are to the left of the boy?,tables,0.5,288,Chairs,Chairs,Chairs,Chairs,0.0,0.0,0.0,0.0
+93,What items of furniture are to the left of the boy?,tables,0.75,432,Chairs,Chairs,Chairs,Chairs,0.0,0.0,0.0,0.0
+94,What is in front of the wall that is not short?,shelf,0.25,144,Shelf,Bookshelf,Shelf,Shelf,1.0,0.0,1.0,1.0
+94,What is in front of the wall that is not short?,shelf,0.5,288,Shelf,Bookshelf,Shelf,Shelf,1.0,0.0,1.0,1.0
+94,What is in front of the wall that is not short?,shelf,0.75,432,Shelf,Bookshelf,Bookshelf,Bookshelf,1.0,0.0,0.0,0.0
+95,How wide is the parking lot made of cement?,wide,0.25,144,Wide,Wide,Wide,Wide,1.0,1.0,1.0,1.0
+95,How wide is the parking lot made of cement?,wide,0.5,288,Wide,Wide,Wide,Wide,1.0,1.0,1.0,1.0
+95,How wide is the parking lot made of cement?,wide,0.75,432,Wide,Wide,Wide,Wide,1.0,1.0,1.0,1.0
+96,On which side of the picture is the clean mirror?,left,0.25,144,Left,Left,Left,Left,1.0,1.0,1.0,1.0
+96,On which side of the picture is the clean mirror?,left,0.5,288,Left,Left,Left,Left,1.0,1.0,1.0,1.0
+96,On which side of the picture is the clean mirror?,left,0.75,432,Left,Left,Left,Left,1.0,1.0,1.0,1.0
+97,What is the device in front of the flat computer?,phone,0.25,144,Keyboard,Keyboard,Keyboard,Keyboard,0.0,0.0,0.0,0.0
+97,What is the device in front of the flat computer?,phone,0.5,288,Keyboard,Keyboard,Keyboard,Keyboard,0.0,0.0,0.0,0.0
+97,What is the device in front of the flat computer?,phone,0.75,432,Keyboard,Keyboard,Keyboard,Keyboard,0.0,0.0,0.0,0.0
+98,What is sitting on the floor?,gift,0.25,144,Snowboard,Snowboard,Snowboard,Snowboard,0.0,0.0,0.0,0.0
+98,What is sitting on the floor?,gift,0.5,288,Snowboard,Snowboard,Snowboard,Snowboard,0.0,0.0,0.0,0.0
+98,What is sitting on the floor?,gift,0.75,432,Snowboard,Snowboard,Snowboard,Snowboard,0.0,0.0,0.0,0.0
+99,Is there a blender to the right of the yellow drink?,yes,0.25,144,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+99,Is there a blender to the right of the yellow drink?,yes,0.5,288,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+99,Is there a blender to the right of the yellow drink?,yes,0.75,432,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0

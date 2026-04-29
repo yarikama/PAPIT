@@ -31,13 +31,18 @@ echo "[$(date)] Cache OK: $(wc -l < $CACHE/index.csv) samples"
 # Phase 3: train mlp4 on each target
 # --------------------------------------------------------------------------
 for tgt in attn_L8 attn_L16 attn_L24 attn_rollout; do
+    if [ -f "$OUT/mlp4_${tgt}.pt" ]; then
+        echo "[$(date)] Phase 3: skipping $tgt (predictor already exists)"
+        continue
+    fi
     echo "=================================================================="
-    echo "[$(date)] Phase 3: training mlp4 on target=$tgt"
+    echo "[$(date)] Phase 3: training mlp4 on target=$tgt (20K subset, 8 epoch)"
     PYTHONPATH=. uv run python scripts/train_distill_arch.py \
         --cache "$CACHE" --target "$tgt" --archs mlp4 \
-        --epochs 12 --batch 64 \
+        --epochs 8 --batch 64 --subset 20000 \
         --save-best "$OUT/mlp4_${tgt}.pt"
 done
+echo "[$(date)] PHASE_3_DONE — all 4 predictors saved"
 echo "[$(date)] Phase 3 DONE. Predictors at $OUT/"
 ls -la "$OUT/"
 
@@ -54,12 +59,16 @@ for tgt in attn_L8 attn_L16 attn_L24 attn_rollout; do
       vqa_v2)  CSV=/opt/dlami/nvme/data/vqa_v2_val_subset.csv ;;
     esac
     OUTCSV="outputs/distill100k_${tgt}_${ds}.csv"
+    if [ -f "$OUTCSV" ]; then
+        echo "[$(date)] Phase 4: skipping $tgt/$ds (CSV exists)"
+        continue
+    fi
     echo "=================================================================="
-    echo "[$(date)] Phase 4: eval mlp4-$tgt on $ds (100 samples)"
+    echo "[$(date)] Phase 4: eval mlp4-$tgt on $ds (100 samples, skip-oracle)"
     PYTHONPATH=. uv run python scripts/eval_distill.py \
         --csv "$CSV" \
         --predictor "$OUT/mlp4_${tgt}.pt" \
-        --max-samples 100 \
+        --max-samples 100 --skip-oracle \
         --out "$OUTCSV"
   done
 done
@@ -78,80 +87,20 @@ for csv in sorted(Path("outputs").glob("distill100k_*.csv")):
     target = "_".join(parts[1:-1]) if dataset != "vqa_v2" else "_".join(parts[1:-2])
     df = pd.read_csv(csv)
     for ret, sub in df.groupby("retention"):
-        rows.append({
+        row = {
             "target": target, "dataset": dataset, "retention": ret,
             "unpruned":   sub["acc_unpruned"].mean(),
             "random":     sub["acc_random"].mean(),
             "papit_clip": sub["acc_papit"].mean(),
             "distill":    sub["acc_distill"].mean(),
-            "oracle_L16": sub["acc_oracle"].mean(),
-        })
+        }
+        if "acc_oracle" in sub.columns:
+            row["oracle_L16"] = sub["acc_oracle"].mean()
+        rows.append(row)
 print("\n========== Phase 4 summary ==========")
 print(pd.DataFrame(rows).round(3).to_string(index=False))
 PY
 
-# --------------------------------------------------------------------------
-# Phase 5: prep 700-sample CSVs and run headline eval with the L=16
-#          predictor against {Unpruned, Random, PAPIT-CLIP, PAPIT-distill}.
-#          Oracle is skipped at 700-sample (already covered at 100-sample).
-# --------------------------------------------------------------------------
-echo "=================================================================="
-echo "[$(date)] Phase 5: preparing 700-sample eval CSVs"
-PYTHONPATH=. uv run python scripts/prep_700_eval.py
-
-WINNER_PRED=$OUT/mlp4_attn_L16.pt
-if [ ! -f "$WINNER_PRED" ]; then
-    echo "[$(date)] ERROR: winner predictor $WINNER_PRED missing; aborting Phase 5"
-    exit 1
-fi
-
-for ds in gqa textvqa vqa_v2; do
-    CSV=/opt/dlami/nvme/data/${ds}_700.csv
-    OUTCSV="outputs/distill700_${ds}.csv"
-    echo "=================================================================="
-    echo "[$(date)] Phase 5: 700-sample eval on $ds with L=16 predictor"
-    PYTHONPATH=. uv run python scripts/eval_distill.py \
-        --csv "$CSV" --predictor "$WINNER_PRED" \
-        --max-samples 700 --skip-oracle --out "$OUTCSV"
-done
-
-# --------------------------------------------------------------------------
-# Phase 6: efficiency benchmark — wall-clock latency for the four scorers.
-# --------------------------------------------------------------------------
-echo "=================================================================="
-echo "[$(date)] Phase 6: efficiency benchmark on 20 GQA samples"
-PYTHONPATH=. uv run python scripts/run_efficiency_distill.py \
-    --csv /opt/dlami/nvme/data/gqa_700.csv \
-    --predictor "$WINNER_PRED" \
-    --n 20 \
-    --out outputs/efficiency_distill.csv
-
-# --------------------------------------------------------------------------
-# Final headline summary
-# --------------------------------------------------------------------------
-PYTHONPATH=. uv run python - <<'PY'
-import pandas as pd
-from pathlib import Path
-print("\n========== Phase 5 headline (700-sample) ==========")
-all_rows = []
-for ds in ["gqa", "textvqa", "vqa_v2"]:
-    p = Path(f"outputs/distill700_{ds}.csv")
-    if not p.exists(): continue
-    df = pd.read_csv(p)
-    for ret, sub in df.groupby("retention"):
-        all_rows.append({
-            "dataset": ds, "k": ret,
-            "unpruned": round(sub["acc_unpruned"].mean(), 3),
-            "random":   round(sub["acc_random"].mean(),   3),
-            "papit_clip": round(sub["acc_papit"].mean(),  3),
-            "papit_distill": round(sub["acc_distill"].mean(), 3),
-        })
-print(pd.DataFrame(all_rows).to_string(index=False))
-
-eff = Path("outputs/efficiency_distill.csv")
-if eff.exists():
-    print("\n========== Phase 6 latency (ms, mean over samples) ==========")
-    print(pd.read_csv(eff).groupby("method")["mean_ms"].agg(["mean","std"]).round(2))
-PY
-
-echo "[$(date)] All Scope-C phases done."
+echo "[$(date)] Phase 3+4 done. Stopping here per user instruction —"
+echo "[$(date)] Phase 5+6 will be launched separately after winner-target review."
+echo "[$(date)] PHASE_3_4_COMPLETE"

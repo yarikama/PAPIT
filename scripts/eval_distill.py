@@ -57,15 +57,42 @@ def build_predictor_from_ckpt(ckpt: dict, device: str):
 
 
 _PUNCT_RE = re.compile(r"[^\w\s]")
+_GOLD_LIST_RE = re.compile(r"'([^']*)'")
 
 
 def _norm(s: str) -> str:
-    s = _PUNCT_RE.sub("", s.strip().lower()).split()
-    return s[-1] if s else ""
+    """Normalize a string: lowercase, strip 'ASSISTANT:' prefix and
+    surrounding artifacts, drop punctuation, collapse whitespace.
+    Preserves multi-word answers ('dakota digital', 'red shirt', etc.)."""
+    s = s.strip().lower()
+    if "assistant:" in s:
+        s = s.rsplit("assistant:", 1)[-1]
+    s = _PUNCT_RE.sub("", s)
+    return " ".join(s.split())
+
+
+def _parse_gold(gold: str) -> list[str]:
+    """Returns list of normalized answers. Handles both GQA's single-word
+    answer and VQA-style numpy-array string `"['a' 'b' 'c' ...]"`."""
+    g = gold.strip()
+    if g.startswith("[") and "'" in g:
+        items = _GOLD_LIST_RE.findall(g)
+        return [_norm(x) for x in items if x.strip()]
+    return [_norm(g)]
 
 
 def gqa_em(pred: str, gold: str) -> float:
-    return 1.0 if _norm(pred) == _norm(gold) else 0.0
+    """Backward-compatible: name kept for old code paths but now returns
+    GQA exact match OR VQA soft accuracy depending on gold format."""
+    p = _norm(pred)
+    if not p:
+        return 0.0
+    answers = _parse_gold(gold)
+    if len(answers) <= 1:
+        return 1.0 if p == answers[0] else 0.0
+    # VQA soft: min(count_matching / 3, 1)
+    count = sum(1 for a in answers if a == p)
+    return min(count / 3.0, 1.0)
 
 
 @torch.no_grad()

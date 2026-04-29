@@ -124,10 +124,90 @@ def top10_jaccard(pred_logits, target):
 
 
 # ---------------------------------------------------------------------------
-# Cache loader (handles both Scope-A and multi-target shards)
+# Sharded dataset for big caches (100K samples × 1.18MB = 118GB doesn't fit
+# in g5.2xlarge's 32GB RAM, so we keep at most a few shards loaded at once).
+# Falls back to in-memory tensors when the cache is small.
 # ---------------------------------------------------------------------------
+from torch.utils.data import Dataset
+
+
+import random as _random
+from torch.utils.data import IterableDataset
+
+
+class ShardedCacheDataset(IterableDataset):
+    """Worker-aware streaming sharded cache.
+    Each DataLoader worker iterates a disjoint subset of shards. With
+    `num_workers >= 2` and `prefetch_factor >= 2`, the next shard is
+    loaded in parallel with the current shard's training, hiding the
+    ~200 ms torch.load latency behind the ~100 ms compute.
+    Call `epoch_shuffle()` on the main-process dataset before each epoch
+    to randomise shard visit order; workers see the updated state via
+    fork-on-iter (default DataLoader behaviour)."""
+
+    def __init__(self, cache_dir: Path, target_key: str, indices):
+        self.cache_dir = cache_dir
+        self.target_key = target_key
+        self.shards = sorted(cache_dir.glob("shard_*.pt"))
+        if not self.shards:
+            raise FileNotFoundError(f"No shards in {cache_dir}")
+        first = torch.load(self.shards[0], weights_only=True)
+        if target_key not in first and "target" in first:
+            if target_key not in ("attn_L16", "target"):
+                raise KeyError(
+                    f"target_key={target_key} not in cache; only 'target' available")
+            self._target_alias = "target"
+        else:
+            self._target_alias = target_key
+        self._per_shard = first["vit"].shape[0]
+        self.patch_dim = first["vit"].shape[-1]
+        self.text_dim = first["text"].shape[-1]
+        del first
+        self._by_shard: dict[int, list[int]] = {}
+        for gi in indices:
+            sh = gi // self._per_shard
+            self._by_shard.setdefault(sh, []).append(gi % self._per_shard)
+        self.epoch_shuffle()
+
+    def epoch_shuffle(self):
+        order = list(self._by_shard.keys())
+        _random.shuffle(order)
+        self._shard_order = order
+
+    def __len__(self):
+        return sum(len(v) for v in self._by_shard.values())
+
+    def __iter__(self):
+        info = torch.utils.data.get_worker_info()
+        order = self._shard_order
+        if info is None:
+            my_shards = order
+        else:
+            # Round-robin shard assignment so workers progress in parallel.
+            my_shards = order[info.id::info.num_workers]
+        for sh in my_shards:
+            d = torch.load(self.shards[sh], weights_only=True)
+            in_shard_indices = self._by_shard[sh][:]
+            _random.shuffle(in_shard_indices)
+            for in_shard in in_shard_indices:
+                yield (d["vit"][in_shard],
+                       d["text"][in_shard],
+                       d[self._target_alias][in_shard])
+            del d
+
+
+def cache_total_size(cache_dir: Path):
+    shards = sorted(cache_dir.glob("shard_*.pt"))
+    if not shards:
+        raise FileNotFoundError(f"No shards in {cache_dir}")
+    first = torch.load(shards[0], weights_only=True)
+    per = first["vit"].shape[0]
+    last = torch.load(shards[-1], weights_only=True)["vit"].shape[0]
+    return per * (len(shards) - 1) + last
+
 
 def load_cache(cache_dir: Path, target_key: str):
+    """Legacy in-memory loader. Used only by Scope-A 5K cache path."""
     shards = sorted(cache_dir.glob("shard_*.pt"))
     if not shards:
         raise FileNotFoundError(f"No shards in {cache_dir}")
@@ -137,7 +217,6 @@ def load_cache(cache_dir: Path, target_key: str):
     if target_key in parts[0]:
         target = torch.cat([p[target_key] for p in parts], dim=0)
     elif "target" in parts[0]:
-        # Scope-A cache stored a single 'target' tensor (= L=16 attention).
         if target_key not in ("attn_L16", "target"):
             raise KeyError(f"target_key={target_key} not found; cache only has 'target'.")
         target = torch.cat([p["target"] for p in parts], dim=0)
@@ -159,34 +238,81 @@ def main():
     ap.add_argument("--seed", type=int, default=0)
     ap.add_argument("--save-best", type=Path, default=None,
                     help="Save the lowest-val-KL model checkpoint here.")
+    ap.add_argument("--in-memory-threshold", type=int, default=20000,
+                    help="Below this many samples, load all of cache into "
+                         "RAM (faster). Above, stream from disk.")
+    ap.add_argument("--shard-cache", type=int, default=8,
+                    help="Number of shards kept in RAM by the streaming loader.")
+    ap.add_argument("--subset", type=int, default=None,
+                    help="Use only this many samples from the cache (random "
+                         "subset). 30K fits in OS file cache so subsequent "
+                         "epochs are RAM-bound rather than disk-bound.")
     args = ap.parse_args()
 
     device = "cuda" if torch.cuda.is_available() else "cpu"
     torch.manual_seed(args.seed)
 
-    vit, text, target = load_cache(args.cache, args.target)
-    n = vit.shape[0]
-    n_val = max(1, int(round(n * args.val_frac)))
-    perm = torch.randperm(n)
-    val_idx, tr_idx = perm[:n_val], perm[n_val:]
-    tr_ld  = DataLoader(TensorDataset(vit[tr_idx],  text[tr_idx],  target[tr_idx]),
-                        batch_size=args.batch, shuffle=True)
-    val_ld = DataLoader(TensorDataset(vit[val_idx], text[val_idx], target[val_idx]),
-                        batch_size=args.batch, shuffle=False)
-    print(f"Cache n={n}  target={args.target}  train={len(tr_idx)}  val={len(val_idx)}")
+    n_avail = cache_total_size(args.cache)
+    n_total = min(args.subset, n_avail) if args.subset else n_avail
+    n_val = max(1, int(round(n_total * args.val_frac)))
+    # Use the first n_total samples (= first ceil(n_total/100) shards) so the
+    # streaming loader only touches those shards. The cache itself was
+    # randomly shuffled when built, so contiguous-prefix == random subset.
+    perm_full = torch.randperm(n_total)             # shuffle within subset
+    val_idx_all = perm_full[:n_val].tolist()
+    tr_idx_all  = perm_full[n_val:].tolist()
+
+    # Stream when the underlying cache is too big for RAM, even if the
+    # subset we're using would fit — load_cache() reads the full cache.
+    streaming = n_avail > args.in_memory_threshold
+    if not streaming:
+        # Small cache (Scope-A 5K): keep the original fast in-memory path.
+        vit, text, target = load_cache(args.cache, args.target)
+        tr_ds  = TensorDataset(vit[torch.tensor(tr_idx_all)],
+                               text[torch.tensor(tr_idx_all)],
+                               target[torch.tensor(tr_idx_all)])
+        val_ds = TensorDataset(vit[torch.tensor(val_idx_all)],
+                               text[torch.tensor(val_idx_all)],
+                               target[torch.tensor(val_idx_all)])
+        patch_dim, text_dim = vit.shape[-1], text.shape[-1]
+        del vit, text, target
+    else:
+        # Big cache (100K): stream from disk; only shards whose samples
+        # appear in tr_idx_all/val_idx_all are loaded.
+        tr_ds  = ShardedCacheDataset(args.cache, args.target, tr_idx_all)
+        val_ds = ShardedCacheDataset(args.cache, args.target, val_idx_all)
+        patch_dim, text_dim = tr_ds.patch_dim, tr_ds.text_dim
+
+    if streaming:
+        tr_ld  = DataLoader(tr_ds,  batch_size=args.batch, shuffle=False,
+                            num_workers=2, prefetch_factor=4,
+                            persistent_workers=False)
+        val_ld = DataLoader(val_ds, batch_size=args.batch, shuffle=False,
+                            num_workers=1, prefetch_factor=2,
+                            persistent_workers=False)
+    else:
+        tr_ld  = DataLoader(tr_ds,  batch_size=args.batch, shuffle=True,
+                            num_workers=0)
+        val_ld = DataLoader(val_ds, batch_size=args.batch, shuffle=False,
+                            num_workers=0)
+    print(f"Cache n={n_total}  target={args.target}  "
+          f"train={len(tr_idx_all)}  val={len(val_idx_all)}  "
+          f"streaming={n_total > args.in_memory_threshold}")
 
     rows = []
     best_overall = (None, float("inf"), None)  # (arch, val_kl, state_dict)
 
     for arch_name in args.archs:
         Arch = ARCHS[arch_name]
-        model = Arch(patch_dim=vit.shape[-1], text_dim=text.shape[-1]).to(device)
+        model = Arch(patch_dim=patch_dim, text_dim=text_dim).to(device)
         n_p = sum(p.numel() for p in model.parameters())
         opt = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=1e-4)
         t0 = time.time()
         last_val_kl, last_jac = None, None
         best_state, best_kl = None, float("inf")
         for ep in range(args.epochs):
+            if streaming:
+                tr_ds.epoch_shuffle()
             model.train()
             for v, t_, y in tr_ld:
                 v, t_, y = v.to(device), t_.to(device), y.to(device)
@@ -222,13 +348,10 @@ def main():
     print(pd.DataFrame(rows).to_string(index=False))
 
     if args.save_best is not None and best_overall[2] is not None:
-        # Save best-overall checkpoint
-        Arch = ARCHS[best_overall[0]]
-        # Recover dims
         torch.save({
             "arch": best_overall[0],
-            "patch_dim": vit.shape[-1],
-            "text_dim":  text.shape[-1],
+            "patch_dim": patch_dim,
+            "text_dim":  text_dim,
             "model_state": best_overall[2],
             "target": args.target,
             "val_kl_best": best_overall[1],
