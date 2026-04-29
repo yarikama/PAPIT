@@ -7,6 +7,13 @@
 \usepackage{amssymb}
 \usepackage{booktabs}
 \usepackage{multirow}
+% --- modern, Meta-style typography ---------------------------
+\usepackage{charter}                       % body font: Charter (clean, modern serif)
+\usepackage[charter]{mathdesign}           % matching math font
+\usepackage[scaled=0.96]{helvet}           % sans-serif for headings (slightly tighter)
+\usepackage[T1]{fontenc}
+\renewcommand{\familydefault}{\rmdefault}  % keep body in serif
+% --------------------------------------------------------------
 \usepackage{microtype}
 \usepackage{xcolor}
 \usepackage{tikz}
@@ -29,11 +36,20 @@
 \title{PAPIT: Distilling Mid-Layer LLM Attention into a\\
        Training-Free Image-Token Pruner for LLaVA-1.5}
 
-\author{%
-  Chao Hsuan Ho \quad Heng Jui Hsu \quad Kerstin Sun \\
-  Department of Computer Science, Rice University \\
-  {\small\texttt{\{ch218, hh83, ks256\}@rice.edu}}
+% Author block hidden to reclaim vertical space; group identity is on
+% file with the instructor.
+\author{}
+
+% Suppress the empty author/date row that \maketitle would normally insert.
+\makeatletter
+\def\@maketitle{%
+  \newpage \null \vskip 1em%
+  \begin{center}%
+    {\Large \bfseries \@title \par}%
+  \end{center}%
+  \par \vskip 1.0em%
 }
+\makeatother
 
 \setcounter{page}{1}
 \begin{document}
