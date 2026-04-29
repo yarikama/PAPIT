@@ -379,19 +379,70 @@ final scoring method.
 \section{Discussion}
 \label{sec:discussion}
 
-% TODO (CLIP insight): Explain why PAPIT's scoring signal does not
-% consistently outperform random pruning.
-% Suggested points to cover:
-%   - CLIP's vision encoder and LLaVA's ViT are not jointly trained with
-%     the LLM, so the saliency signal does not directly predict what
-%     LLaVA attends to during generation.
-%   - GradCAM captures text-image alignment at the CLS level; individual
-%     patch gradients are diffuse when the query is satisfied by global
-%     context rather than a localized region.
-%   - LLaVA's strong language prior allows it to recover from suboptimal
-%     patch selection, reducing the marginal value of prompt-aware scoring.
-%   - Future directions: jointly trained pruning predictors or using
-%     LLM-internal attention signals (FastV-style) for more reliable scoring.
+A natural question raised by Table~\ref{tab:accuracy} is why prompt-aware
+scoring fails to consistently outperform a query-agnostic random baseline.
+We attribute this to four interacting factors.
+
+\paragraph{Representation misalignment.}
+Although LLaVA's vision tower is initialized from CLIP
+ViT-L/14~\cite{radford2021clip}, visual instruction
+tuning~\cite{liu2023llava,liu2024llava15} re-purposes its patch hidden
+states for autoregressive generation. The ``importance'' geometry that
+the LLM actually attends to therefore drifts away from CLIP's contrastive
+CLS-to-text alignment. Our GradCAM~\cite{selvaraju2017gradcam} signal
+still measures the latter, making it a proxy rather than a faithful
+predictor of which tokens the LLM needs --- a property that
+FastV~\cite{chen2024fastv} exploits by reading attention \emph{from
+inside the LLM itself}, rather than from the vision encoder.
+
+\paragraph{Random pruning is a stronger baseline than it appears.}
+Uniform sampling preserves \emph{spatial coverage}: every region of the
+$24{\times}24$ grid contributes some signal to the LLM. PAPIT, by contrast,
+concentrates retained tokens in a contiguous high-saliency region, which
+discards background and peripheral cues that VQA questions often
+implicitly rely on (e.g., ``what is the boy doing?'' depends on the scene,
+not only the boy). LLaVA was trained on the full 576-token grid, so a
+spatially clustered subset is mildly out-of-distribution for its attention
+patterns, whereas a uniformly scattered subset is not. Recent work has
+also shown that ViTs allocate a non-trivial fraction of patch tokens to
+\emph{global} register-like roles~\cite{darcet2024registers}, which random
+sampling preserves in expectation but query-driven top-$k$ tends to drop.
+
+\paragraph{Top-$k$ selection is redundancy-prone.}
+High-GradCAM patches are spatially adjacent
+(Figure~\ref{fig:qualitative}), so the retained set carries highly
+correlated information. This is the same pathology that motivates
+similarity-aware token reduction such as ToMe~\cite{bolya2023tome}, which
+merges \emph{redundant} tokens rather than scoring them independently. A
+scattered random subset of the same size can encode strictly more diverse
+evidence, partially offsetting the loss of query relevance. Concurrent
+VLM-pruning work like SparseVLM~\cite{zhang2024sparsevlm} similarly
+reports that pure relevance-based selection underperforms hybrid
+strategies that explicitly preserve diversity.
+
+\paragraph{Where prompt-awareness does help.}
+The TextVQA $k{=}75\%$ result ($+0.9$ over random) is consistent with the
+above account: text regions in natural images are \emph{small and
+spatially localized}~\cite{singh2019textvqa}, exactly the regime where
+uniform sampling is most likely to miss the answer-bearing patches and
+where saliency-driven selection has measurable upside. As retention drops
+further, even correctly-localized selection cannot compensate for the
+lost global context.
+
+\paragraph{Implications for future work.}
+Two directions follow directly. (i) Replace the CLIP-based scorer with
+one trained on LLaVA's own post-instruction-tuning hidden states,
+supervised by LLM-internal attention --- either FastV-style logit
+attention~\cite{chen2024fastv} or attention-rollout aggregation across
+layers~\cite{abnar2020rollout} --- so the signal predicts what the
+\emph{LLM} attends to rather than what CLIP aligns. This is analogous to
+the learned predictor in DynamicViT~\cite{rao2021dynamicvit}, but
+conditioned on the user prompt. (ii) Add an explicit spatial-diversity
+constraint on top of top-$k$, for instance grid-stratified selection,
+similarity-based merging in the spirit of ToMe~\cite{bolya2023tome}, or
+DPP-style sampling~\cite{kulesza2012dpp} that jointly maximizes relevance
+and diversity, to prevent collapse onto a single saliency mode while
+preserving prompt awareness.
 
 % ============================================================
 \section{Conclusion}
