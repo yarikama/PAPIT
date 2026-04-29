@@ -57,37 +57,19 @@
 
 % ============================================================
 \begin{abstract}
-LLaVA-1.5~\cite{liu2024llava15} encodes a $336{\times}336$ image as $576$ patch
-tokens, most of which are irrelevant to a given user query. A natural,
-training-free way to identify the relevant tokens is to score patches
-against the prompt using CLIP~\cite{radford2021clip}-derived saliency.
-We test this idea with \textbf{PAPIT}, a single-pass pipeline that scores
-patches by GradCAM~\cite{selvaraju2017gradcam} on LLaVA's own vision tower
-and retains the top-$k$ before the LLM. Across GQA~\cite{hudson2019gqa},
-VQA~v2~\cite{goyal2017vqav2} and TextVQA~\cite{singh2019textvqa} (700
-samples each), PAPIT only matches a query-agnostic random baseline. A
-direct \emph{alignment diagnostic} explains why: per-image Spearman
-$\rho{\approx}0$ between PAPIT's GradCAM scores and LLaVA's last-layer
-LLM attention, with top-$10\%$ Jaccard \emph{below} the uniform-random
-reference on all three datasets. As a positive control, replacing the
-scorer with a two-pass oracle that reads attention from the LLM's
-\emph{middle} layer beats random by up to $+0.08$ on GQA. We then close
-the loop with \textbf{PAPIT-Distill}: a $1.3$M-parameter MLP trained on
-$100{,}000$ cached LLaVA forward passes to predict layer-$16$ attention
-from ViT patch features and the prompt's CLIP text embedding. The
-distilled scorer is a drop-in replacement for the GradCAM step,
-adds ${<}\!2$\,ms per image, and recovers the oracle's gain over random
-in single-pass deployment. On 100 held-out samples per benchmark,
-PAPIT-Distill at $k{=}50\%$ reaches $56.0$\,/\,$83.3$\,/\,$36.0$ on
-GQA\,/\,VQA~v2\,/\,TextVQA, vs.\ $52.0$\,/\,$81.0$\,/\,$30.7$ for
-random and $57.0$\,/\,$83.3$\,/\,$36.7$ for unpruned --- closing the
-gap to unpruned at $\le 1$ point on every benchmark. On TextVQA at
-$k{=}25\%$ it gains $+12$ points over random ($36.0$ vs.\ $23.7$),
-essentially recovering Unpruned at a $10\times$ attention-FLOP
-reduction. The picture that emerges is a clean three-contribution
-story: a deployable pruning pipeline, a quantitative negative result
-that rules out CLIP-aligned saliency, and a cheap distillation that
-turns mid-layer LLM attention into a training-free signal.
+We present \textbf{PAPIT-Distill}, a $1.3$M-parameter MLP that distils
+LLaVA-1.5-7B's mid-layer attention into a single-pass image-token
+pruner. On TextVQA at $k{=}25\%$ retention (a $10\times$
+attention-FLOP reduction) it gains $+12$ points over random pruning
+($36.0$ vs.\ $23.7$), essentially recovering the unpruned baseline
+($36.7$). On GQA and VQA~v2 at $k{=}50\%$ it closes the gap to
+unpruned to within a single point. Scoring a $576$-patch image takes
+$0.43$\,ms --- ${\sim}150{\times}$ faster than its CLIP-GradCAM
+analogue and ${\sim}500{\times}$ faster than the two-pass oracle it
+learns from. En route we report a quantitative \emph{negative result}
+that motivates the method: cross-dataset Spearman $\rho{\approx}0$
+between CLIP-derived saliency and LLaVA's own LLM attention, ruling
+out training-free CLIP-aligned scorers as a class.
 \end{abstract}
 
 % ============================================================
