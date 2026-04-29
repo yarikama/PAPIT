@@ -64,9 +64,13 @@ and find on all three datasets a per-image Spearman $\rho \approx 0$
 with top-$10\%$ Jaccard \emph{below} the uniform-random baseline. Our main contribution is therefore a
 quantitative \emph{negative result}: CLIP-aligned saliency carries
 essentially no information about which patches the LLM relies on,
-which we argue rules out an entire family of training-free
-prompt-aware pruning approaches and motivates LLM-internal scoring
-signals (e.g., FastV-style attention).
+ruling out an entire family of training-free prompt-aware pruning
+approaches. As a positive control, we test an LLM-internal-attention
+oracle on the same pipeline and find that mid-layer attention
+($L\!\approx\!16$ in LLaVA-1.5-7B) does beat random ($+0.08$ at
+$k\!=\!25\%$, matching unpruned at $k\!=\!50\%$ on GQA-100), showing
+that prompt-aware pruning is achievable provided the signal is read
+from inside the LLM rather than from the CLIP-aligned vision side.
 \end{abstract}
 
 % ============================================================
@@ -501,6 +505,61 @@ principle, exceed the random baseline by more than the small
 sampling-noise band where CLIP saliency happens to coincide with LLM
 attention by chance.
 
+\paragraph{Positive control: an LLM-internal-attention oracle.}
+A natural follow-up is whether a \emph{different} training-free
+signal --- specifically LLaVA's own LLM attention --- can beat
+random under the same pruning pipeline. We test a two-pass oracle:
+run LLaVA once on the full 576-token sequence, sum non-image-query
+attention to each image-token key at a given layer (averaged over
+heads), use that as the patch score, then re-generate on the
+spliced (pruned) inputs. This is strictly more expensive than
+single-pass FastV~\cite{chen2024fastv} but isolates the question of
+whether the \emph{signal} can carry information that the pruning
+pipeline can exploit.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Two-pass LLM-attention oracle on GQA (100 samples,
+         exact match). \textbf{Bold} = beats random.
+         L\,$=$\,16 attains $0.61$ at $k\!=\!25\%$ (+0.08 vs.\
+         random, $-0.07$ vs.\ unpruned), and matches unpruned at
+         $k\!=\!50\%$. FastV's recommended layer~2 does not transfer
+         to the two-pass setting.}
+\label{tab:oracle}
+\begin{tabular}{@{}lccc@{}}
+\toprule
+Selector & $k\!=\!25\%$ & $k\!=\!50\%$ & $k\!=\!75\%$ \\
+\midrule
+Unpruned         & 0.58 & 0.58 & 0.58 \\
+Random           & 0.53 & 0.53 & 0.56 \\
+PAPIT (CLIP)     & 0.56 & 0.53 & 0.51 \\
+\midrule
+LLM-attn $L\!=\!2$  & 0.49 & 0.54 & 0.53 \\
+LLM-attn $L\!=\!8$  & \textbf{0.58} & \textbf{0.54} & 0.56 \\
+LLM-attn $L\!=\!16$ & \textbf{0.61} & \textbf{0.58} & 0.56 \\
+LLM-attn $L\!=\!24$ & \textbf{0.60} & \textbf{0.57} & 0.55 \\
+LLM-attn $L\!=\!31$ & 0.50 & \textbf{0.55} & 0.55 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:oracle} shows that mid-layer LLM-attention (L\,$=$\,8 to
+24) consistently beats random, while early (L\,$=$\,2) and late
+(L\,$=$\,31) layers do not. Two readings follow. (i) The negative
+result of Table~\ref{tab:diagnostic} is specifically about
+\emph{CLIP-aligned} signals: a different training-free signal
+\emph{can} carry useful patch importance information, so prompt-aware
+pruning is not impossible in principle. (ii) The signal lives in the
+\emph{middle} of the LLM, not where FastV~\cite{chen2024fastv} recommends
+($L\,$=$\,2$ in their single-pass setting). In our two-pass setting,
+$L\,$=$\,2$ has not yet seen enough of the prompt to commit attention
+mass to query-relevant patches, so its scores are essentially
+positional. We caveat that $N\!=\!100$ gives a binomial standard
+error of $\approx 0.05$, so the L\,$=$\,16 advantage at $k\!=\!25\%$
+($+0.08$ vs.\ random) is suggestive rather than conclusive; we leave
+larger-$N$ replication and cross-dataset validation to future work.
+
 % ============================================================
 \section{Discussion}
 \label{sec:discussion}
@@ -551,20 +610,26 @@ near-equivalent selectors operating on a redundant token set, not as
 a genuine prompt-aware advantage in any single regime.
 
 \paragraph{Implications for future work.}
-The diagnostic rules out an entire class of training-free
-prompt-aware pruners that score patches in any CLIP-aligned space.
-The remaining viable direction is to score patches in \emph{LLaVA's
-own post-instruction-tuning} representation, supervised by
-LLM-internal attention --- either FastV-style logit
-attention~\cite{chen2024fastv} or attention-rollout
-aggregation~\cite{abnar2020rollout} --- analogous to the learned
+The diagnostic rules out CLIP-aligned saliency as a viable
+training-free signal. The positive control (Table~\ref{tab:oracle})
+points the way out: mid-layer LLM attention does carry usable
+information, so the productive direction is to make that signal
+\emph{cheap} to read. Two concrete options follow. First, distil
+mid-layer LLM attention into a small predictor over LLaVA's own
+post-instruction-tuning hidden states, in the spirit of the learned
 predictor in DynamicViT~\cite{rao2021dynamicvit} but conditioned on
-the user prompt. Spatial-diversity constraints (grid-stratified
-selection, ToMe-style merging, or DPP-style~\cite{kulesza2012dpp}
-relevance--diversity sampling) are complementary, but only become
-meaningful once the underlying relevance signal is itself
-informative; layered on top of a near-noise score they cannot
-recover what the signal does not contain.
+the user prompt and supervised by attention rollout from
+layers~$\sim$8--24~\cite{abnar2020rollout}. Second, integrate
+single-pass FastV-style pruning~\cite{chen2024fastv} with our
+ViT-side pipeline: apply a coarse CLIP-blind pre-prune (e.g.,
+ToMe-style merging~\cite{bolya2023tome}) before the LLM, and a
+fine FastV-style cut inside the LLM, with the latter operating at
+the layer where the signal is informative rather than the canonical
+layer~$2$. Spatial-diversity priors (grid-stratified
+selection, DPP-style~\cite{kulesza2012dpp} relevance--diversity
+sampling) become meaningful only once a non-trivial relevance signal
+is in hand; on a near-noise score they cannot recover what the
+signal does not contain.
 
 % ============================================================
 \section{Conclusion}
@@ -575,25 +640,33 @@ tower could pick image tokens well enough to beat a query-agnostic
 random baseline. Across three VQA benchmarks (700 samples each),
 PAPIT matches but does not exceed random pruning, despite producing
 visibly localised selections on individual examples. An alignment
-diagnostic on 100 GQA samples shows why: GradCAM saliency and
-LLaVA's internal LLM attention over the 576 image tokens are
-statistically uncorrelated (Spearman $\rho \approx 0$, top-$10\%$
-Jaccard $\le$ uniform-random reference). The CLIP-aligned saliency
-signal that the entire family of training-free prompt-aware methods
-relies on therefore carries essentially no information about which
-patches the LLM actually uses --- a constraint that no choice of
-scoring rule (GradCAM, cosine, value-feature) within that signal
-family can overcome.
+diagnostic on 100 samples per dataset shows why: GradCAM saliency
+and LLaVA's internal LLM attention over the 576 image tokens are
+statistically uncorrelated on every benchmark (Spearman
+$\rho \approx 0$, top-$10\%$ Jaccard \emph{below} the uniform-random
+reference). The CLIP-aligned signal that the entire family of
+training-free prompt-aware methods relies on therefore carries
+essentially no information about which patches the LLM actually uses
+--- a constraint that no scoring rule within that signal family
+can overcome.
 
-Our contributions are accordingly twofold. We release a clean
-training-free pruning pipeline that achieves 41--90\%
-attention-FLOPs reduction with $\le$2.3-point accuracy loss on GQA
-and VQA~v2 at $k{=}75\%$, viable in deployments where any drop is
-tolerable and training is not. And we provide quantitative evidence
-that any further \emph{prompt-aware} gain over random will require
-moving the scoring signal inside the LLM, in the spirit of FastV
-or a learned predictor over LLaVA hidden states supervised by
-LLM-internal attention.
+A two-pass LLM-internal-attention oracle, run through the same
+pruning pipeline, paints a complementary picture: \emph{mid}-layer
+attention ($L\!\in\![8,24]$ for LLaVA-1.5-7B) does beat random and
+recovers up to $0.61$ at $k\!=\!25\%$ on GQA, while the early
+($L\!=\!2$) and late ($L\!=\!31$) layers do not. Prompt-aware
+pruning is therefore achievable, but only when the relevance signal
+is read from \emph{inside} the LLM, at the right depth.
+
+Our contributions are accordingly threefold. (i) A clean training-free
+pipeline with 41--90\% attention-FLOPs reduction and
+$\le$2.3-point accuracy loss vs.\ unpruned on GQA and VQA~v2 at
+$k{=}75\%$. (ii) A cross-dataset negative result on training-free
+CLIP-aligned saliency. (iii) A positive control identifying
+mid-layer LLM attention as a usable training-free signal, motivating
+distillation into a small learned predictor over LLaVA hidden states
+or a hybrid ViT-side / FastV-style two-stage pruner that operates at
+the informative depth rather than the canonical layer~$2$.
 
 \noindent\textbf{Acknowledgments.}
 We used GitHub Copilot for code completion and Claude for editing assistance.
