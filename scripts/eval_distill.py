@@ -32,6 +32,28 @@ from papit.integration.llava import PAPITLlavaRunner
 import sys
 sys.path.insert(0, str(Path(__file__).parent))
 from train_distill import PatchScorePredictor  # noqa: E402
+from train_distill_arch import ARCHS  # noqa: E402
+
+
+def build_predictor_from_ckpt(ckpt: dict, device: str):
+    """Construct a predictor object from a checkpoint, supporting both
+    Scope-A `train_distill` checkpoints (no `arch` key, MLP2 baseline)
+    and Scope-C `train_distill_arch` checkpoints (with `arch` key).
+    """
+    arch = ckpt.get("arch", "mlp2")
+    patch_dim = ckpt.get("patch_dim", 1024)
+    text_dim  = ckpt.get("text_dim", 768)
+    if arch == "mlp2" and "hidden" in ckpt:
+        # Scope-A baseline shape with explicit hidden
+        m = PatchScorePredictor(patch_dim=patch_dim, text_dim=text_dim,
+                                hidden=ckpt["hidden"])
+    elif arch in ARCHS:
+        m = ARCHS[arch](patch_dim=patch_dim, text_dim=text_dim)
+    else:
+        raise ValueError(f"Unknown arch: {arch}")
+    m.load_state_dict(ckpt["model_state"])
+    m.to(device).eval()
+    return m, arch
 
 
 _PUNCT_RE = re.compile(r"[^\w\s]")
@@ -109,12 +131,9 @@ def main():
     device = runner.device
 
     ckpt = torch.load(args.predictor, weights_only=True, map_location=device)
-    predictor = PatchScorePredictor(
-        patch_dim=ckpt["patch_dim"], text_dim=ckpt["text_dim"], hidden=ckpt["hidden"],
-    ).to(device)
-    predictor.load_state_dict(ckpt["model_state"])
-    predictor.eval()
-    print(f"Loaded distilled predictor: {sum(p.numel() for p in predictor.parameters())/1e6:.2f}M params")
+    predictor, arch = build_predictor_from_ckpt(ckpt, device)
+    print(f"Loaded distilled predictor (arch={arch}): "
+          f"{sum(p.numel() for p in predictor.parameters())/1e6:.2f}M params")
 
     args.out.parent.mkdir(parents=True, exist_ok=True)
     rows = []
