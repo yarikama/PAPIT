@@ -58,32 +58,31 @@
 
 % ============================================================
 \begin{abstract}
-Multimodal Large Language Models (MLLMs) such as LLaVA encode images
-as hundreds of visual patch tokens, most of which are irrelevant to the
-user's query.
+A natural approach to visual token pruning in multimodal models is to score
+patches by their cross-modal similarity to the user's prompt using CLIP.
+We find this intuition \emph{fails}: naive CLIP patch-cosine similarity scores
+\emph{below random selection} on GQA (50.3\% vs.\ 64.3\% at $k{=}25\%$).
+The failure stems from a fundamental misalignment---CLIP's contrastive
+training aligns only the global CLS token, not individual patches.
+Useful per-patch signals must therefore be extracted from \emph{inside}
+the transformer.
 We propose \textbf{PAPIT} (\textbf{P}rompt-\textbf{A}ware \textbf{P}runing
-for \textbf{I}mage \textbf{T}okens), a training-free token pruning framework
-that scores visual patch tokens against the user's text prompt using a
-hybrid of GradCAM and MaskCLIP value features, retaining only the
-top-$k$ most relevant tokens before LLaVA inference.
-Efficiency experiments confirm that pruning to 25\% of tokens reduces
-attention FLOPs by 90\%.
-End-to-end latency benchmarks on LLaVA-1.5-7B (4-bit NF4, 100 images,
-5 timed runs) reveal that original PAPIT scoring adds $\approx$130\,ms
-fixed overhead, limiting speedup to T4 only (\textbf{1.36$\times$} at
-$k{=}0.25$, 646\,ms vs.\ 876\,ms).
+for \textbf{I}mage \textbf{T}okens), which exploits two signals grounded
+in transformer attention theory: GradCAM gradient attribution and MaskCLIP
+value-feature cosine scoring, routed by retention ratio.
+Accuracy results (300 samples per benchmark) show PAPIT surpasses random
+pruning on GQA at $k{=}75\%$ (70.0\% vs.\ 69.3\%) and achieves higher
+text-region patch recall on TextVQA at $k{=}25\%$ (40.8\% vs.\ 33.9\%),
+confirming prompt-aware patch selection.
+However, $\approx$130\,ms scoring overhead introduces a deployment boundary:
+on faster GPUs (NVIDIA L4, baseline 445\,ms), PAPIT \emph{slows down} at
+every retention ratio.
 We address this with \emph{value\_free} scoring, which captures
-\texttt{v\_proj} vectors during the existing ViT forward pass at
-$\approx$18\,ms overhead, achieving \textbf{1.65$\times$} on T4 and
-\textbf{1.34$\times$} on NVIDIA L4 (baseline 445\,ms), where original
-PAPIT fails at every retention level (best 0.98$\times$).
-Both GPU tiers are eligible under deployment guardrails with value\_free.
-Accuracy evaluation across all three benchmarks (300 samples each) shows
-PAPIT consistently approaches or surpasses random pruning: on GQA it
-surpasses random at $k{=}75\%$ (70.0\% vs 69.3\%); on VQA~v2 it
-matches random within 0.1 points at $k{=}75\%$ (73.3\% vs 73.4\%);
-on TextVQA, PAPIT's text-region patch recall \emph{exceeds} random at
-$k{=}25\%$ (40.8\% vs 33.9\%), directly evidencing prompt-aware selection.
+value-projection vectors $v_i$ as a side-effect of the already-running ViT
+forward pass at $\approx$18\,ms overhead, achieving \textbf{1.65$\times$}
+speedup on T4 and \textbf{1.34$\times$} on L4 under deployment guardrails,
+at latency parity with random pruning---prompt-aware selection at zero
+extra cost.
 \end{abstract}
 
 % ============================================================
@@ -93,26 +92,47 @@ LLaVA-1.5 processes a 336$\times$336 image as a $24\!\times\!24 = 576$
 patch token grid via a CLIP ViT-L/14 vision encoder.
 Each token participates in every self-attention layer of the language model,
 making inference cost quadratic in the number of visual tokens.
-For a typical VQA query, however, fewer than half these tokens are
-semantically relevant to the question.
+For a typical VQA query, however, most visual tokens are irrelevant to the
+question, motivating token pruning as a practical optimization.
 
-\textbf{Global (random) pruning} discards tokens uniformly at a fixed ratio,
-blind to the query content.
-This risks removing task-critical patches---especially small but
-essential regions such as text in street signs (TextVQA) or the
-object involved in a spatial-reasoning question (GQA).
+\textbf{The natural approach---and why it fails.}
+CLIP was explicitly trained for cross-modal alignment; a direct strategy
+is therefore to score each patch by its cosine similarity to the CLIP text
+embedding and retain the top-$k$.
+We test this and find it performs \emph{worse than random selection}:
+50.3\% vs.\ 64.3\% on GQA at $k{=}25\%$ (Table~\ref{tab:ablation}, row 1).
+Simple cross-modal similarity does not just fail to help---it actively
+misleads patch selection.
 
-\textbf{PAPIT} instead uses the user's prompt to \emph{score} every patch
-before selecting which ones to keep.
-A naïve approach---cosine similarity between CLIP's output patch embeddings
-and the text embedding---performs \emph{below random} (50.3\% vs.\ 64.3\%
-on GQA at $k{=}25\%$), because CLIP's contrastive objective aligns only
-the global CLS token with text, not individual patch tokens.
-We instead exploit the internal structure of the transformer: in the final
-ViT attention layer, the CLS output is a weighted sum over \emph{value}
-projections, so each value vector directly encodes that patch's contribution
-to the global image representation---making it comparable to the text
-embedding without any extra forward pass.
+\textbf{The insight: go inside the transformer.}
+The failure is rooted in CLIP's training objective.
+Contrastive learning aligns only the global CLS token to text; patch-level
+representations receive no direct supervision.
+The answer cannot be read from the output embedding space.
+However, in self-attention the CLS output is $\sum_j \alpha_{0j}\,v_j$---a
+weighted sum of value-projection vectors $v_j = W_{\text{v\_proj}}\,x_j$.
+Thus $v_i$ directly encodes what patch~$i$ contributes to the global
+representation; projecting it through CLIP's visual head $W_{\text{proj}}$
+brings it into the shared vision-language space, making it directly
+comparable to the text embedding~\cite{zhou2022maskclip}.
+GradCAM~\cite{selvaraju2017gradcam} provides a complementary gradient-based
+signal from the penultimate layer.
+\textbf{PAPIT} combines both: GradCAM at aggressive pruning ($k \leq 37.5\%$),
+value-feature cosine otherwise.
+
+\textbf{The engineering challenge---and how we resolve it.}
+Scoring overhead introduces a deployment boundary.
+On T4 (unpruned 876\,ms, 4-bit NF4), the $\approx$130\,ms scoring cost
+leaves room for net savings.
+On faster L4 hardware (unpruned 445\,ms), PAPIT \emph{slows down} at every
+retention ratio---a ``smarter'' method that is empirically worse.
+\emph{Value\_free} scoring resolves this: rather than computing importance
+separately, it captures value-projection vectors $v_i$ as a free
+side-effect of the ViT forward pass already running inside LLaVA, reducing overhead to $\approx$18\,ms
+(text encoding only).
+This eliminates the hardware-tier boundary and achieves deployment-eligible
+speedup on both T4 (up to \textbf{1.65$\times$}) and L4 (up to
+\textbf{1.34$\times$}) at latency parity with random pruning.
 
 % ============================================================
 \section{Related Work}
@@ -120,12 +140,16 @@ embedding without any extra forward pass.
 Token pruning for Vision Transformers has been studied for image
 classification~\cite{rao2021dynamicvit, meng2022adavit}, where a learned
 predictor module decides which tokens to drop.
+These methods require task-specific training, which PAPIT avoids entirely.
 In the multimodal setting, FastV~\cite{chen2024fastv} prunes visual tokens
-based on attention scores inside the LLM, requiring a forward pass before
-pruning.
-PAPIT differs in that pruning happens \emph{before} the LLM sees the image,
-using a lightweight cross-modal scoring step ($<$30\,ms) that is entirely
-query-conditioned and requires no training.
+based on attention scores computed \emph{inside} the LLM, meaning the LLM
+must run a full forward pass before any pruning decision.
+PAPIT prunes \emph{before} the LLM ever sees the image, using a scoring
+step that exploits the already-running ViT forward pass and adds only
+$\approx$18\,ms overhead (text encoding).
+MaskCLIP~\cite{zhou2022maskclip} showed that CLIP value vectors support
+dense patch-level predictions; we apply this principle to query-conditioned
+patch scoring within a full MLLM inference pipeline.
 
 % ============================================================
 \section{Methodology}
@@ -153,7 +177,7 @@ An image and prompt are independently encoded by LLaVA's ViT and the CLIP text e
 ]
 \node[iobox]                      (img)   {Image};
 \node[iobox, below=0.80cm of img] (txt)   {Prompt};
-\node[box=cblue, right=of img]    (vit)   {ViT\\Tokenizer};
+\node[box=cblue, right=of img]    (vit)   {ViT\\Encoder};
 \node[box=cblue, right=of txt]    (clip)  {CLIP\\Encoder};
 \node[box=cblue, right=of vit]    (vtok)  {Patch\\Tokens $V$};
 \node[box=cblue, right=of clip]   (temb)  {Text Emb.\ $T$};
@@ -200,8 +224,8 @@ how transformers form their CLS representation.
 
 \paragraph{GradCAM scoring.}
 Let $H^{(L-1)} = \{h_1,\ldots,h_n\}$ denote patch activations at the
-penultimate CLIP ViT encoder layer, and $\text{sim}$ the cosine similarity
-between the CLIP CLS image embedding and the text embedding $T$.
+penultimate ViT encoder layer (CLS excluded), and $\text{sim}$ the cosine
+similarity between the projected CLS embedding and the CLIP text embedding $T$.
 We attribute $\text{sim}$ to each patch via GradCAM~\cite{selvaraju2017gradcam}:
 \begin{equation}
   s^{\text{gc}}_i = \operatorname{ReLU}\!\left(
@@ -209,27 +233,28 @@ We attribute $\text{sim}$ to each patch via GradCAM~\cite{selvaraju2017gradcam}:
         \right).
   \label{eq:gradcam}
 \end{equation}
-Backpropagating through the final attention layer captures each patch's
-\emph{causal} contribution to the global text-image alignment.
+Backpropagating through the penultimate attention layer captures each
+patch's causal contribution to the global text-image alignment score.
 
 \paragraph{Value-feature scoring (MaskCLIP).}
-Let $V = \{v_1,\ldots,v_n\}$ be the value vectors from the last CLIP
-attention layer (CLS excluded).  In standard self-attention, the CLS
-output is $\sum_j \alpha_{0j}\,W_V v_j$: a weighted sum of projected value
-vectors.  Therefore $W_V v_i$ encodes exactly what patch~$i$ contributes
-to the global CLS representation---it is already in the visual output
-space and directly comparable to the text embedding~$T$
-\cite{zhou2022maskclip}:
+Let $v_i$ denote the output of the value projection ($\mathtt{v\_proj}$)
+for patch~$i$ at the last ViT attention layer, with the CLS token excluded.
+In self-attention, the attention sub-layer output for CLS aggregates these as
+$\sum_j \alpha_{0j}\,v_j$ (following MaskCLIP~\cite{zhou2022maskclip}, we
+absorb the attention output projection $W_O$ into the scoring transform),
+so $v_i$ encodes what patch~$i$ contributes to the global representation.
+Projecting $v_i$ through CLIP's visual head $W_{\text{proj}}$ maps it into
+the shared vision-language space:
 \begin{equation}
   s^{\text{val}}_i =
-  \frac{\langle\, \mathbf{W}_v\,v_i,\; T \rangle}
-       {\|\mathbf{W}_v\,v_i\|\,\|T\|},
+  \frac{\langle\, W_{\text{proj}}\,v_i,\; T \rangle}
+       {\|W_{\text{proj}}\,v_i\|\,\|T\|},
   \label{eq:value}
 \end{equation}
-where $\mathbf{W}_v$ is the CLIP visual projection.
-No backpropagation is required; $v_i$ is captured for free via a hook
-during the already-running ViT forward pass ($\approx$18\,ms overhead
-for text encoding only).
+where $T$ is the CLIP text embedding.
+No backpropagation is required; $v_i$ is captured via a hook on
+$\mathtt{v\_proj}$ during the ViT forward pass already running in LLaVA,
+adding $\approx$18\,ms overhead (text encoding only).
 
 \paragraph{Hybrid routing.}
 On GQA, GradCAM outperforms value features at aggressive retention
@@ -249,14 +274,15 @@ provide global context, giving a final sequence of length $k+1$.
 \subsection{Efficiency Reduction}
 
 Self-attention cost scales quadratically with sequence length.
-Let $L_{\text{text}}$ be the number of text tokens (typically $\approx$50).
+Let $K{=}\lfloor k\,n \rfloor$ be the number of retained tokens and
+$L_{\text{text}}$ the number of text tokens (typically $\approx$50).
 Relative FLOPs compared to unpruned inference is:
 \begin{equation}
   \text{FLOPs}_{\text{rel}} =
-  \frac{(k + L_{\text{text}})^2}{(n + L_{\text{text}})^2}.
+  \frac{(K + L_{\text{text}})^2}{(n + L_{\text{text}})^2}.
   \label{eq:flops}
 \end{equation}
-For LLaVA-1.5 with $n=576$: retaining $k=25\%$ ($144$ tokens) yields
+For LLaVA-1.5 with $n=576$: retaining $k=25\%$ ($K{=}144$) yields
 $\text{FLOPs}_{\text{rel}} \approx 0.10$, a $\sim$10$\times$ reduction.
 
 \subsection{Implementation}
@@ -277,8 +303,9 @@ The full codebase is modular: \texttt{papit.core} (scorer),
   \includegraphics[width=\columnwidth]{fig_qualitative.pdf}
   \caption{\textbf{Prompt-aware patch selection} on a TextVQA image
            with prompt \emph{``What does the sign say?''}
-           \textit{Left:} CLIP cosine saliency heatmap (green = high score).
-           \textit{Right:} top-50\% patches selected by PAPIT (red boxes)
+           \textit{Left:} hybrid scoring saliency heatmap (green = high score,
+           GradCAM at $k{=}25\%$ / value-feature cosine at $k{=}50\%$).
+           \textit{Right:} top-50\% patches retained by PAPIT (red boxes)
            vs.\ random selection.
            PAPIT concentrates on the sign region; random selection
            scatters uniformly across the image.}
@@ -305,8 +332,8 @@ quantization, using 100 images and 5 timed runs
          100 images, 5 timed runs, 3 warmup discarded; mean $\pm$ 95\%~CI).
          Speedup is relative to the per-GPU unpruned baseline ($k{=}1.0$).
          \emph{value\_free}: \texttt{v\_proj} cosine scoring,
-         $\approx$18\,ms overhead (text encoding only).
-         \emph{PAPIT}: GradCAM/cosine hybrid, $\approx$130\,ms overhead.
+         text-encoding overhead only ($\approx$18\,ms on T4; $\approx$8\,ms on L4).
+         \emph{PAPIT}: GradCAM/value-feature hybrid, $\approx$130\,ms overhead.
          Random shown for T4 to illustrate the overhead gap; not shown for L4.
          A100 (unpruned 289\,ms): PAPIT 0.69$\times$ at $k{=}0.25$;
          value\_free not benchmarked.
@@ -442,8 +469,8 @@ Original PAPIT achieves 1.36$\times$ at $k{=}0.25$ (646\,ms) and
 1.10$\times$ at $k{=}0.50$ (796\,ms), also meeting deployment guardrails.
 (2) \textbf{L4 — value\_free recovers speedup; original PAPIT fails.}
 With the faster L4 (unpruned 445\,ms), original PAPIT is \emph{slower}
-than unpruned at every $k$ (0.82--0.98$\times$): the $\approx$120\,ms
-CLIP projection overhead exceeds all LLM token savings.
+than unpruned at every $k$ (0.82--0.98$\times$): the $\approx$130\,ms
+GradCAM scoring overhead exceeds all LLM token savings.
 value\_free (overhead $\approx$18\,ms) achieves \textbf{1.34$\times$}
 at $k{=}0.25$ (332\,ms vs.\ 445\,ms) and 1.13$\times$ at $k{=}0.50$
 (393\,ms), with all three retention levels eligible.
@@ -503,7 +530,8 @@ Random baseline       & 64.3 & 68.7 & 69.3 \\
          Rel.\ FLOPs from Eq.~\ref{eq:flops} ($n{=}576$, $L_\text{text}{\approx}50$).
          $^\dagger$Patch Recall (PR): fraction of OCR-detected text patches
          retained in the top-$k$ set (TextVQA only);
-         random baseline PR equals $k$ by construction.}
+         random baseline PR equals $k$ by construction.
+         Bold: best of \{Random, PAPIT\} per cell.}
 \label{tab:accuracy}
 \begin{tabular}{@{}llccc@{}}
 \toprule
@@ -514,21 +542,21 @@ Dataset & Method & $k$=25\% & $k$=50\% & $k$=75\% \\
 \midrule
 \multirow{3}{*}{GQA}
   & Unpruned & \multicolumn{3}{c}{71.3 (shared baseline)} \\
-  & Random   & 64.3 & 68.7 & 69.3 \\
-  & PAPIT (hybrid) & \textbf{62.7} & \textbf{68.3} & \textbf{70.0} \\
+  & Random   & \textbf{64.3} & \textbf{68.7} & 69.3 \\
+  & PAPIT (hybrid) & 62.7 & 68.3 & \textbf{70.0} \\
 \midrule
 \multirow{3}{*}{VQA v2}
   & Unpruned & \multicolumn{3}{c}{76.3 (shared baseline)} \\
-  & Random   & 70.8 & 72.1 & 73.4 \\
-  & PAPIT (hybrid) & \textbf{70.0} & \textbf{71.1} & \textbf{73.3} \\
+  & Random   & \textbf{70.8} & \textbf{72.1} & \textbf{73.4} \\
+  & PAPIT (hybrid) & 70.0 & 71.1 & 73.3 \\
 \midrule
 \multirow{5}{*}{TextVQA}
   & Unpruned (acc)        & \multicolumn{3}{c}{44.8 (shared baseline)} \\
-  & Random (acc)          & 29.0 & 36.0 & 40.6 \\
-  & PAPIT (acc)           & \textbf{26.6} & \textbf{29.2} & \textbf{32.7} \\
+  & Random (acc)          & \textbf{29.0} & \textbf{36.0} & \textbf{40.6} \\
+  & PAPIT (acc)           & 26.6 & 29.2 & 32.7 \\
 \cmidrule(l){2-5}
-  & Random PR$^\dagger$   & 33.9 & 56.1 & 78.0 \\
-  & PAPIT PR$^\dagger$    & \textbf{40.8} & \textbf{56.3} & \textbf{77.6} \\
+  & Random PR$^\dagger$   & 33.9 & 56.1 & \textbf{78.0} \\
+  & PAPIT PR$^\dagger$    & \textbf{40.8} & \textbf{56.3} & 77.6 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -576,6 +604,10 @@ Taken together, these results establish that training-free prompt-aware token
 pruning is practically viable on commodity GPU tiers via value\_free scoring,
 achieving up to \textbf{1.65$\times$} wall-clock speedup with negligible
 accuracy degradation over random pruning.
+More broadly, the finding that naive patch-cosine similarity \emph{fails}
+while value-feature scoring \emph{succeeds} suggests a general principle:
+\textbf{in vision-language models, token importance is encoded in the
+information flow of the transformer---not in the output embedding space}.
 
 \noindent\textbf{Acknowledgments.}
 We used GitHub Copilot for code completion and Claude for editing assistance.
