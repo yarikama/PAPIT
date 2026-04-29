@@ -116,6 +116,8 @@ def main():
     ap.add_argument("--max-samples", type=int, default=100)
     ap.add_argument("--retention", nargs="+", type=float, default=[0.25, 0.50, 0.75])
     ap.add_argument("--oracle-layer", type=int, default=16)
+    ap.add_argument("--skip-oracle", action="store_true",
+                    help="Skip the two-pass oracle (saves ~30%% time on large evals).")
     ap.add_argument("--out", type=Path, default=Path("outputs/distill_eval.csv"))
     ap.add_argument("--llava-id", type=str, default="llava-hf/llava-1.5-7b-hf")
     args = ap.parse_args()
@@ -158,10 +160,13 @@ def main():
                 text_emb.unsqueeze(0).float(),
             )[0]
         s_clip = runner._gradcam_scores(inputs["pixel_values"], row["question"], 576)
-        s_oracle = llm_attn_score(
-            runner, inputs["pixel_values"], inputs["input_ids"],
-            inputs["attention_mask"], layer=args.oracle_layer,
-        )
+        if args.skip_oracle:
+            s_oracle = None
+        else:
+            s_oracle = llm_attn_score(
+                runner, inputs["pixel_values"], inputs["input_ids"],
+                inputs["attention_mask"], layer=args.oracle_layer,
+            )
 
         unpruned_ans = runner.generate_unpruned(img, row["question"], max_new_tokens=16)
 
@@ -170,22 +175,26 @@ def main():
             try:
                 a_papit   = generate_with_scores(runner, img, row["question"], s_clip,    k)
                 a_distill = generate_with_scores(runner, img, row["question"], s_distill, k)
-                a_oracle  = generate_with_scores(runner, img, row["question"], s_oracle,  k)
                 a_random  = generate_with_scores(runner, img, row["question"], None,      k, seed=i)
+                a_oracle  = (None if args.skip_oracle
+                             else generate_with_scores(runner, img, row["question"], s_oracle, k))
             except Exception as e:
                 print(f"[{i} k={ret}] err: {e}"); continue
 
-            rows.append({
+            rec = {
                 "idx": i, "question": row["question"], "gold": gold,
                 "retention": ret, "k": k,
                 "ans_unpruned": unpruned_ans, "ans_random": a_random,
-                "ans_papit": a_papit, "ans_distill": a_distill, "ans_oracle": a_oracle,
+                "ans_papit": a_papit, "ans_distill": a_distill,
                 "acc_unpruned": gqa_em(unpruned_ans, gold),
                 "acc_random":   gqa_em(a_random,    gold),
                 "acc_papit":    gqa_em(a_papit,     gold),
                 "acc_distill":  gqa_em(a_distill,   gold),
-                "acc_oracle":   gqa_em(a_oracle,    gold),
-            })
+            }
+            if not args.skip_oracle:
+                rec["ans_oracle"] = a_oracle
+                rec["acc_oracle"] = gqa_em(a_oracle, gold)
+            rows.append(rec)
 
         if (i + 1) % 20 == 0:
             tmp = pd.DataFrame(rows)
@@ -193,11 +202,13 @@ def main():
             for ret in args.retention:
                 sub = tmp[tmp["retention"] == ret]
                 if len(sub) == 0: continue
-                print(f"  k={ret:.2f}: unp={sub['acc_unpruned'].mean():.3f}"
-                      f" rand={sub['acc_random'].mean():.3f}"
-                      f" papit={sub['acc_papit'].mean():.3f}"
-                      f" distill={sub['acc_distill'].mean():.3f}"
-                      f" oracle={sub['acc_oracle'].mean():.3f}")
+                line = (f"  k={ret:.2f}: unp={sub['acc_unpruned'].mean():.3f}"
+                        f" rand={sub['acc_random'].mean():.3f}"
+                        f" papit={sub['acc_papit'].mean():.3f}"
+                        f" distill={sub['acc_distill'].mean():.3f}")
+                if "acc_oracle" in sub.columns:
+                    line += f" oracle={sub['acc_oracle'].mean():.3f}"
+                print(line)
 
     out_df = pd.DataFrame(rows)
     out_df.to_csv(args.out, index=False)
@@ -212,7 +223,8 @@ def main():
         print(f"    Random      : {sub['acc_random'].mean():.4f}")
         print(f"    PAPIT (CLIP): {sub['acc_papit'].mean():.4f}")
         print(f"    PAPIT-distill: {sub['acc_distill'].mean():.4f}")
-        print(f"    Oracle L=16 : {sub['acc_oracle'].mean():.4f}")
+        if "acc_oracle" in sub.columns:
+            print(f"    Oracle L=16 : {sub['acc_oracle'].mean():.4f}")
     print(f"\nWrote to {args.out}")
 
 
