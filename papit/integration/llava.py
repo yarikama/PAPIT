@@ -71,6 +71,7 @@ class PAPITLlavaRunner:
         clip_model_id: str = "openai/clip-vit-large-patch14",
         config: PAPITConfig | None = None,
         device: str | None = None,
+        attn_implementation: str | None = None,
     ) -> None:
         from transformers import AutoProcessor, LlavaForConditionalGeneration
 
@@ -79,11 +80,15 @@ class PAPITLlavaRunner:
 
         # --- LLaVA ---------------------------------------------------------
         dtype = torch.float16 if self.device == "cuda" else torch.float32
+        load_kwargs: dict[str, Any] = dict(
+            torch_dtype=dtype,
+            device_map="auto" if self.device == "cuda" else None,
+        )
+        if attn_implementation is not None:
+            load_kwargs["attn_implementation"] = attn_implementation
         self.llava: LlavaForConditionalGeneration = (
             LlavaForConditionalGeneration.from_pretrained(
-                llava_model_id,
-                torch_dtype=dtype,
-                device_map="auto" if self.device == "cuda" else None,
+                llava_model_id, **load_kwargs
             ).eval()
         )
         self.processor = AutoProcessor.from_pretrained(llava_model_id)

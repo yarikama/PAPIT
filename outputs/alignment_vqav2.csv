@@ -1,0 +1,101 @@
+idx,image_path,question,spearman,jaccard_top10pct
+0,/opt/dlami/nvme/data/raw/vqa_v2/images/000000.jpg,Where is he looking?,0.26703179929551685,0.03571428571428571
+1,/opt/dlami/nvme/data/raw/vqa_v2/images/000001.jpg,What are the people in the background doing?,0.22084327380178156,0.08411214953271028
+2,/opt/dlami/nvme/data/raw/vqa_v2/images/000002.jpg,What is he on top of?,-0.43647318163705706,0.02654867256637168
+3,/opt/dlami/nvme/data/raw/vqa_v2/images/000003.jpg,What website copyrighted the picture?,0.06670444084103391,0.02654867256637168
+4,/opt/dlami/nvme/data/raw/vqa_v2/images/000004.jpg,Is this a creamy soup?,0.01641603974649852,0.06422018348623854
+5,/opt/dlami/nvme/data/raw/vqa_v2/images/000005.jpg,Is this rice noodle soup?,-0.0479568232711784,0.03571428571428571
+6,/opt/dlami/nvme/data/raw/vqa_v2/images/000006.jpg,What is to the right of the soup?,0.15076064294870678,0.06422018348623854
+7,/opt/dlami/nvme/data/raw/vqa_v2/images/000007.jpg,What is the man doing in the street?,0.16438675887419688,0.08411214953271028
+8,/opt/dlami/nvme/data/raw/vqa_v2/images/000008.jpg,How many photo's can you see?,0.05023651394360991,0.02654867256637168
+9,/opt/dlami/nvme/data/raw/vqa_v2/images/000009.jpg,What does the truck on the left sell?,0.08472274068591289,0.008695652173913044
+10,/opt/dlami/nvme/data/raw/vqa_v2/images/000010.jpg,Why is there a gap between the roof and wall?,0.06220823977220957,0.06422018348623854
+11,/opt/dlami/nvme/data/raw/vqa_v2/images/000011.jpg,Is it daylight in this picture?,-0.0745728047741936,0.05454545454545454
+12,/opt/dlami/nvme/data/raw/vqa_v2/images/000012.jpg,Why is the cow laying down?,-0.031572742524710144,0.017543859649122806
+13,/opt/dlami/nvme/data/raw/vqa_v2/images/000013.jpg,What color is the grass in this picture?,0.15397680977975425,0.08411214953271028
+14,/opt/dlami/nvme/data/raw/vqa_v2/images/000014.jpg,Did the batter hit the ball?,0.001515963430361226,0.02654867256637168
+15,/opt/dlami/nvme/data/raw/vqa_v2/images/000015.jpg,How many are playing ball?,-0.08532845704926281,0.05454545454545454
+16,/opt/dlami/nvme/data/raw/vqa_v2/images/000016.jpg,Is there a chain link fence in the image?,0.09132120875586007,0.08411214953271028
+17,/opt/dlami/nvme/data/raw/vqa_v2/images/000017.jpg,Is the boy playing baseball?,-0.055832920311624505,0.008695652173913044
+18,/opt/dlami/nvme/data/raw/vqa_v2/images/000018.jpg,Is that a folding chair?,-0.0396295071612744,0.008695652173913044
+19,/opt/dlami/nvme/data/raw/vqa_v2/images/000019.jpg,How many beds?,0.031952422974278326,0.0
+20,/opt/dlami/nvme/data/raw/vqa_v2/images/000020.jpg,What color is the bedspread?,0.12954071534581896,0.09433962264150944
+21,/opt/dlami/nvme/data/raw/vqa_v2/images/000021.jpg,How many pictures are there?,0.011055052903196312,0.03571428571428571
+22,/opt/dlami/nvme/data/raw/vqa_v2/images/000022.jpg,Are these twin mattresses?,0.07011926101571632,0.04504504504504504
+23,/opt/dlami/nvme/data/raw/vqa_v2/images/000023.jpg,How many sources of light are there?,-0.00976110046378079,0.04504504504504504
+24,/opt/dlami/nvme/data/raw/vqa_v2/images/000024.jpg,Is this room decorated for the 1970s?,0.009724682143830803,0.05454545454545454
+25,/opt/dlami/nvme/data/raw/vqa_v2/images/000025.jpg,Are the lights on in this room?,0.009491698241387308,0.05454545454545454
+26,/opt/dlami/nvme/data/raw/vqa_v2/images/000026.jpg,Are the windows big?,0.04178651661515216,0.0
+27,/opt/dlami/nvme/data/raw/vqa_v2/images/000027.jpg,What is the chair made of?,0.04584497227041396,0.04504504504504504
+28,/opt/dlami/nvme/data/raw/vqa_v2/images/000028.jpg,Is this room in someone's home?,-0.00572390692369167,0.02654867256637168
+29,/opt/dlami/nvme/data/raw/vqa_v2/images/000029.jpg,Which room is this?,-0.06599449267140807,0.008695652173913044
+30,/opt/dlami/nvme/data/raw/vqa_v2/images/000030.jpg,Is the bed white?,0.06614969180775962,0.06422018348623854
+31,/opt/dlami/nvme/data/raw/vqa_v2/images/000031.jpg,Could this be a hotel room?,-0.06652475923112425,0.02654867256637168
+32,/opt/dlami/nvme/data/raw/vqa_v2/images/000032.jpg,Is the bed made?,-0.021914487015712664,0.06422018348623854
+33,/opt/dlami/nvme/data/raw/vqa_v2/images/000033.jpg,Are there bed headboards present in the photo?,0.024090697634352728,0.06422018348623854
+34,/opt/dlami/nvme/data/raw/vqa_v2/images/000034.jpg,Is there a mirror in the room?,-0.0313263562375376,0.02654867256637168
+35,/opt/dlami/nvme/data/raw/vqa_v2/images/000035.jpg,What kind of room is this?,-0.07048651535314057,0.017543859649122806
+36,/opt/dlami/nvme/data/raw/vqa_v2/images/000036.jpg,How many chairs are in the photo?,0.028615351634256138,0.04504504504504504
+37,/opt/dlami/nvme/data/raw/vqa_v2/images/000037.jpg,Is the desk cluttered?,-0.03793590907426664,0.02654867256637168
+38,/opt/dlami/nvme/data/raw/vqa_v2/images/000038.jpg,Has the bed been made?,0.05147607312763122,0.04504504504504504
+39,/opt/dlami/nvme/data/raw/vqa_v2/images/000039.jpg,How many seats are there?,0.007798034373824489,0.07407407407407407
+40,/opt/dlami/nvme/data/raw/vqa_v2/images/000040.jpg,How many frames are on the wall?,-0.0206926877056444,0.03571428571428571
+41,/opt/dlami/nvme/data/raw/vqa_v2/images/000041.jpg,What color are the walls?,-0.02056840448226091,0.04504504504504504
+42,/opt/dlami/nvme/data/raw/vqa_v2/images/000042.jpg,Are there any boxes in the room?,0.0014059595684499358,0.05454545454545454
+43,/opt/dlami/nvme/data/raw/vqa_v2/images/000043.jpg,Could this be a multi-purpose room?,0.01633483886618585,0.0
+44,/opt/dlami/nvme/data/raw/vqa_v2/images/000044.jpg,What animal print does that chair resemble?,0.11323361646923881,0.05454545454545454
+45,/opt/dlami/nvme/data/raw/vqa_v2/images/000045.jpg,What is behind the foot of the bed?,0.1385201173346289,0.02654867256637168
+46,/opt/dlami/nvme/data/raw/vqa_v2/images/000046.jpg,What is the size of the bed?,-0.035902111967933276,0.017543859649122806
+47,/opt/dlami/nvme/data/raw/vqa_v2/images/000047.jpg,How many pictures on the wall?,0.031781801557172466,0.03571428571428571
+48,/opt/dlami/nvme/data/raw/vqa_v2/images/000048.jpg,Will this kid leave the powdered sugar on his face?,-0.011458818927581,0.017543859649122806
+49,/opt/dlami/nvme/data/raw/vqa_v2/images/000049.jpg,What is the child eating?,0.11404517095686055,0.03571428571428571
+50,/opt/dlami/nvme/data/raw/vqa_v2/images/000050.jpg,Is this person wearing a tie?,0.03319851817169673,0.08411214953271028
+51,/opt/dlami/nvme/data/raw/vqa_v2/images/000051.jpg,What color is the kids hair?,0.12113823810013613,0.05454545454545454
+52,/opt/dlami/nvme/data/raw/vqa_v2/images/000052.jpg,Is the man's tie purple?,-0.020810513225230885,0.017543859649122806
+53,/opt/dlami/nvme/data/raw/vqa_v2/images/000053.jpg,Where was the picture taken of the man?,0.17629426123589376,0.07407407407407407
+54,/opt/dlami/nvme/data/raw/vqa_v2/images/000054.jpg,What is the man wearing on his head?,-0.06464327216983556,0.04504504504504504
+55,/opt/dlami/nvme/data/raw/vqa_v2/images/000055.jpg,Is this a designer tie?,-0.0030709378177873684,0.05454545454545454
+56,/opt/dlami/nvme/data/raw/vqa_v2/images/000056.jpg,Is this photo color?,-0.015350187326553856,0.1262135922330097
+57,/opt/dlami/nvme/data/raw/vqa_v2/images/000057.jpg,Does the door open inward or outward?,0.0422844965404519,0.017543859649122806
+58,/opt/dlami/nvme/data/raw/vqa_v2/images/000058.jpg,Is there a drainage in the pic?,0.05870281882232145,0.04504504504504504
+59,/opt/dlami/nvme/data/raw/vqa_v2/images/000059.jpg,What does the sentence on the top say?,0.07982224512591374,0.06422018348623854
+60,/opt/dlami/nvme/data/raw/vqa_v2/images/000060.jpg,What kind of vehicle is the RV pulling on the bottom picture?,-0.20586659577852945,0.008695652173913044
+61,/opt/dlami/nvme/data/raw/vqa_v2/images/000061.jpg,Where is the camping tent?,-0.06775855338770628,0.04504504504504504
+62,/opt/dlami/nvme/data/raw/vqa_v2/images/000062.jpg,What color are the gym shoes?,-0.02503254929434338,0.008695652173913044
+63,/opt/dlami/nvme/data/raw/vqa_v2/images/000063.jpg,Is there a red sandal here?,-0.01896844897374052,0.017543859649122806
+64,/opt/dlami/nvme/data/raw/vqa_v2/images/000064.jpg,What color is the flip flop?,-0.013382228852804564,0.017543859649122806
+65,/opt/dlami/nvme/data/raw/vqa_v2/images/000065.jpg,Are there players in the dugout?,-0.048154933647459555,0.03571428571428571
+66,/opt/dlami/nvme/data/raw/vqa_v2/images/000066.jpg,Is the battery looking at the ball?,0.010846270117058788,0.03571428571428571
+67,/opt/dlami/nvme/data/raw/vqa_v2/images/000067.jpg,How many people are on the field?,-0.11461692304257613,0.02654867256637168
+68,/opt/dlami/nvme/data/raw/vqa_v2/images/000068.jpg,How many signs?,0.17866780894407683,0.09433962264150944
+69,/opt/dlami/nvme/data/raw/vqa_v2/images/000069.jpg,What color is the Salisbury Rd. sign?,-0.021508862787435613,0.03571428571428571
+70,/opt/dlami/nvme/data/raw/vqa_v2/images/000070.jpg,What does the last sign say?,0.2193850541590281,0.05454545454545454
+71,/opt/dlami/nvme/data/raw/vqa_v2/images/000071.jpg,What color is the sign?,0.038953153815124,0.017543859649122806
+72,/opt/dlami/nvme/data/raw/vqa_v2/images/000072.jpg,Can you turn right or left in the tunnel?,0.039386424216816325,0.02654867256637168
+73,/opt/dlami/nvme/data/raw/vqa_v2/images/000073.jpg,What color is the plant?,0.04094242833558505,0.09433962264150944
+74,/opt/dlami/nvme/data/raw/vqa_v2/images/000074.jpg,What color is the woman's shirt on the left?,-0.08978378063354486,0.008695652173913044
+75,/opt/dlami/nvme/data/raw/vqa_v2/images/000075.jpg,What type of beverage is being displayed?,0.05765537256006248,0.04504504504504504
+76,/opt/dlami/nvme/data/raw/vqa_v2/images/000076.jpg,Why are some people wearing hats?,0.04841145446459767,0.06422018348623854
+77,/opt/dlami/nvme/data/raw/vqa_v2/images/000077.jpg,What kind of event are the people involved in?,-0.03965191191303695,0.03571428571428571
+78,/opt/dlami/nvme/data/raw/vqa_v2/images/000078.jpg,How many skyscrapers are there?,0.029606637676688453,0.07407407407407407
+79,/opt/dlami/nvme/data/raw/vqa_v2/images/000079.jpg,What is the color of the building in the background?,-0.021223802916460515,0.07407407407407407
+80,/opt/dlami/nvme/data/raw/vqa_v2/images/000080.jpg,Is there a tree in front of the building?,0.00879612484735685,0.05454545454545454
+81,/opt/dlami/nvme/data/raw/vqa_v2/images/000081.jpg,Is there a person riding a bike?,-0.0817660139811431,0.05454545454545454
+82,/opt/dlami/nvme/data/raw/vqa_v2/images/000082.jpg,Are there lights on in the two buildings?,0.06757957409070646,0.017543859649122806
+83,/opt/dlami/nvme/data/raw/vqa_v2/images/000083.jpg,How many stories is the building on the left?,-0.0783195475854204,0.05454545454545454
+84,/opt/dlami/nvme/data/raw/vqa_v2/images/000084.jpg,Is this a hospital?,0.1064022767462768,0.017543859649122806
+85,/opt/dlami/nvme/data/raw/vqa_v2/images/000085.jpg,How many umbrellas do you see?,-0.04235690792239166,0.10476190476190476
+86,/opt/dlami/nvme/data/raw/vqa_v2/images/000086.jpg,How many colors is the building on the right painted?,0.00301582957944146,0.11538461538461539
+87,/opt/dlami/nvme/data/raw/vqa_v2/images/000087.jpg,What is on the boy's back walking?,-0.015006261803070953,0.08411214953271028
+88,/opt/dlami/nvme/data/raw/vqa_v2/images/000088.jpg,How many modes of transportation are depicted?,-0.15398885047470737,0.04504504504504504
+89,/opt/dlami/nvme/data/raw/vqa_v2/images/000089.jpg,What color is the building?,-0.00038134815853519647,0.10476190476190476
+90,/opt/dlami/nvme/data/raw/vqa_v2/images/000090.jpg,Is it still snowing in the picture?,0.015039967246189646,0.08411214953271028
+91,/opt/dlami/nvme/data/raw/vqa_v2/images/000091.jpg,Does this appear to be a photo of multiple exposures of the black clad snowboarder?,0.11605865830717095,0.08411214953271028
+92,/opt/dlami/nvme/data/raw/vqa_v2/images/000092.jpg,How many people can you see in the picture?,0.08294949869750746,0.09433962264150944
+93,/opt/dlami/nvme/data/raw/vqa_v2/images/000093.jpg,Is this an adult party?,0.012491989132551295,0.04504504504504504
+94,/opt/dlami/nvme/data/raw/vqa_v2/images/000094.jpg,What is being celebrated?,-0.13415761666821882,0.017543859649122806
+95,/opt/dlami/nvme/data/raw/vqa_v2/images/000095.jpg,Who is in front of the cake with candles?,-0.009647526217342236,0.04504504504504504
+96,/opt/dlami/nvme/data/raw/vqa_v2/images/000096.jpg,What is this vehicle?,-0.10785964653393072,0.008695652173913044
+97,/opt/dlami/nvme/data/raw/vqa_v2/images/000097.jpg,Can you see the hook up for the train?,0.034092676869392005,0.06422018348623854
+98,/opt/dlami/nvme/data/raw/vqa_v2/images/000098.jpg,Is this train at the station?,0.08093171808487583,0.02654867256637168
+99,/opt/dlami/nvme/data/raw/vqa_v2/images/000099.jpg,What is cast?,0.0025189482742585074,0.06422018348623854

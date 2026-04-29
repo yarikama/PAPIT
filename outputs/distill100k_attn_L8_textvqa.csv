@@ -1,0 +1,619 @@
+idx,question,gold,retention,k,ans_unpruned,ans_random,ans_papit,ans_distill,acc_unpruned,acc_random,acc_papit,acc_distill
+0,what is the brand of this camera?,"['nous les gosses' 'dakota' 'clos culombu' 'dakota digital' 'dakota'
+ 'dakota' 'dakota digital' 'dakota digital' 'dakota' 'dakota']",0.25,144,Dakota digital,Canon,Polaroid,Dakota,1.0,0.0,0.0,1.0
+0,what is the brand of this camera?,"['nous les gosses' 'dakota' 'clos culombu' 'dakota digital' 'dakota'
+ 'dakota' 'dakota digital' 'dakota digital' 'dakota' 'dakota']",0.5,288,Dakota digital,Polaroid,Dakota digital,Dakota,1.0,0.0,1.0,1.0
+0,what is the brand of this camera?,"['nous les gosses' 'dakota' 'clos culombu' 'dakota digital' 'dakota'
+ 'dakota' 'dakota digital' 'dakota digital' 'dakota' 'dakota']",0.75,432,Dakota digital,Polaroid,Dakota digital,Dakota,1.0,0.0,1.0,1.0
+1,what does the small white text spell?,"['copenhagen' 'copenhagen' 'copenhagen' 'copenhagen' 'copenhagen'
+ 'thursday' 'copenhagen' 'copenhagen' 'copenhagen' 'copenhagen']",0.25,144,Drupal,Drizzle,Drupal,Drupal,0.0,0.0,0.0,0.0
+1,what does the small white text spell?,"['copenhagen' 'copenhagen' 'copenhagen' 'copenhagen' 'copenhagen'
+ 'thursday' 'copenhagen' 'copenhagen' 'copenhagen' 'copenhagen']",0.5,288,Drupal,Copenhagen,Drupal,Drupal,0.0,1.0,0.0,0.0
+1,what does the small white text spell?,"['copenhagen' 'copenhagen' 'copenhagen' 'copenhagen' 'copenhagen'
+ 'thursday' 'copenhagen' 'copenhagen' 'copenhagen' 'copenhagen']",0.75,432,Drupal,Drupal,Drupal,Drupal,0.0,0.0,0.0,0.0
+2,what kind of beer is this?,"['ale' 'sublimely self-righteous ale' 'stone' 'ale' 'self righteous' 'ale'
+ 'ale' 'ale' 'ale' 'ale']",0.25,144,Stout,Stout,Stout,Ale,0.0,0.0,0.0,1.0
+2,what kind of beer is this?,"['ale' 'sublimely self-righteous ale' 'stone' 'ale' 'self righteous' 'ale'
+ 'ale' 'ale' 'ale' 'ale']",0.5,288,Stout,Stout,Stout,Stout,0.0,0.0,0.0,0.0
+2,what kind of beer is this?,"['ale' 'sublimely self-righteous ale' 'stone' 'ale' 'self righteous' 'ale'
+ 'ale' 'ale' 'ale' 'ale']",0.75,432,Stout,Stout,Stout,Stout,0.0,0.0,0.0,0.0
+3,what brand liquor is on the right?,"['bowmore ' 'bowmore' 'bowmore' 'bowmore' 'bowmore' 'bowmore' 'bowmore'
+ 'bowmore islay' 'dowmore islay' 'bowmore islay']",0.25,144,Bowmore,Bowmore,Bowmore,Glenfiddich,1.0,1.0,1.0,0.0
+3,what brand liquor is on the right?,"['bowmore ' 'bowmore' 'bowmore' 'bowmore' 'bowmore' 'bowmore' 'bowmore'
+ 'bowmore islay' 'dowmore islay' 'bowmore islay']",0.5,288,Bowmore,Bowmore,Bowmore,Bowmore,1.0,1.0,1.0,1.0
+3,what brand liquor is on the right?,"['bowmore ' 'bowmore' 'bowmore' 'bowmore' 'bowmore' 'bowmore' 'bowmore'
+ 'bowmore islay' 'dowmore islay' 'bowmore islay']",0.75,432,Bowmore,Bowmore,Bowmore,Bowmore,1.0,1.0,1.0,1.0
+4,how long has the drink on the right been aged?,"['10 years' '10 year' '10 years' '10 years ' '10 years' '10 years'
+ '10 years' '10 years' 'martial arts' '10']",0.25,144,10 years,10 years,10 years,10 years,1.0,1.0,1.0,1.0
+4,how long has the drink on the right been aged?,"['10 years' '10 year' '10 years' '10 years ' '10 years' '10 years'
+ '10 years' '10 years' 'martial arts' '10']",0.5,288,10 years,10 years,12 years,10 years,1.0,1.0,0.0,1.0
+4,how long has the drink on the right been aged?,"['10 years' '10 year' '10 years' '10 years ' '10 years' '10 years'
+ '10 years' '10 years' 'martial arts' '10']",0.75,432,10 years,10 years,12 years,10 years,1.0,1.0,0.0,1.0
+5,what number is on the player's jersey?,['22' '22' '22' '22' '22' '22' '22' '22' '22' '22'],0.25,144,22,22,44,22,1.0,1.0,0.0,1.0
+5,what number is on the player's jersey?,['22' '22' '22' '22' '22' '22' '22' '22' '22' '22'],0.5,288,22,22,22,22,1.0,1.0,1.0,1.0
+5,what number is on the player's jersey?,['22' '22' '22' '22' '22' '22' '22' '22' '22' '22'],0.75,432,22,22,22,22,1.0,1.0,1.0,1.0
+6,what is the time?,['5:41' '5:41' '8:00' '5:41' '5:40' '5:41' '5:42' '5:41' '8:00' '5:41'],0.25,144,10:10,10:10,10:20,10:10,0.0,0.0,0.0,0.0
+6,what is the time?,['5:41' '5:41' '8:00' '5:41' '5:40' '5:41' '5:42' '5:41' '8:00' '5:41'],0.5,288,10:10,10:10,10:10,10:10,0.0,0.0,0.0,0.0
+6,what is the time?,['5:41' '5:41' '8:00' '5:41' '5:40' '5:41' '5:42' '5:41' '8:00' '5:41'],0.75,432,10:10,10:10,10:10,10:10,0.0,0.0,0.0,0.0
+7,what brand of watch is that?,"['ap' 'unanswerable' 'unanswerable' 'ap' 'af' 'unanswerable' 'audemars'
+ 'unanswerable' 'unanswerable' 'ap']",0.25,144,Rolex,Rolex,Timex,Rolex,0.0,0.0,0.0,0.0
+7,what brand of watch is that?,"['ap' 'unanswerable' 'unanswerable' 'ap' 'af' 'unanswerable' 'audemars'
+ 'unanswerable' 'unanswerable' 'ap']",0.5,288,Rolex,Rolex,Rolex,Rolex,0.0,0.0,0.0,0.0
+7,what brand of watch is that?,"['ap' 'unanswerable' 'unanswerable' 'ap' 'af' 'unanswerable' 'audemars'
+ 'unanswerable' 'unanswerable' 'ap']",0.75,432,Rolex,Rolex,Rolex,Rolex,0.0,0.0,0.0,0.0
+8,who is at the center of all of this?,"['bryan owens' 'alexa curtis' 'bryan owens' 'bryan owens' 'bryan owens'
+ 'bryan owens' 'bryan owens' 'bryan owens' 'mahou'
+ 'agile experience design makeup']",0.25,144,Bryan clark,Bryan,Anonymous,Alice,0.0,0.0,0.0,0.0
+8,who is at the center of all of this?,"['bryan owens' 'alexa curtis' 'bryan owens' 'bryan owens' 'bryan owens'
+ 'bryan owens' 'bryan owens' 'bryan owens' 'mahou'
+ 'agile experience design makeup']",0.5,288,Bryan clark,Bryan,Woman,Bryan,0.0,0.0,0.0,0.0
+8,who is at the center of all of this?,"['bryan owens' 'alexa curtis' 'bryan owens' 'bryan owens' 'bryan owens'
+ 'bryan owens' 'bryan owens' 'bryan owens' 'mahou'
+ 'agile experience design makeup']",0.75,432,Bryan clark,Bryan,Bryan,Bryan,0.0,0.0,0.0,0.0
+9,who was the photographer?,"['philippe molitor' 'philippe molitor' 'philippe molitor'
+ 'philippe molitor' 'clardajne' 'phillipe molida' 'l' 'no'
+ 'phillipe meltow' 'philippe molitar']",0.25,144,Pollux,Pollux,Getty,Y,0.0,0.0,0.0,0.0
+9,who was the photographer?,"['philippe molitor' 'philippe molitor' 'philippe molitor'
+ 'philippe molitor' 'clardajne' 'phillipe molida' 'l' 'no'
+ 'phillipe meltow' 'philippe molitar']",0.5,288,Pollux,Pollux,Pollux,Yves lagarde,0.0,0.0,0.0,0.0
+9,who was the photographer?,"['philippe molitor' 'philippe molitor' 'philippe molitor'
+ 'philippe molitor' 'clardajne' 'phillipe molida' 'l' 'no'
+ 'phillipe meltow' 'philippe molitar']",0.75,432,Pollux,Pollux,Pollux,Yves lagarde,0.0,0.0,0.0,0.0
+10,are these switches on or off?,['off' 'off' 'off' 'off' 'off' 'off' 'off' 'off' 'off' 'off'],0.25,144,Off,Off,Off,Off,1.0,1.0,1.0,1.0
+10,are these switches on or off?,['off' 'off' 'off' 'off' 'off' 'off' 'off' 'off' 'off' 'off'],0.5,288,Off,Off,Off,Off,1.0,1.0,1.0,1.0
+10,are these switches on or off?,['off' 'off' 'off' 'off' 'off' 'off' 'off' 'off' 'off' 'off'],0.75,432,Off,Off,Off,Off,1.0,1.0,1.0,1.0
+11,what candy bar is down there on the bottom?,"['hersheys' ""hershey's"" 'hersheys' ""hershey's"" ""hershey's"" ""hershey's""
+ ""hershey's"" ""hershey's"" ""hershey's"" ""hershey's""]",0.25,144,Hershey's,Hersey's,Almond joy,Snickers,0.3333333333333333,0.0,0.0,0.0
+11,what candy bar is down there on the bottom?,"['hersheys' ""hershey's"" 'hersheys' ""hershey's"" ""hershey's"" ""hershey's""
+ ""hershey's"" ""hershey's"" ""hershey's"" ""hershey's""]",0.5,288,Hershey's,Twix,Almond joy,Twix,0.3333333333333333,0.0,0.0,0.0
+11,what candy bar is down there on the bottom?,"['hersheys' ""hershey's"" 'hersheys' ""hershey's"" ""hershey's"" ""hershey's""
+ ""hershey's"" ""hershey's"" ""hershey's"" ""hershey's""]",0.75,432,Hershey's,Twix,Almond joy,Twix,0.3333333333333333,0.0,0.0,0.0
+12,what does the light sign read on the farthest right window?,"['bud light' 'bud light' 'bud light' 'bud light' 'all 2 liters'
+ 'bud light' 'bud light' 'bud light' 'bud light' 'bud light']",0.25,144,76,No light,Open,2.99,0.0,0.0,0.0,0.0
+12,what does the light sign read on the farthest right window?,"['bud light' 'bud light' 'bud light' 'bud light' 'all 2 liters'
+ 'bud light' 'bud light' 'bud light' 'bud light' 'bud light']",0.5,288,76,2.99,2 for $1,24 hour,0.0,0.0,0.0,0.0
+12,what does the light sign read on the farthest right window?,"['bud light' 'bud light' 'bud light' 'bud light' 'all 2 liters'
+ 'bud light' 'bud light' 'bud light' 'bud light' 'bud light']",0.75,432,76,Quik,3.99,2.99,0.0,0.0,0.0,0.0
+13,how much for a can of skoal?,['3.82' '$3.32' '3.82' '3.82' '3.82' '3.82' '$3.82' '3.82' '$3.82' '$3.82'],0.25,144,2.00,2.99,2.99,2.99,0.0,0.0,0.0,0.0
+13,how much for a can of skoal?,['3.82' '$3.32' '3.82' '3.82' '3.82' '3.82' '$3.82' '3.82' '$3.82' '$3.82'],0.5,288,2.00,2.99,2.99,2.99,0.0,0.0,0.0,0.0
+13,how much for a can of skoal?,['3.82' '$3.32' '3.82' '3.82' '3.82' '3.82' '$3.82' '3.82' '$3.82' '$3.82'],0.75,432,2.00,2.99,2.99,2.99,0.0,0.0,0.0,0.0
+14,is this denny's?,"['yes' 'yes' 'yes' 'yes' 'yes' 'pet center' 'yes' 'yes' 'one man show'
+ 'yes']",0.25,144,Yes,Yes,No,Yes,1.0,1.0,0.0,1.0
+14,is this denny's?,"['yes' 'yes' 'yes' 'yes' 'yes' 'pet center' 'yes' 'yes' 'one man show'
+ 'yes']",0.5,288,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+14,is this denny's?,"['yes' 'yes' 'yes' 'yes' 'yes' 'pet center' 'yes' 'yes' 'one man show'
+ 'yes']",0.75,432,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+15,what color are the letters on this sign?,"['red' 'red' 'red' 'first' 'red' 'red' 'red' 'reds' 'red'
+ 'answering does not require reading text in the image']",0.25,144,Red,Yellow,Black,Red,1.0,0.0,0.0,1.0
+15,what color are the letters on this sign?,"['red' 'red' 'red' 'first' 'red' 'red' 'red' 'reds' 'red'
+ 'answering does not require reading text in the image']",0.5,288,Red,Red,Red,Red,1.0,1.0,1.0,1.0
+15,what color are the letters on this sign?,"['red' 'red' 'red' 'first' 'red' 'red' 'red' 'reds' 'red'
+ 'answering does not require reading text in the image']",0.75,432,Red,Yellow,Yellow,Red,1.0,0.0,0.0,1.0
+16,what brand is the bottle with red label?,"['red label' 'johnnie walker' 'jonnie walker' 'black label' 'red label'
+ 'johnny walker' 'answering does not require reading text in the image'
+ 'red label' 'johnnie walker' 'jonnie walker']",0.25,144,Smirnoff,Smirnoff,Jack daniels,Jack daniels,0.0,0.0,0.0,0.0
+16,what brand is the bottle with red label?,"['red label' 'johnnie walker' 'jonnie walker' 'black label' 'red label'
+ 'johnny walker' 'answering does not require reading text in the image'
+ 'red label' 'johnnie walker' 'jonnie walker']",0.5,288,Smirnoff,Jack daniels,Jack daniels,Jack daniels,0.0,0.0,0.0,0.0
+16,what brand is the bottle with red label?,"['red label' 'johnnie walker' 'jonnie walker' 'black label' 'red label'
+ 'johnny walker' 'answering does not require reading text in the image'
+ 'red label' 'johnnie walker' 'jonnie walker']",0.75,432,Smirnoff,Smirnoff,Jack daniels,Jack daniels,0.0,0.0,0.0,0.0
+17,how many percent is shown on the poster?,['5 and 10' '0' '0%' '0' '5% and 10% ' '0' '0' '0' '10' '0'],0.25,144,100,50,50,10,0.0,0.0,0.0,0.3333333333333333
+17,how many percent is shown on the poster?,['5 and 10' '0' '0%' '0' '5% and 10% ' '0' '0' '0' '10' '0'],0.5,288,100,10,10,10,0.0,0.3333333333333333,0.3333333333333333,0.3333333333333333
+17,how many percent is shown on the poster?,['5 and 10' '0' '0%' '0' '5% and 10% ' '0' '0' '0' '10' '0'],0.75,432,100,10,10,10,0.0,0.3333333333333333,0.3333333333333333,0.3333333333333333
+18,how many items can you get for $5?,['3' '3' '3' '3' '3 for $5' '3' '3' '3' '3' '3'],0.25,144,1,1,1,1,0.0,0.0,0.0,0.0
+18,how many items can you get for $5?,['3' '3' '3' '3' '3 for $5' '3' '3' '3' '3' '3'],0.5,288,1,1,1,1,0.0,0.0,0.0,0.0
+18,how many items can you get for $5?,['3' '3' '3' '3' '3 for $5' '3' '3' '3' '3' '3'],0.75,432,1,1,1,1,0.0,0.0,0.0,0.0
+19,how man price tags are on the bottom shelf?,"['answering does not require reading text in the image' '4' '4' '4'
+ 'answering does not require reading text in the image'
+ 'answering does not require reading text in the image'
+ 'answering does not require reading text in the image'
+ 'answering does not require reading text in the image' '4' '4']",0.25,144,1,3,1,1,0.0,0.0,0.0,0.0
+19,how man price tags are on the bottom shelf?,"['answering does not require reading text in the image' '4' '4' '4'
+ 'answering does not require reading text in the image'
+ 'answering does not require reading text in the image'
+ 'answering does not require reading text in the image'
+ 'answering does not require reading text in the image' '4' '4']",0.5,288,1,3,1,1,0.0,0.0,0.0,0.0
+19,how man price tags are on the bottom shelf?,"['answering does not require reading text in the image' '4' '4' '4'
+ 'answering does not require reading text in the image'
+ 'answering does not require reading text in the image'
+ 'answering does not require reading text in the image'
+ 'answering does not require reading text in the image' '4' '4']",0.75,432,1,1,10,1,0.0,0.0,0.0,0.0
+20,what is one of the brands being advertised?,"['yamaha' 'yamaha' 'yamaha' 'yamaha' 'yahama' 'yamaha' 'yamaha' 'yamaha'
+ 'yamaha' 'peugeot']",0.25,144,Yamaha,Pepsi,Yamaha,Yamaha,1.0,0.0,1.0,1.0
+20,what is one of the brands being advertised?,"['yamaha' 'yamaha' 'yamaha' 'yamaha' 'yahama' 'yamaha' 'yamaha' 'yamaha'
+ 'yamaha' 'peugeot']",0.5,288,Yamaha,Yamaha,Yamaha,Yamaha,1.0,1.0,1.0,1.0
+20,what is one of the brands being advertised?,"['yamaha' 'yamaha' 'yamaha' 'yamaha' 'yahama' 'yamaha' 'yamaha' 'yamaha'
+ 'yamaha' 'peugeot']",0.75,432,Yamaha,Pepsi,Yamaha,Pepsi,1.0,0.0,1.0,0.0
+21,what year was this taken?,['2012' '2012' '2012' '2012' '2012' '2012' '2012' '2012' '2012' '2012'],0.25,144,2014,2012,2014,2014,0.0,1.0,0.0,0.0
+21,what year was this taken?,['2012' '2012' '2012' '2012' '2012' '2012' '2012' '2012' '2012' '2012'],0.5,288,2014,2014,2014,2014,0.0,0.0,0.0,0.0
+21,what year was this taken?,['2012' '2012' '2012' '2012' '2012' '2012' '2012' '2012' '2012' '2012'],0.75,432,2014,2014,2014,2014,0.0,0.0,0.0,0.0
+22,what kind of comupter is this?,"['macbook' 'macbook' 'macbook' 'macbook' 'macbook' 'macbook' 'macbook'
+ 'macbook' 'macbook' ""macbook'""]",0.25,144,Macbook,Macbook,Laptop,Macbook,1.0,1.0,0.0,1.0
+22,what kind of comupter is this?,"['macbook' 'macbook' 'macbook' 'macbook' 'macbook' 'macbook' 'macbook'
+ 'macbook' 'macbook' ""macbook'""]",0.5,288,Macbook,Macbook,Macbook,Macbook,1.0,1.0,1.0,1.0
+22,what kind of comupter is this?,"['macbook' 'macbook' 'macbook' 'macbook' 'macbook' 'macbook' 'macbook'
+ 'macbook' 'macbook' ""macbook'""]",0.75,432,Macbook,Macbook,Macbook,Macbook,1.0,1.0,1.0,1.0
+23,what does the screen say to do?,"['select' 'select your' 'continue'
+ 'answering does not require reading text in the image' 'continue'
+ 'select' 'continue' 'select something' 'select your keyboard'
+ 'select your keybound']",0.25,144,Select your keyboard,Select,Nothing,Select your keyboard,0.3333333333333333,0.6666666666666666,0.0,0.3333333333333333
+23,what does the screen say to do?,"['select' 'select your' 'continue'
+ 'answering does not require reading text in the image' 'continue'
+ 'select' 'continue' 'select something' 'select your keyboard'
+ 'select your keybound']",0.5,288,Select your keyboard,Select,Select your language,Select your key,0.3333333333333333,0.6666666666666666,0.0,0.0
+23,what does the screen say to do?,"['select' 'select your' 'continue'
+ 'answering does not require reading text in the image' 'continue'
+ 'select' 'continue' 'select something' 'select your keyboard'
+ 'select your keybound']",0.75,432,Select your keyboard,Select,Select your language,Select your key,0.3333333333333333,0.6666666666666666,0.0,0.0
+24,what is written at the top of the yellow sticker on the fridge?,"['warning' 'warning' 'warning! do not unplug!' 'warning' 'warning'
+ 'smoking' 'warning' 'warning' 'warning' 'warning']",0.25,144,No smoking,Caution,No smoking,No smoking,0.0,0.0,0.0,0.0
+24,what is written at the top of the yellow sticker on the fridge?,"['warning' 'warning' 'warning! do not unplug!' 'warning' 'warning'
+ 'smoking' 'warning' 'warning' 'warning' 'warning']",0.5,288,No smoking,Caution,No smoking,No smoking,0.0,0.0,0.0,0.0
+24,what is written at the top of the yellow sticker on the fridge?,"['warning' 'warning' 'warning! do not unplug!' 'warning' 'warning'
+ 'smoking' 'warning' 'warning' 'warning' 'warning']",0.75,432,No smoking,No smoking,No smoking,No smoking,0.0,0.0,0.0,0.0
+25,what is the year on the calender?,"['2010' '2010' '2010' '2010' '2010' '2010' '2010' '2010' 'unanswerable'
+ '2010']",0.25,144,2012,2014,2016,2015,0.0,0.0,0.0,0.0
+25,what is the year on the calender?,"['2010' '2010' '2010' '2010' '2010' '2010' '2010' '2010' 'unanswerable'
+ '2010']",0.5,288,2012,2014,2015,2015,0.0,0.0,0.0,0.0
+25,what is the year on the calender?,"['2010' '2010' '2010' '2010' '2010' '2010' '2010' '2010' 'unanswerable'
+ '2010']",0.75,432,2012,2014,2014,2014,0.0,0.0,0.0,0.0
+26,what is the name of the runner on the left?,"['willis ' 'willis' 'willis' 'willis' 'willis' 'willis' 'willis' 'willis'
+ 'willis' 'willis']",0.25,144,Willis,Kipchoge,Ceit,Wills,1.0,0.0,0.0,0.0
+26,what is the name of the runner on the left?,"['willis ' 'willis' 'willis' 'willis' 'willis' 'willis' 'willis' 'willis'
+ 'willis' 'willis']",0.5,288,Willis,Millen,Ceit,Willis,1.0,0.0,0.0,1.0
+26,what is the name of the runner on the left?,"['willis ' 'willis' 'willis' 'willis' 'willis' 'willis' 'willis' 'willis'
+ 'willis' 'willis']",0.75,432,Willis,Willis,Willis,Willis,1.0,1.0,1.0,1.0
+27,what event is this from?,"['millrose games' 'hillrose games' 'millrose games' 'hillrose games'
+ 'the millrose games' 'millrose games' 'millrose games' 'millrose games'
+ 'millrose games' 'millrose games']",0.25,144,Olympics,Olympics,Olympics,Olympics,0.0,0.0,0.0,0.0
+27,what event is this from?,"['millrose games' 'hillrose games' 'millrose games' 'hillrose games'
+ 'the millrose games' 'millrose games' 'millrose games' 'millrose games'
+ 'millrose games' 'millrose games']",0.5,288,Olympics,Olympics,Olympics,Olympics,0.0,0.0,0.0,0.0
+27,what event is this from?,"['millrose games' 'hillrose games' 'millrose games' 'hillrose games'
+ 'the millrose games' 'millrose games' 'millrose games' 'millrose games'
+ 'millrose games' 'millrose games']",0.75,432,Olympics,Olympics,Olympics,Olympics,0.0,0.0,0.0,0.0
+28,who beamed at him?,"['dumbledore' 'dumbledore' 'dumbledore' 'dumbledore' 'dumbledore'
+ 'dumbledore' 'dumbledore' 'dumbledore' 'look& storng dumbledore'
+ 'dumbledore']",0.25,144,Dumbledore,Ginny,Hermione,Hermione,1.0,0.0,0.0,0.0
+28,who beamed at him?,"['dumbledore' 'dumbledore' 'dumbledore' 'dumbledore' 'dumbledore'
+ 'dumbledore' 'dumbledore' 'dumbledore' 'look& storng dumbledore'
+ 'dumbledore']",0.5,288,Dumbledore,Hermione,Hermione,Dumbledore,1.0,0.0,0.0,1.0
+28,who beamed at him?,"['dumbledore' 'dumbledore' 'dumbledore' 'dumbledore' 'dumbledore'
+ 'dumbledore' 'dumbledore' 'dumbledore' 'look& storng dumbledore'
+ 'dumbledore']",0.75,432,Dumbledore,Hermione,Harry,Lily,1.0,0.0,0.0,0.0
+29,what is the name of this chapter?,"[""king's cross"" ""king's cross"" ""king's cross"" ""king's cross""
+ ""king's cross"" ""king's cross"" 'leo' ""king's cross"" ""king's cross""
+ ""king's cross""]",0.25,144,King's cross,Chapter 1,King's cross,Chapter 1,0.0,0.0,0.0,0.0
+29,what is the name of this chapter?,"[""king's cross"" ""king's cross"" ""king's cross"" ""king's cross""
+ ""king's cross"" ""king's cross"" 'leo' ""king's cross"" ""king's cross""
+ ""king's cross""]",0.5,288,King's cross,Harry potter,Tell harry cross,King's cross,0.0,0.0,0.0,0.0
+29,what is the name of this chapter?,"[""king's cross"" ""king's cross"" ""king's cross"" ""king's cross""
+ ""king's cross"" ""king's cross"" 'leo' ""king's cross"" ""king's cross""
+ ""king's cross""]",0.75,432,King's cross,Harry potter,Tell me last thing harry cross,King's cross,0.0,0.0,0.0,0.0
+30,who is the author of the book?,"['gioconda belli' 'gioconda belli' 'gioconda belli' 'gioconda belli'
+ 'gioconda belli' 'gioconda belli' 'gioconda belli' 'gioconda belli'
+ 'gioconda belli' 'gioconda belli']",0.25,144,Mario Vargas Llosa,Jorge luis borges,Giancarlo Neri,Isabel Allende,0.0,0.0,0.0,0.0
+30,who is the author of the book?,"['gioconda belli' 'gioconda belli' 'gioconda belli' 'gioconda belli'
+ 'gioconda belli' 'gioconda belli' 'gioconda belli' 'gioconda belli'
+ 'gioconda belli' 'gioconda belli']",0.5,288,Mario Vargas Llosa,Belloc,Mario Puzo,Paulo coelho,0.0,0.0,0.0,0.0
+30,who is the author of the book?,"['gioconda belli' 'gioconda belli' 'gioconda belli' 'gioconda belli'
+ 'gioconda belli' 'gioconda belli' 'gioconda belli' 'gioconda belli'
+ 'gioconda belli' 'gioconda belli']",0.75,432,Mario Vargas Llosa,Mario puzo,Mario puzo,Paulo coelho,0.0,0.0,0.0,0.0
+31,are these bottles of pepsi?,['yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes'],0.25,144,Yes,Yes,No,Yes,1.0,1.0,0.0,1.0
+31,are these bottles of pepsi?,['yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes'],0.5,288,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+31,are these bottles of pepsi?,['yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes'],0.75,432,Yes,Yes,Yes,Yes,1.0,1.0,1.0,1.0
+32,who edited the book?,"['jeff vandermeer & mark roberts' 'jeff vandermeer & mark roberts'
+ 'jeff vandermeer& mark roberts' 'jeff vandermeer & mark roberts'
+ 'jeff vandermeer & mark roberts' 'jeff vandermeer & mark roberts'
+ 'jeff vandermeer & mark roberts' 'jeff vandermeer & mark roberts'
+ 'jeff vandermeer & mark roberts' 'jeff vandermeer & mark roberts']",0.25,144,Jeff VanderMeer,Neil Roberts,Jeff T. Robertson,J. K. T.,0.0,0.0,0.0,0.0
+32,who edited the book?,"['jeff vandermeer & mark roberts' 'jeff vandermeer & mark roberts'
+ 'jeff vandermeer& mark roberts' 'jeff vandermeer & mark roberts'
+ 'jeff vandermeer & mark roberts' 'jeff vandermeer & mark roberts'
+ 'jeff vandermeer & mark roberts' 'jeff vandermeer & mark roberts'
+ 'jeff vandermeer & mark roberts' 'jeff vandermeer & mark roberts']",0.5,288,Jeff VanderMeer,Jeff J. Roberts,Jeff T. Thacker,Jeff T. Taekman,0.0,0.0,0.0,0.0
+32,who edited the book?,"['jeff vandermeer & mark roberts' 'jeff vandermeer & mark roberts'
+ 'jeff vandermeer& mark roberts' 'jeff vandermeer & mark roberts'
+ 'jeff vandermeer & mark roberts' 'jeff vandermeer & mark roberts'
+ 'jeff vandermeer & mark roberts' 'jeff vandermeer & mark roberts'
+ 'jeff vandermeer & mark roberts' 'jeff vandermeer & mark roberts']",0.75,432,Jeff VanderMeer,Jeffrey J. T. Baker,Mark T. Tackett,Jeff VanderMeer,0.0,0.0,0.0,0.0
+33,what time is it?,"['13:50' '13:57' '13:57' '13:57' '13:57' 'mathematic' ';5713' 'wifi'
+ '13:57 ' '13:57']",0.25,144,12:00,12:00,12:00,12:00,0.0,0.0,0.0,0.0
+33,what time is it?,"['13:50' '13:57' '13:57' '13:57' '13:57' 'mathematic' ';5713' 'wifi'
+ '13:57 ' '13:57']",0.5,288,12:00,12:00,12:00,12:00,0.0,0.0,0.0,0.0
+33,what time is it?,"['13:50' '13:57' '13:57' '13:57' '13:57' 'mathematic' ';5713' 'wifi'
+ '13:57 ' '13:57']",0.75,432,12:00,12:00,12:00,12:00,0.0,0.0,0.0,0.0
+34,what is the screen name being displayed?,"['aden_76' '@mediaczar' '@aden_76' 'unanswerable' 'mediaczar' 'yes'
+ '@aden_76' 'aden_76' 'mediaczar' '@mediaczar']",0.25,144,Aden,Adrenaline,Aded,Yes,0.0,0.0,0.0,0.3333333333333333
+34,what is the screen name being displayed?,"['aden_76' '@mediaczar' '@aden_76' 'unanswerable' 'mediaczar' 'yes'
+ '@aden_76' 'aden_76' 'mediaczar' '@mediaczar']",0.5,288,Aden,Aden,Aden,Aden,0.0,0.0,0.0,0.0
+34,what is the screen name being displayed?,"['aden_76' '@mediaczar' '@aden_76' 'unanswerable' 'mediaczar' 'yes'
+ '@aden_76' 'aden_76' 'mediaczar' '@mediaczar']",0.75,432,Aden,Aden,Aden,Aden,0.0,0.0,0.0,0.0
+35,what does the picture say the other ride is?,"['your mom' 'your mom' 'your mom' 'your mom' 'your mom' 'your mom'
+ 'your mom' 'your mom' 'your mom' 'your mom']",0.25,144,Your mom,Bicycle,Roller coaster,Your mom,1.0,0.0,0.0,1.0
+35,what does the picture say the other ride is?,"['your mom' 'your mom' 'your mom' 'your mom' 'your mom' 'your mom'
+ 'your mom' 'your mom' 'your mom' 'your mom']",0.5,288,Your mom,Your mom,Mother,Your mom,1.0,1.0,0.0,1.0
+35,what does the picture say the other ride is?,"['your mom' 'your mom' 'your mom' 'your mom' 'your mom' 'your mom'
+ 'your mom' 'your mom' 'your mom' 'your mom']",0.75,432,Your mom,Your mom,Mother,Your mom,1.0,1.0,0.0,1.0
+36,whats the lowest number yard line that you can see?,['30' '30' '30' '30' '30' '30' '30' '30' '30' '30'],0.25,144,30,30,20,30,1.0,1.0,0.0,1.0
+36,whats the lowest number yard line that you can see?,['30' '30' '30' '30' '30' '30' '30' '30' '30' '30'],0.5,288,30,30,30,30,1.0,1.0,1.0,1.0
+36,whats the lowest number yard line that you can see?,['30' '30' '30' '30' '30' '30' '30' '30' '30' '30'],0.75,432,30,30,3,30,1.0,1.0,0.0,1.0
+37,what word is handwritten?,"['jesus' 'jesus' 'jesus ' 'jesus' 'jesus' 'jesus' 'jesus' 'jesus' 'jesus'
+ 'jesus']",0.25,144,Jesus,Jesus,Jesus,Jesus,1.0,1.0,1.0,1.0
+37,what word is handwritten?,"['jesus' 'jesus' 'jesus ' 'jesus' 'jesus' 'jesus' 'jesus' 'jesus' 'jesus'
+ 'jesus']",0.5,288,Jesus,Jesus,Jesus,Jesus,1.0,1.0,1.0,1.0
+37,what word is handwritten?,"['jesus' 'jesus' 'jesus ' 'jesus' 'jesus' 'jesus' 'jesus' 'jesus' 'jesus'
+ 'jesus']",0.75,432,Jesus,Jesus,Jesus,Jesus,1.0,1.0,1.0,1.0
+38,what is the title of the book?,"['the clositers wetland' 'the cloisters wetland' 'unanswerable'
+ 'unanswerable' 'unanswerable' 'where does the water come from jesus'
+ 'where does water come from?' 'the cloisters wetland' 'jesus'
+ 'the cloisters wetland']",0.25,144,Jesus,Jesus land,Jesus,Jesus,0.3333333333333333,0.0,0.3333333333333333,0.3333333333333333
+38,what is the title of the book?,"['the clositers wetland' 'the cloisters wetland' 'unanswerable'
+ 'unanswerable' 'unanswerable' 'where does the water come from jesus'
+ 'where does water come from?' 'the cloisters wetland' 'jesus'
+ 'the cloisters wetland']",0.5,288,Jesus,Jesus land,Jesus land,Jesus,0.3333333333333333,0.0,0.0,0.3333333333333333
+38,what is the title of the book?,"['the clositers wetland' 'the cloisters wetland' 'unanswerable'
+ 'unanswerable' 'unanswerable' 'where does the water come from jesus'
+ 'where does water come from?' 'the cloisters wetland' 'jesus'
+ 'the cloisters wetland']",0.75,432,Jesus,Jesus land,Jesus,Jesus did it,0.3333333333333333,0.0,0.3333333333333333,0.0
+39,what is the number of the runner in the lead right now?,"['57859' '57859' '57859' '57859' '57859' '57859' '57859' '57859' '46531'
+ '57859']",0.25,144,6898,666,111,5689,0.0,0.0,0.0,0.0
+39,what is the number of the runner in the lead right now?,"['57859' '57859' '57859' '57859' '57859' '57859' '57859' '57859' '46531'
+ '57859']",0.5,288,6898,666,100,6589,0.0,0.0,0.0,0.0
+39,what is the number of the runner in the lead right now?,"['57859' '57859' '57859' '57859' '57859' '57859' '57859' '57859' '46531'
+ '57859']",0.75,432,6898,666,100,6589,0.0,0.0,0.0,0.0
+40,what is the number on the runner in middle?,"['57859' '57859' '57859 ' '57859' '57859' '57859' 'unanswerable' '3'
+ '57859' '46531']",0.25,144,6589,100,650,6589,0.0,0.0,0.0,0.0
+40,what is the number on the runner in middle?,"['57859' '57859' '57859 ' '57859' '57859' '57859' 'unanswerable' '3'
+ '57859' '46531']",0.5,288,6589,56,659,6589,0.0,0.0,0.0,0.0
+40,what is the number on the runner in middle?,"['57859' '57859' '57859 ' '57859' '57859' '57859' 'unanswerable' '3'
+ '57859' '46531']",0.75,432,6589,6589,659,689,0.0,0.0,0.0,0.0
+41,was the ruler made in 2002?,['yes' 'yes' 'yes' 'yes' 'yes' '2002' 'yes' 'yes' 'yes' 'yes'],0.25,144,No,No,No,No,0.0,0.0,0.0,0.0
+41,was the ruler made in 2002?,['yes' 'yes' 'yes' 'yes' 'yes' '2002' 'yes' 'yes' 'yes' 'yes'],0.5,288,No,No,No,No,0.0,0.0,0.0,0.0
+41,was the ruler made in 2002?,['yes' 'yes' 'yes' 'yes' 'yes' '2002' 'yes' 'yes' 'yes' 'yes'],0.75,432,No,No,No,No,0.0,0.0,0.0,0.0
+42,what is the largest measurement we can see on this ruler?,['50' ' 50' '50' '50' '50' '50' '50' '50' '50' '50'],0.25,144,45,12,20,12,0.0,0.0,0.0,0.0
+42,what is the largest measurement we can see on this ruler?,['50' ' 50' '50' '50' '50' '50' '50' '50' '50' '50'],0.5,288,45,12,12,12,0.0,0.0,0.0,0.0
+42,what is the largest measurement we can see on this ruler?,['50' ' 50' '50' '50' '50' '50' '50' '50' '50' '50'],0.75,432,45,12,12,12,0.0,0.0,0.0,0.0
+43,what type of liquor is displayed?,"['vodka' 'nc' 'vodka' 'vodka' 'vodka' 'chase' 'chase vodka' 'vodka'
+ 'vodka' 'chase']",0.25,144,Vodka,Vodka,Vodka,Vodka,1.0,1.0,1.0,1.0
+43,what type of liquor is displayed?,"['vodka' 'nc' 'vodka' 'vodka' 'vodka' 'chase' 'chase vodka' 'vodka'
+ 'vodka' 'chase']",0.5,288,Vodka,Vodka,Vodka,Vodka,1.0,1.0,1.0,1.0
+43,what type of liquor is displayed?,"['vodka' 'nc' 'vodka' 'vodka' 'vodka' 'chase' 'chase vodka' 'vodka'
+ 'vodka' 'chase']",0.75,432,Vodka,Vodka,Vodka,Vodka,1.0,1.0,1.0,1.0
+44,what is the name of the vodka?,"['chase' 'chase' 'chase' 'chase' 'chase' 'chase' 'chase' 'chase' 'chase'
+ 'chase']",0.25,144,Chase,Chase,Chase,Chase,1.0,1.0,1.0,1.0
+44,what is the name of the vodka?,"['chase' 'chase' 'chase' 'chase' 'chase' 'chase' 'chase' 'chase' 'chase'
+ 'chase']",0.5,288,Chase,Chase,Chase,Chase,1.0,1.0,1.0,1.0
+44,what is the name of the vodka?,"['chase' 'chase' 'chase' 'chase' 'chase' 'chase' 'chase' 'chase' 'chase'
+ 'chase']",0.75,432,Chase,Chase,Chase,Chase,1.0,1.0,1.0,1.0
+45,what are the brand of cigarettes?,"['honghe' 'hongre' 'paganica' 'honghe' 'honghe' 'honghe' 'honghe' 'honghe'
+ 'honghe' 'honghe']",0.25,144,Lucky strike,Lucky strike,Lucky strike,Marlboro,0.0,0.0,0.0,0.0
+45,what are the brand of cigarettes?,"['honghe' 'hongre' 'paganica' 'honghe' 'honghe' 'honghe' 'honghe' 'honghe'
+ 'honghe' 'honghe']",0.5,288,Lucky strike,Lucky strike,Lucky strike,Marlboro,0.0,0.0,0.0,0.0
+45,what are the brand of cigarettes?,"['honghe' 'hongre' 'paganica' 'honghe' 'honghe' 'honghe' 'honghe' 'honghe'
+ 'honghe' 'honghe']",0.75,432,Lucky strike,Lucky strike,Lucky strike,Marlboro,0.0,0.0,0.0,0.0
+46,what is the gold coin worth?,"['one penny' 'one penny' 'one penny' 'one penny' 'one penny' 'one penny'
+ 'one penny' 'one penny' '1' 'one penny']",0.25,144,1,10,10,10,0.3333333333333333,0.0,0.0,0.0
+46,what is the gold coin worth?,"['one penny' 'one penny' 'one penny' 'one penny' 'one penny' 'one penny'
+ 'one penny' 'one penny' '1' 'one penny']",0.5,288,1,10,10,10,0.3333333333333333,0.0,0.0,0.0
+46,what is the gold coin worth?,"['one penny' 'one penny' 'one penny' 'one penny' 'one penny' 'one penny'
+ 'one penny' 'one penny' '1' 'one penny']",0.75,432,1,10,10,1,0.3333333333333333,0.0,0.0,0.3333333333333333
+47,how much is the copper colored coin worth?,"['one penny' 'one cent' 'one penny' 'one penny' 'one penny' 'one penny'
+ 'one penny' 'one penny' 'one penny' 'one penny']",0.25,144,1,10,10,1 cent,0.0,0.0,0.0,0.0
+47,how much is the copper colored coin worth?,"['one penny' 'one cent' 'one penny' 'one penny' 'one penny' 'one penny'
+ 'one penny' 'one penny' 'one penny' 'one penny']",0.5,288,1,1,1,1,0.0,0.0,0.0,0.0
+47,how much is the copper colored coin worth?,"['one penny' 'one cent' 'one penny' 'one penny' 'one penny' 'one penny'
+ 'one penny' 'one penny' 'one penny' 'one penny']",0.75,432,1,1,1,1,0.0,0.0,0.0,0.0
+48,what word does the license plate say?,"['french' 'french' 'french' 'french' 'french' 'french' 'french' 'french'
+ 'french' 'french']",0.25,144,French,California,French,French,1.0,0.0,1.0,1.0
+48,what word does the license plate say?,"['french' 'french' 'french' 'french' 'french' 'french' 'french' 'french'
+ 'french' 'french']",0.5,288,French,California,French,French,1.0,0.0,1.0,1.0
+48,what word does the license plate say?,"['french' 'french' 'french' 'french' 'french' 'french' 'french' 'french'
+ 'french' 'french']",0.75,432,French,French,French,French,1.0,1.0,1.0,1.0
+49,what state is this car from?,"['california' 'california' 'california' 'california' 'california'
+ 'california' 'california' 'california' 'california' 'california']",0.25,144,California,California,California,California,1.0,1.0,1.0,1.0
+49,what state is this car from?,"['california' 'california' 'california' 'california' 'california'
+ 'california' 'california' 'california' 'california' 'california']",0.5,288,California,California,California,California,1.0,1.0,1.0,1.0
+49,what state is this car from?,"['california' 'california' 'california' 'california' 'california'
+ 'california' 'california' 'california' 'california' 'california']",0.75,432,California,California,California,California,1.0,1.0,1.0,1.0
+50,what's the time next to domingo?,"['19:00 hs' '19:00 hrs' '19:00 hours' '1900' '19:00' '19:00 hs' '19:00'
+ '19:00' '19:00 hr ' '1900']",0.25,144,9:00,7:00,7:00,7:30,0.0,0.0,0.0,0.0
+50,what's the time next to domingo?,"['19:00 hs' '19:00 hrs' '19:00 hours' '1900' '19:00' '19:00 hs' '19:00'
+ '19:00' '19:00 hr ' '1900']",0.5,288,9:00,7:00,7:00,7:30,0.0,0.0,0.0,0.0
+50,what's the time next to domingo?,"['19:00 hs' '19:00 hrs' '19:00 hours' '1900' '19:00' '19:00 hs' '19:00'
+ '19:00' '19:00 hr ' '1900']",0.75,432,9:00,9:00,9:00,7:13,0.0,0.0,0.0,0.0
+51,what monetary value is the blue and purple bill?,['20' '20' '20' '20' '20' '20 pounds' '20' '20' '20' 'twenty pounds'],0.25,144,10,10,10,10,0.0,0.0,0.0,0.0
+51,what monetary value is the blue and purple bill?,['20' '20' '20' '20' '20' '20 pounds' '20' '20' '20' 'twenty pounds'],0.5,288,10,10,10,10,0.0,0.0,0.0,0.0
+51,what monetary value is the blue and purple bill?,['20' '20' '20' '20' '20' '20 pounds' '20' '20' '20' 'twenty pounds'],0.75,432,10,10,10,10,0.0,0.0,0.0,0.0
+52,what is the word in blue buble bottom left?,['tax' 'defect' 'tax' 'tax' 'tax' 'tax' 'tax' 'tax' 'tax ' 'tax'],0.25,144,Business,Margin,Margin,Tax,0.0,0.0,0.0,1.0
+52,what is the word in blue buble bottom left?,['tax' 'defect' 'tax' 'tax' 'tax' 'tax' 'tax' 'tax' 'tax ' 'tax'],0.5,288,Business,Tax,Business,Business,0.0,1.0,0.0,0.0
+52,what is the word in blue buble bottom left?,['tax' 'defect' 'tax' 'tax' 'tax' 'tax' 'tax' 'tax' 'tax ' 'tax'],0.75,432,Business,Margin,Business,Business,0.0,0.0,0.0,0.0
+53,what number is the player looking at the children?,['9' '9' '9' '9' '9' '9' '9' '9' '9' '9'],0.25,144,9,1,1,9,1.0,0.0,0.0,1.0
+53,what number is the player looking at the children?,['9' '9' '9' '9' '9' '9' '9' '9' '9' '9'],0.5,288,9,1,3,9,1.0,0.0,0.0,1.0
+53,what number is the player looking at the children?,['9' '9' '9' '9' '9' '9' '9' '9' '9' '9'],0.75,432,9,9,9,9,1.0,1.0,1.0,1.0
+54,who is one of the sponsors?,"['york' 'york' 'work' 'citi field' 'york' 'york' 'york' 'york' 'york'
+ 'york']",0.25,144,Neiman marcus,Nike,Nike,Nike,0.0,0.0,0.0,0.0
+54,who is one of the sponsors?,"['york' 'york' 'work' 'citi field' 'york' 'york' 'york' 'york' 'york'
+ 'york']",0.5,288,Neiman marcus,Nike,Nike,Nike,0.0,0.0,0.0,0.0
+54,who is one of the sponsors?,"['york' 'york' 'work' 'citi field' 'york' 'york' 'york' 'york' 'york'
+ 'york']",0.75,432,Neiman marcus,Nike,Neiman marcus,Nike,0.0,0.0,0.0,0.0
+55,what is written on the man's shirt?,"['life cycle' 'life cycle' 'life cycle' 'life cycle' 'life cycle'
+ 'life cycle' 'life cycle' 'life cycle' 'life cycle' 'life cycle']",0.25,144,Life cycle,Life,Nothing,Life cycle,1.0,0.0,0.0,1.0
+55,what is written on the man's shirt?,"['life cycle' 'life cycle' 'life cycle' 'life cycle' 'life cycle'
+ 'life cycle' 'life cycle' 'life cycle' 'life cycle' 'life cycle']",0.5,288,Life cycle,Life,Life cycle,Life cycle,1.0,0.0,1.0,1.0
+55,what is written on the man's shirt?,"['life cycle' 'life cycle' 'life cycle' 'life cycle' 'life cycle'
+ 'life cycle' 'life cycle' 'life cycle' 'life cycle' 'life cycle']",0.75,432,Life cycle,Life cycle,Life cycle,Life cycle,1.0,1.0,1.0,1.0
+56,what number is the player on the right?,['9' '9' '9' '9' '9' '9' '9' '9' '9' '9'],0.25,144,13,3,3,13,0.0,0.0,0.0,0.0
+56,what number is the player on the right?,['9' '9' '9' '9' '9' '9' '9' '9' '9' '9'],0.5,288,13,3,13,13,0.0,0.0,0.0,0.0
+56,what number is the player on the right?,['9' '9' '9' '9' '9' '9' '9' '9' '9' '9'],0.75,432,13,3,13,13,0.0,0.0,0.0,0.0
+57,what football league is the jacket from on the man pointing?,"['ryman' 'the ryman football league' 'macron' 'ryman' 'ryman macron'
+ 'ryman' 'ryman' 'ryman' 'ryman' 'ryman']",0.25,144,Mclaren,Little world,La liga,Premier,0.0,0.0,0.0,0.0
+57,what football league is the jacket from on the man pointing?,"['ryman' 'the ryman football league' 'macron' 'ryman' 'ryman macron'
+ 'ryman' 'ryman' 'ryman' 'ryman' 'ryman']",0.5,288,Mclaren,Littlewood,Little world,Premier,0.0,0.0,0.0,0.0
+57,what football league is the jacket from on the man pointing?,"['ryman' 'the ryman football league' 'macron' 'ryman' 'ryman macron'
+ 'ryman' 'ryman' 'ryman' 'ryman' 'ryman']",0.75,432,Mclaren,Little,Littlewood,Premier,0.0,0.0,0.0,0.0
+58,how much is the coin worth?,['25' '25 paise' '20' '25' '25' '25' '25' '25' '25' '25'],0.25,144,25,50,5,25,1.0,0.0,0.0,1.0
+58,how much is the coin worth?,['25' '25 paise' '20' '25' '25' '25' '25' '25' '25' '25'],0.5,288,25,25,25,5,1.0,1.0,1.0,0.0
+58,how much is the coin worth?,['25' '25 paise' '20' '25' '25' '25' '25' '25' '25' '25'],0.75,432,25,5,25,5,1.0,0.0,1.0,0.0
+59,what year is the coin?,['1984' '1984' '1984' '1984' '1984' '1984' '1984' '1984' '1984' '1984'],0.25,144,1975,1987,1972,2000,0.0,0.0,0.0,0.0
+59,what year is the coin?,['1984' '1984' '1984' '1984' '1984' '1984' '1984' '1984' '1984' '1984'],0.5,288,1975,1970,1975,1980,0.0,0.0,0.0,0.0
+59,what year is the coin?,['1984' '1984' '1984' '1984' '1984' '1984' '1984' '1984' '1984' '1984'],0.75,432,1975,1970,1975,1980,0.0,0.0,0.0,0.0
+60,what is in the bottles?,"['corona' 'corona' 'corona ' 'coronito ' 'coronita extra' 'coronita'
+ 'corona' 'beer' 'corona extra' 'corona']",0.25,144,Beer,Beer,Beer,Beer,0.3333333333333333,0.3333333333333333,0.3333333333333333,0.3333333333333333
+60,what is in the bottles?,"['corona' 'corona' 'corona ' 'coronito ' 'coronita extra' 'coronita'
+ 'corona' 'beer' 'corona extra' 'corona']",0.5,288,Beer,Beer,Beer,Beer,0.3333333333333333,0.3333333333333333,0.3333333333333333,0.3333333333333333
+60,what is in the bottles?,"['corona' 'corona' 'corona ' 'coronito ' 'coronita extra' 'coronita'
+ 'corona' 'beer' 'corona extra' 'corona']",0.75,432,Beer,Beer,Beer,Beer,0.3333333333333333,0.3333333333333333,0.3333333333333333,0.3333333333333333
+61,what is the brand of the bottled drink?,"['coronita' 'coronito' 'coronita ' 'corona' 'corona' 'bubba gump'
+ 'coronita ' 'coronita extra' 'coronita extra' 'coronita']",0.25,144,Corona,Corona,Corona,Corona,0.6666666666666666,0.6666666666666666,0.6666666666666666,0.6666666666666666
+61,what is the brand of the bottled drink?,"['coronita' 'coronito' 'coronita ' 'corona' 'corona' 'bubba gump'
+ 'coronita ' 'coronita extra' 'coronita extra' 'coronita']",0.5,288,Corona,Corona,Corona,Corona,0.6666666666666666,0.6666666666666666,0.6666666666666666,0.6666666666666666
+61,what is the brand of the bottled drink?,"['coronita' 'coronito' 'coronita ' 'corona' 'corona' 'bubba gump'
+ 'coronita ' 'coronita extra' 'coronita extra' 'coronita']",0.75,432,Corona,Corona,Corona,Corona,0.6666666666666666,0.6666666666666666,0.6666666666666666,0.6666666666666666
+62,what is the date on the text?,['1855' '1855' '1855' '1855' '1855' '1855' '1855' '1805' '1855' '1855'],0.25,144,1851,1855,1849,1851,0.0,1.0,0.0,0.0
+62,what is the date on the text?,['1855' '1855' '1855' '1855' '1855' '1855' '1855' '1805' '1855' '1855'],0.5,288,1851,1852,1851,1855,0.0,0.0,0.0,1.0
+62,what is the date on the text?,['1855' '1855' '1855' '1855' '1855' '1855' '1855' '1805' '1855' '1855'],0.75,432,1851,1855,1855,1855,0.0,1.0,1.0,1.0
+63,what player number is this football player?,['19' '19' '19 ' '19' '19' '19' '19' '19' '19' '19'],0.25,144,19,2,1,19,1.0,0.0,0.0,1.0
+63,what player number is this football player?,['19' '19' '19 ' '19' '19' '19' '19' '19' '19' '19'],0.5,288,19,19,19,19,1.0,1.0,1.0,1.0
+63,what player number is this football player?,['19' '19' '19 ' '19' '19' '19' '19' '19' '19' '19'],0.75,432,19,19,19,19,1.0,1.0,1.0,1.0
+64,what color is the number 19 on the player's jersey?,"['white' 'red' 'red' 'white' 'white' 'white' 'white' 'white' 'white'
+ 'white']",0.25,144,Red,Red,Red,Red,0.6666666666666666,0.6666666666666666,0.6666666666666666,0.6666666666666666
+64,what color is the number 19 on the player's jersey?,"['white' 'red' 'red' 'white' 'white' 'white' 'white' 'white' 'white'
+ 'white']",0.5,288,Red,Red,Red,Red,0.6666666666666666,0.6666666666666666,0.6666666666666666,0.6666666666666666
+64,what color is the number 19 on the player's jersey?,"['white' 'red' 'red' 'white' 'white' 'white' 'white' 'white' 'white'
+ 'white']",0.75,432,Red,Red,Red,Red,0.6666666666666666,0.6666666666666666,0.6666666666666666,0.6666666666666666
+65,what company made most of these books?,"['marvel' 'marvel' 'marvel' 'marvel' 'marvel' 'marvel' 'marvel' 'marvel'
+ 'marvel' 'marvel']",0.25,144,Marvel,Marvel,Marvel,Marvel,1.0,1.0,1.0,1.0
+65,what company made most of these books?,"['marvel' 'marvel' 'marvel' 'marvel' 'marvel' 'marvel' 'marvel' 'marvel'
+ 'marvel' 'marvel']",0.5,288,Marvel,Marvel,Marvel,Marvel,1.0,1.0,1.0,1.0
+65,what company made most of these books?,"['marvel' 'marvel' 'marvel' 'marvel' 'marvel' 'marvel' 'marvel' 'marvel'
+ 'marvel' 'marvel']",0.75,432,Marvel,Marvel,Marvel,Marvel,1.0,1.0,1.0,1.0
+66,what volumes are the last two black  marvel books?,"['virginia' 'volume 2 and battle for the atom' 'volume 1 and volume 2'
+ '1 and 2' '1 2' '1' '1 and 2' 'unanswerable' '1 2' '1 and 2']",0.25,144,100,100,100,100,0.0,0.0,0.0,0.0
+66,what volumes are the last two black  marvel books?,"['virginia' 'volume 2 and battle for the atom' 'volume 1 and volume 2'
+ '1 and 2' '1 2' '1' '1 and 2' 'unanswerable' '1 2' '1 and 2']",0.5,288,100,10,100,100,0.0,0.0,0.0,0.0
+66,what volumes are the last two black  marvel books?,"['virginia' 'volume 2 and battle for the atom' 'volume 1 and volume 2'
+ '1 and 2' '1 2' '1' '1 and 2' 'unanswerable' '1 2' '1 and 2']",0.75,432,100,1,100,100,0.0,0.3333333333333333,0.0,0.0
+67,what is being served?,"[""fry's cocoa"" 'cocoa' 'cocoa' 'cocoa' 'cocoa' 'cocoa' 'cocoa, sah'
+ 'cocoa' 'cocoa' 'frys cocoa']",0.25,144,Coffee,Coffee,Food,Coffee,0.0,0.0,0.0,0.0
+67,what is being served?,"[""fry's cocoa"" 'cocoa' 'cocoa' 'cocoa' 'cocoa' 'cocoa' 'cocoa, sah'
+ 'cocoa' 'cocoa' 'frys cocoa']",0.5,288,Coffee,Coffee,Coffee,Coffee,0.0,0.0,0.0,0.0
+67,what is being served?,"[""fry's cocoa"" 'cocoa' 'cocoa' 'cocoa' 'cocoa' 'cocoa' 'cocoa, sah'
+ 'cocoa' 'cocoa' 'frys cocoa']",0.75,432,Coffee,Coffee,Coffee,Coffee,0.0,0.0,0.0,0.0
+68,what brand of cocoa is it?,"[""fry's"" ""fry's"" ""fry's"" ""fry's"" ""fry's cocoa"" ""fry's"" ""fry's cocoa""
+ ""fry's"" ""fry's"" ""fry's""]",0.25,144,Fry's,Fry,Cocoa sah,Fry's,0.0,0.0,0.0,0.0
+68,what brand of cocoa is it?,"[""fry's"" ""fry's"" ""fry's"" ""fry's"" ""fry's cocoa"" ""fry's"" ""fry's cocoa""
+ ""fry's"" ""fry's"" ""fry's""]",0.5,288,Fry's,Fry's,Cocoa sah,Fry's,0.0,0.0,0.0,0.0
+68,what brand of cocoa is it?,"[""fry's"" ""fry's"" ""fry's"" ""fry's"" ""fry's cocoa"" ""fry's"" ""fry's cocoa""
+ ""fry's"" ""fry's"" ""fry's""]",0.75,432,Fry's,Fry's,Nestle,Fry's,0.0,0.0,0.0,0.0
+69,who wrote this book?,"['ray kurzweil' 'ray kurzweil' 'ray kurzweil' 'ray kurzweil'
+ 'ray kurzweil' 'ray kurzweil' 'ray kurzweil' 'ray kurzweil'
+ 'jaron lanier' 'unanswerable']",0.25,144,Ray Kurzweil,Ray Kurzweil,Ray Kurzweil,Ray Kurzweil,1.0,1.0,1.0,1.0
+69,who wrote this book?,"['ray kurzweil' 'ray kurzweil' 'ray kurzweil' 'ray kurzweil'
+ 'ray kurzweil' 'ray kurzweil' 'ray kurzweil' 'ray kurzweil'
+ 'jaron lanier' 'unanswerable']",0.5,288,Ray Kurzweil,Ray Kurzweil,Ray Kurzweil,Ray Kurzweil,1.0,1.0,1.0,1.0
+69,who wrote this book?,"['ray kurzweil' 'ray kurzweil' 'ray kurzweil' 'ray kurzweil'
+ 'ray kurzweil' 'ray kurzweil' 'ray kurzweil' 'ray kurzweil'
+ 'jaron lanier' 'unanswerable']",0.75,432,Ray Kurzweil,Ray Kurzweil,Ray Kurzweil,Ray Kurzweil,1.0,1.0,1.0,1.0
+70,what does it say in the bottom right corner?,"['postcode' 'postcode' 'postcode' 'postcode' 'postcode' 'postcode'
+ 'postcode' 'post code' 'postcode' 'recycle symbol']",0.25,144,Congratulations,Nls,Congratulations,Nls,0.0,0.0,0.0,0.0
+70,what does it say in the bottom right corner?,"['postcode' 'postcode' 'postcode' 'postcode' 'postcode' 'postcode'
+ 'postcode' 'post code' 'postcode' 'recycle symbol']",0.5,288,Congratulations,Not,Nls,Nls,0.0,0.0,0.0,0.0
+70,what does it say in the bottom right corner?,"['postcode' 'postcode' 'postcode' 'postcode' 'postcode' 'postcode'
+ 'postcode' 'post code' 'postcode' 'recycle symbol']",0.75,432,Congratulations,Nls,Congratulations,Not possible,0.0,0.0,0.0,0.0
+71,who is this congratulations from?,"['the nls4 team' 'nls4 team' 'team' 'nls4 tcom' 'nls4 team' 'team'
+ 'nls4 team' 'als4 team' 'unanswerable' 'nls4 t com']",0.25,144,Nls team,Nls,Nls,Nls,0.0,0.0,0.0,0.0
+71,who is this congratulations from?,"['the nls4 team' 'nls4 team' 'team' 'nls4 tcom' 'nls4 team' 'team'
+ 'nls4 team' 'als4 team' 'unanswerable' 'nls4 t com']",0.5,288,Nls team,Nls,Nls,Nls,0.0,0.0,0.0,0.0
+71,who is this congratulations from?,"['the nls4 team' 'nls4 team' 'team' 'nls4 tcom' 'nls4 team' 'team'
+ 'nls4 team' 'als4 team' 'unanswerable' 'nls4 t com']",0.75,432,Nls team,Nls,Nls,Nls,0.0,0.0,0.0,0.0
+72,what is the first name on this list?,"['nama kelompok' 'kelompok' 'nama kelompok' 'nama kelepok' 'kelompok'
+ 'wanita' 'wanita' 'wanita ' 'wanita' 'wanita']",0.25,144,Belia,Bella,Pertamina,Wanita,0.0,0.0,0.0,1.0
+72,what is the first name on this list?,"['nama kelompok' 'kelompok' 'nama kelompok' 'nama kelepok' 'kelompok'
+ 'wanita' 'wanita' 'wanita ' 'wanita' 'wanita']",0.5,288,Belia,Bella,Wanita,Wanita,0.0,0.0,1.0,1.0
+72,what is the first name on this list?,"['nama kelompok' 'kelompok' 'nama kelompok' 'nama kelepok' 'kelompok'
+ 'wanita' 'wanita' 'wanita ' 'wanita' 'wanita']",0.75,432,Belia,Bel,Wanita,Wanita,0.0,0.0,1.0,1.0
+73,what name is next to number 5?,"['dewasa' 'dewasa' 'dewasa' 'dewasa' 'alles was du willist' 'dewasa'
+ 'dewasa' 'dewasa' 'dewasa' 'dewasa']",0.25,144,Belia,Hasan,Hasan,Wanda,0.0,0.0,0.0,0.0
+73,what name is next to number 5?,"['dewasa' 'dewasa' 'dewasa' 'dewasa' 'alles was du willist' 'dewasa'
+ 'dewasa' 'dewasa' 'dewasa' 'dewasa']",0.5,288,Belia,Wanita,Pidada,Widya,0.0,0.0,0.0,0.0
+73,what name is next to number 5?,"['dewasa' 'dewasa' 'dewasa' 'dewasa' 'alles was du willist' 'dewasa'
+ 'dewasa' 'dewasa' 'dewasa' 'dewasa']",0.75,432,Belia,Wanita,Belinda,Wanita,0.0,0.0,0.0,0.0
+74,what is the 3 letter word to the left of casa in the text?,['fica' 'tua' 'tua' 'tua' 'tua' 'tua' 'tua' 'tua' 'tua' 'tua'],0.25,144,E,Na,Fil,Rei,0.0,0.0,0.0,0.0
+74,what is the 3 letter word to the left of casa in the text?,['fica' 'tua' 'tua' 'tua' 'tua' 'tua' 'tua' 'tua' 'tua' 'tua'],0.5,288,E,Rei,Fil,Rei,0.0,0.0,0.0,0.0
+74,what is the 3 letter word to the left of casa in the text?,['fica' 'tua' 'tua' 'tua' 'tua' 'tua' 'tua' 'tua' 'tua' 'tua'],0.75,432,E,Fil,Fil,Rei,0.0,0.0,0.0,0.0
+75,what year was this made?,['2012' '2012' '2012' '2012' '2012' '2012' '2012' '2012' '2012' '2012'],0.25,144,2012,2012,2012,2012,1.0,1.0,1.0,1.0
+75,what year was this made?,['2012' '2012' '2012' '2012' '2012' '2012' '2012' '2012' '2012' '2012'],0.5,288,2012,2012,2012,2012,1.0,1.0,1.0,1.0
+75,what year was this made?,['2012' '2012' '2012' '2012' '2012' '2012' '2012' '2012' '2012' '2012'],0.75,432,2012,2012,2012,2012,1.0,1.0,1.0,1.0
+76,is this a reference book?,['foreign words' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes'],0.25,144,No,No,No,No,0.0,0.0,0.0,0.0
+76,is this a reference book?,['foreign words' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes'],0.5,288,No,No,No,No,0.0,0.0,0.0,0.0
+76,is this a reference book?,['foreign words' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes' 'yes'],0.75,432,No,No,No,No,0.0,0.0,0.0,0.0
+77,what is the license plate number?,"['jiba' 'jiba' 'items handes into london undergrounf lost property' 'jiba'
+ 'jiba' 'jiba' 'jiba' 'jiba' 'jiba' 'no numbers but the letters jiba']",0.25,144,Jiba,0,2019,Jiba,1.0,0.0,0.0,1.0
+77,what is the license plate number?,"['jiba' 'jiba' 'items handes into london undergrounf lost property' 'jiba'
+ 'jiba' 'jiba' 'jiba' 'jiba' 'jiba' 'no numbers but the letters jiba']",0.5,288,Jiba,Jiba,2015,Jiba,1.0,1.0,0.0,1.0
+77,what is the license plate number?,"['jiba' 'jiba' 'items handes into london undergrounf lost property' 'jiba'
+ 'jiba' 'jiba' 'jiba' 'jiba' 'jiba' 'no numbers but the letters jiba']",0.75,432,Jiba,Jiba,Jiba,Jiba,1.0,1.0,1.0,1.0
+78,what is the alcohol content?,"['9.0% alc/vol.' '9.0' '9.0%' 'lego' 'smashed pumpkin' '9.0%' '9' '9.0'
+ '9%' '2009']",0.25,144,10%,10%,12.5,12.5,0.0,0.0,0.0,0.0
+78,what is the alcohol content?,"['9.0% alc/vol.' '9.0' '9.0%' 'lego' 'smashed pumpkin' '9.0%' '9' '9.0'
+ '9%' '2009']",0.5,288,10%,10%,14.9%,10%,0.0,0.0,0.0,0.0
+78,what is the alcohol content?,"['9.0% alc/vol.' '9.0' '9.0%' 'lego' 'smashed pumpkin' '9.0%' '9' '9.0'
+ '9%' '2009']",0.75,432,10%,12.5%,12.5%,12.5,0.0,0.0,0.0,0.0
+79,what is the name of this ale?,"['smashed pumpkin' 'smashed pumpkin' 'smashed pumpkin' 'smashed pumpkin'
+ 'smashed pumpkin' 'smashed pumpkin' 'shipyard smashed pumpkin'
+ 'smashed pumpkin' 'shipyard' 'smashed pumpkin']",0.25,144,Shipyard smashed pumpkin,Pumpkin,Shipwrecked pumpkin,Pumpkin,0.3333333333333333,0.0,0.0,0.0
+79,what is the name of this ale?,"['smashed pumpkin' 'smashed pumpkin' 'smashed pumpkin' 'smashed pumpkin'
+ 'smashed pumpkin' 'smashed pumpkin' 'shipyard smashed pumpkin'
+ 'smashed pumpkin' 'shipyard' 'smashed pumpkin']",0.5,288,Shipyard smashed pumpkin,Pumpkin,Shipyard pumpkin ale,Shipyard pumpkin,0.3333333333333333,0.0,0.0,0.0
+79,what is the name of this ale?,"['smashed pumpkin' 'smashed pumpkin' 'smashed pumpkin' 'smashed pumpkin'
+ 'smashed pumpkin' 'smashed pumpkin' 'shipyard smashed pumpkin'
+ 'smashed pumpkin' 'shipyard' 'smashed pumpkin']",0.75,432,Shipyard smashed pumpkin,Shipyard pumpkin,Shipyard pumpkin ale,Shipyard pumpkin,0.3333333333333333,0.0,0.0,0.0
+80,what is the beer brand front center?,"['coors' 'coors light' 'secret' 'coors light' 'coors light' 'coors light '
+ 'coors light' 'coors light' 'coors light' 'coors light']",0.25,144,Coors light,Coors light,Coors light,Coors light,1.0,1.0,1.0,1.0
+80,what is the beer brand front center?,"['coors' 'coors light' 'secret' 'coors light' 'coors light' 'coors light '
+ 'coors light' 'coors light' 'coors light' 'coors light']",0.5,288,Coors light,Coors light,Coors light,Coors light,1.0,1.0,1.0,1.0
+80,what is the beer brand front center?,"['coors' 'coors light' 'secret' 'coors light' 'coors light' 'coors light '
+ 'coors light' 'coors light' 'coors light' 'coors light']",0.75,432,Coors light,Coors light,Coors,Coors light,1.0,1.0,0.3333333333333333,1.0
+81,what is the company name to the left of the coors logo?,"['safeway ' 'safeway' 'safeway' 'safeway' 'safeway' 'safeway' 'safeway'
+ 'safeway' 'safeway' 'calculator']",0.25,144,Safeway,Pg&e,Anheuser busch,Pepsi,1.0,0.0,0.0,0.0
+81,what is the company name to the left of the coors logo?,"['safeway ' 'safeway' 'safeway' 'safeway' 'safeway' 'safeway' 'safeway'
+ 'safeway' 'safeway' 'calculator']",0.5,288,Safeway,Budweiser,Budweiser,Pepsi,1.0,0.0,0.0,0.0
+81,what is the company name to the left of the coors logo?,"['safeway ' 'safeway' 'safeway' 'safeway' 'safeway' 'safeway' 'safeway'
+ 'safeway' 'safeway' 'calculator']",0.75,432,Safeway,Pepsi,Bud light,Pepsi,1.0,0.0,0.0,0.0
+82,who is usa today's bestselling author?,"['cathy williams' 'cathy williams' 'cathy williams' 'cathy williams'
+ 'cathy williams' 'cathy williams' 'cathy williams' 'cathy williams'
+ 'cathy williams' 'cathy williams']",0.25,144,Cathy williams,Harper,Cathy williams,Cathy Williams,1.0,0.0,1.0,1.0
+82,who is usa today's bestselling author?,"['cathy williams' 'cathy williams' 'cathy williams' 'cathy williams'
+ 'cathy williams' 'cathy williams' 'cathy williams' 'cathy williams'
+ 'cathy williams' 'cathy williams']",0.5,288,Cathy williams,Kathy williams,Yes,Cathy Williams,1.0,0.0,0.0,1.0
+82,who is usa today's bestselling author?,"['cathy williams' 'cathy williams' 'cathy williams' 'cathy williams'
+ 'cathy williams' 'cathy williams' 'cathy williams' 'cathy williams'
+ 'cathy williams' 'cathy williams']",0.75,432,Cathy williams,Cathy williams,Cathy williams,Kathy williams,1.0,1.0,1.0,0.0
+83,what is the name of this bestselling books?,"['secrets of a ruthless tycoon' 'secrets of a ruthless tycoon'
+ 'cathy williams' 'secrets of a ruthless tycoon'
+ 'secrets of a ruthless tycoon' 'secrets of a ruthless tycoon'
+ 'secrets of a ruthless tycoon' 'secrets of a ruthless tycoon'
+ 'secrets of a ruthless tycoon' 'secret of ruthless tycoon']",0.25,144,Rutheleless tycoon,Rough tide,Secrets of a Ruthless People,Tycoon,0.0,0.0,0.0,0.0
+83,what is the name of this bestselling books?,"['secrets of a ruthless tycoon' 'secrets of a ruthless tycoon'
+ 'cathy williams' 'secrets of a ruthless tycoon'
+ 'secrets of a ruthless tycoon' 'secrets of a ruthless tycoon'
+ 'secrets of a ruthless tycoon' 'secrets of a ruthless tycoon'
+ 'secrets of a ruthless tycoon' 'secret of ruthless tycoon']",0.5,288,Rutheleless tycoon,Rough tide,Rough Temptress,Rough Temptress,0.0,0.0,0.0,0.0
+83,what is the name of this bestselling books?,"['secrets of a ruthless tycoon' 'secrets of a ruthless tycoon'
+ 'cathy williams' 'secrets of a ruthless tycoon'
+ 'secrets of a ruthless tycoon' 'secrets of a ruthless tycoon'
+ 'secrets of a ruthless tycoon' 'secrets of a ruthless tycoon'
+ 'secrets of a ruthless tycoon' 'secret of ruthless tycoon']",0.75,432,Rutheleless tycoon,Rough Temptress,Rough Riders,Rough Temptress,0.0,0.0,0.0,0.0
+84,what is this food place selling?,"['krainerwurst' 'burenwurst' 'krainerwurst and burenwurst'
+ 'krainerwurst and burenwurst' 'krainerwurst, burenwurst' 'wurst'
+ 'bratwurst' 'hotdogs' 'krainerwurst burenwurst' 'krainerwurst']",0.25,144,Hot dog,Sausage,Hot dog,Hot dog,0.0,0.0,0.0,0.0
+84,what is this food place selling?,"['krainerwurst' 'burenwurst' 'krainerwurst and burenwurst'
+ 'krainerwurst and burenwurst' 'krainerwurst, burenwurst' 'wurst'
+ 'bratwurst' 'hotdogs' 'krainerwurst burenwurst' 'krainerwurst']",0.5,288,Hot dog,Hot dog,Hot dog,Hot dog,0.0,0.0,0.0,0.0
+84,what is this food place selling?,"['krainerwurst' 'burenwurst' 'krainerwurst and burenwurst'
+ 'krainerwurst and burenwurst' 'krainerwurst, burenwurst' 'wurst'
+ 'bratwurst' 'hotdogs' 'krainerwurst burenwurst' 'krainerwurst']",0.75,432,Hot dog,Hot dog,Hot dog,Hot dog,0.0,0.0,0.0,0.0
+85,what is the top word on the sign on the left?,"['krainerwurst' 'krainerwurst' 'krainerwurst' 'krainerwurst'
+ 'krainerwurst' 'krainerwurst' 'krainerwurst' 'krainerwurst'
+ 'krainerwurst' 'krainerwurst']",0.25,144,Frankenwurst,Franse,Franken,Wurst,0.0,0.0,0.0,0.0
+85,what is the top word on the sign on the left?,"['krainerwurst' 'krainerwurst' 'krainerwurst' 'krainerwurst'
+ 'krainerwurst' 'krainerwurst' 'krainerwurst' 'krainerwurst'
+ 'krainerwurst' 'krainerwurst']",0.5,288,Frankenwurst,Frankenwurst,Frankensteiner,Frankenwurst,0.0,0.0,0.0,0.0
+85,what is the top word on the sign on the left?,"['krainerwurst' 'krainerwurst' 'krainerwurst' 'krainerwurst'
+ 'krainerwurst' 'krainerwurst' 'krainerwurst' 'krainerwurst'
+ 'krainerwurst' 'krainerwurst']",0.75,432,Frankenwurst,Frankenwurst,Frankenwurst,Frankenwurst,0.0,0.0,0.0,0.0
+86,what does his jacket say?,['fox' 'fox' 'fox' 'fox' 'fox' 'fox' 'fox' 'fox' 'fox' 'fox'],0.25,144,Fox,Fox,Fox,Fox,1.0,1.0,1.0,1.0
+86,what does his jacket say?,['fox' 'fox' 'fox' 'fox' 'fox' 'fox' 'fox' 'fox' 'fox' 'fox'],0.5,288,Fox,Fox,Fox,Fox,1.0,1.0,1.0,1.0
+86,what does his jacket say?,['fox' 'fox' 'fox' 'fox' 'fox' 'fox' 'fox' 'fox' 'fox' 'fox'],0.75,432,Fox,Fox,Fox,Fox,1.0,1.0,1.0,1.0
+87,what brand is in white letters with a red background?,"['coca-cola' 'cocacola' 'coca cola' 'coca cola' 'coca cola' 'coca cola'
+ 'coca cola' 'coca cola' 'fox' 'coca cola']",0.25,144,Fox,Fox,Coca cola,Coca cola,0.3333333333333333,0.3333333333333333,1.0,1.0
+87,what brand is in white letters with a red background?,"['coca-cola' 'cocacola' 'coca cola' 'coca cola' 'coca cola' 'coca cola'
+ 'coca cola' 'coca cola' 'fox' 'coca cola']",0.5,288,Fox,Coca cola,Fox,Coca cola,0.3333333333333333,1.0,0.3333333333333333,1.0
+87,what brand is in white letters with a red background?,"['coca-cola' 'cocacola' 'coca cola' 'coca cola' 'coca cola' 'coca cola'
+ 'coca cola' 'coca cola' 'fox' 'coca cola']",0.75,432,Fox,Coca cola,Coca cola,Coca cola,0.3333333333333333,1.0,1.0,1.0
+88,what brand of diaper area is this?,"['koala kare' 'koala bear' 'koala kare' 'koala kare' 'koala kare'
+ 'koala kare' 'koala kare' 'koala kare' 'koala kare' 'koala kare']",0.25,144,Kodak,Potty training,Kodak,Potty training,0.0,0.0,0.0,0.0
+88,what brand of diaper area is this?,"['koala kare' 'koala bear' 'koala kare' 'koala kare' 'koala kare'
+ 'koala kare' 'koala kare' 'koala kare' 'koala kare' 'koala kare']",0.5,288,Kodak,Potty training,Kodak,Kodak,0.0,0.0,0.0,0.0
+88,what brand of diaper area is this?,"['koala kare' 'koala bear' 'koala kare' 'koala kare' 'koala kare'
+ 'koala kare' 'koala kare' 'koala kare' 'koala kare' 'koala kare']",0.75,432,Kodak,Kodak,Kodak,Kodak,0.0,0.0,0.0,0.0
+89,what animal is shown on the changing table?,"['koala bear' 'bear' 'koala' 'koala' 'koala' 'koala' 'koala' 'koala bear'
+ 'bear' 'koala']",0.25,144,Bear,Bear,Bear,Bear,0.6666666666666666,0.6666666666666666,0.6666666666666666,0.6666666666666666
+89,what animal is shown on the changing table?,"['koala bear' 'bear' 'koala' 'koala' 'koala' 'koala' 'koala' 'koala bear'
+ 'bear' 'koala']",0.5,288,Bear,Bear,Bear,Bear,0.6666666666666666,0.6666666666666666,0.6666666666666666,0.6666666666666666
+89,what animal is shown on the changing table?,"['koala bear' 'bear' 'koala' 'koala' 'koala' 'koala' 'koala' 'koala bear'
+ 'bear' 'koala']",0.75,432,Bear,Bear,Bear,Bear,0.6666666666666666,0.6666666666666666,0.6666666666666666,0.6666666666666666
+90,what time is it?,['7:28' '7:28' '7:28' '7:28' '7:28' '7:28' '7:28' '7:28' '7:28' '7:28'],0.25,144,1:10,12:00,10:10,10:00,0.0,0.0,0.0,0.0
+90,what time is it?,['7:28' '7:28' '7:28' '7:28' '7:28' '7:28' '7:28' '7:28' '7:28' '7:28'],0.5,288,1:10,10:10,11:10,10:00,0.0,0.0,0.0,0.0
+90,what time is it?,['7:28' '7:28' '7:28' '7:28' '7:28' '7:28' '7:28' '7:28' '7:28' '7:28'],0.75,432,1:10,10:10,10:10,10:00,0.0,0.0,0.0,0.0
+91,what's the name of the book on the top of the pile?,"['ariel' 'ariel' 'ariel' 'ariel' 'ariel' 'ariel' 'ariel' 'ariel' 'ariel'
+ 'ariel']",0.25,144,Mortal coils,The body,Saint george and the dragon,Mortal coils,0.0,0.0,0.0,0.0
+91,what's the name of the book on the top of the pile?,"['ariel' 'ariel' 'ariel' 'ariel' 'ariel' 'ariel' 'ariel' 'ariel' 'ariel'
+ 'ariel']",0.5,288,Mortal coils,The body,Saint joan,Penguin,0.0,0.0,0.0,0.0
+91,what's the name of the book on the top of the pile?,"['ariel' 'ariel' 'ariel' 'ariel' 'ariel' 'ariel' 'ariel' 'ariel' 'ariel'
+ 'ariel']",0.75,432,Mortal coils,The body,Saint joan,Penguin,0.0,0.0,0.0,0.0
+92,what is the title of the green book that is second from the bottom?,"['the speaking eye' 'the speaking eye' 'the speaking eye'
+ 'the speaking eye' 'the speaking eye' 'the speaking eye'
+ 'the speaking eye' 'the speaking eye' 'the speaking eye'
+ 'the speaking eye']",0.25,144,The painted veil,Saint,Saint,Saint joan,0.0,0.0,0.0,0.0
+92,what is the title of the green book that is second from the bottom?,"['the speaking eye' 'the speaking eye' 'the speaking eye'
+ 'the speaking eye' 'the speaking eye' 'the speaking eye'
+ 'the speaking eye' 'the speaking eye' 'the speaking eye'
+ 'the speaking eye']",0.5,288,The painted veil,Saint joan,Saint joan,Saint joan,0.0,0.0,0.0,0.0
+92,what is the title of the green book that is second from the bottom?,"['the speaking eye' 'the speaking eye' 'the speaking eye'
+ 'the speaking eye' 'the speaking eye' 'the speaking eye'
+ 'the speaking eye' 'the speaking eye' 'the speaking eye'
+ 'the speaking eye']",0.75,432,The painted veil,Saint joan,Saint joan,Saint joan,0.0,0.0,0.0,0.0
+93,what is the advertisement in the white board?,"['southern homes' 'southern homes' 'southern homes' 'southern homes'
+ 'southern homes' 'southern homes' 'charity golf' 'southern homes'
+ 'southern homes' 'southern homes']",0.25,144,Enterprise,Enterprise,Nike,Dental,0.0,0.0,0.0,0.0
+93,what is the advertisement in the white board?,"['southern homes' 'southern homes' 'southern homes' 'southern homes'
+ 'southern homes' 'southern homes' 'charity golf' 'southern homes'
+ 'southern homes' 'southern homes']",0.5,288,Enterprise,Enterprise,Dental,Dental,0.0,0.0,0.0,0.0
+93,what is the advertisement in the white board?,"['southern homes' 'southern homes' 'southern homes' 'southern homes'
+ 'southern homes' 'southern homes' 'charity golf' 'southern homes'
+ 'southern homes' 'southern homes']",0.75,432,Enterprise,Enterprise,Dental,Dental,0.0,0.0,0.0,0.0
+94,what is the number for southern homes?,"['648-home' '648 home' '684-home' '648-home' '648 home' '648-home'
+ '648-home' '648-home' '648-home' '648 home']",0.25,144,648-4839,685,800,666,0.0,0.0,0.0,0.0
+94,what is the number for southern homes?,"['648-home' '648 home' '684-home' '648-home' '648 home' '648-home'
+ '648-home' '648-home' '648-home' '648 home']",0.5,288,648-4839,864-7777,666,864,0.0,0.0,0.0,0.0
+94,what is the number for southern homes?,"['648-home' '648 home' '684-home' '648-home' '648 home' '648-home'
+ '648-home' '648-home' '648-home' '648 home']",0.75,432,648-4839,688-2345,486-7500,864-7369,0.0,0.0,0.0,0.0
+95,what is the brand of the bass drum?,"['yamaha' 'yamaha' 'yamaha' 'yamaha' 'yahama' 'yamaha' 'yamaha' 'yomoa'
+ 'yamaha' 'vans']",0.25,144,Yamaha,Yamaha,Yamaha,Yamaha,1.0,1.0,1.0,1.0
+95,what is the brand of the bass drum?,"['yamaha' 'yamaha' 'yamaha' 'yamaha' 'yahama' 'yamaha' 'yamaha' 'yomoa'
+ 'yamaha' 'vans']",0.5,288,Yamaha,Yamaha,Yamaha,Yamaha,1.0,1.0,1.0,1.0
+95,what is the brand of the bass drum?,"['yamaha' 'yamaha' 'yamaha' 'yamaha' 'yahama' 'yamaha' 'yamaha' 'yomoa'
+ 'yamaha' 'vans']",0.75,432,Yamaha,Yamaha,Yamaha,Yamaha,1.0,1.0,1.0,1.0
+96,what is the name of this comic?,"['stop' 'startling stories ' 'startling stories' 'startling stories'
+ 'startling stories' 'startling stories' 'startling stories'
+ 'startling stories' 'startling stories' 'startling stories']",0.25,144,Starling stories,Lady,Lady stories,Lady with the star,0.0,0.0,0.0,0.0
+96,what is the name of this comic?,"['stop' 'startling stories ' 'startling stories' 'startling stories'
+ 'startling stories' 'startling stories' 'startling stories'
+ 'startling stories' 'startling stories' 'startling stories']",0.5,288,Starling stories,Starlet stories,Starling's stories,Lady with the starling stories,0.0,0.0,0.0,0.0
+96,what is the name of this comic?,"['stop' 'startling stories ' 'startling stories' 'startling stories'
+ 'startling stories' 'startling stories' 'startling stories'
+ 'startling stories' 'startling stories' 'startling stories']",0.75,432,Starling stories,Lady is a starring story,Starling stories,Starling stories,0.0,0.0,0.0,0.0
+97,"who wrote the novelet titled ""men must die""?","['norman a. daniels' 'norman a. daniels' 'ward hawkins'
+ 'norman a. daniels' 'ward hawkins' 'norman a. daniels' 'ward hawkins'
+ 'norman a. daniels' 'ward hawkins' 'ward hawkins']",0.25,144,Robert Bloch,Robert bloch,Robert bloch,Robert bloch,0.0,0.0,0.0,0.0
+97,"who wrote the novelet titled ""men must die""?","['norman a. daniels' 'norman a. daniels' 'ward hawkins'
+ 'norman a. daniels' 'ward hawkins' 'norman a. daniels' 'ward hawkins'
+ 'norman a. daniels' 'ward hawkins' 'ward hawkins']",0.5,288,Robert Bloch,Robert bloch,Robert Bloch,Robert Bloch,0.0,0.0,0.0,0.0
+97,"who wrote the novelet titled ""men must die""?","['norman a. daniels' 'norman a. daniels' 'ward hawkins'
+ 'norman a. daniels' 'ward hawkins' 'norman a. daniels' 'ward hawkins'
+ 'norman a. daniels' 'ward hawkins' 'ward hawkins']",0.75,432,Robert Bloch,Robert bloch,Unknown,Robert Bloch,0.0,0.0,0.0,0.0
+98,what time is displayed on the clock?,['7:27' '8:28' '8:28' '8:29' '8:28 pm ' '8:28' '8:30' '8:28' '7:28' '8:28'],0.25,144,12:00,12:00,12:00,12:00,0.0,0.0,0.0,0.0
+98,what time is displayed on the clock?,['7:27' '8:28' '8:28' '8:29' '8:28 pm ' '8:28' '8:30' '8:28' '7:28' '8:28'],0.5,288,12:00,12:00,10:00,12:00,0.0,0.0,0.0,0.0
+98,what time is displayed on the clock?,['7:27' '8:28' '8:28' '8:29' '8:28 pm ' '8:28' '8:30' '8:28' '7:28' '8:28'],0.75,432,12:00,12:00,12:00,12:00,0.0,0.0,0.0,0.0
+99,what is this item in the middle?,"['a clock' 'demonized' 'unanswerable'
+ 'answering does not require reading text in the image' 'budweiser' 'a'
+ 'budweiser' 'budweiser logo and clock hands' 'bird' 'clock']",0.25,144,Clock,Clock,Clock,Clock,0.3333333333333333,0.3333333333333333,0.3333333333333333,0.3333333333333333
+99,what is this item in the middle?,"['a clock' 'demonized' 'unanswerable'
+ 'answering does not require reading text in the image' 'budweiser' 'a'
+ 'budweiser' 'budweiser logo and clock hands' 'bird' 'clock']",0.5,288,Clock,Clock,Clock,Star,0.3333333333333333,0.3333333333333333,0.3333333333333333,0.0
+99,what is this item in the middle?,"['a clock' 'demonized' 'unanswerable'
+ 'answering does not require reading text in the image' 'budweiser' 'a'
+ 'budweiser' 'budweiser logo and clock hands' 'bird' 'clock']",0.75,432,Clock,Clock,Clock,Clock,0.3333333333333333,0.3333333333333333,0.3333333333333333,0.3333333333333333

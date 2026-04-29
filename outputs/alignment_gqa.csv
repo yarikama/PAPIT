@@ -1,0 +1,101 @@
+idx,image_path,question,spearman,jaccard_top10pct
+0,/opt/dlami/nvme/data/raw/gqa/images/n161313.jpg,Is it overcast?,-0.2605786482221425,0.017543859649122806
+1,/opt/dlami/nvme/data/raw/gqa/images/n235859.jpg,Who is wearing the dress?,-0.25072719779985697,0.017543859649122806
+2,/opt/dlami/nvme/data/raw/gqa/images/n336443.jpg,Does the utensil on top of the table look clean and black?,-0.02351713956266383,0.11538461538461539
+3,/opt/dlami/nvme/data/raw/gqa/images/n179136.jpg,Is the surfer that looks wet wearing a wetsuit?,-0.0074110880894952364,0.07407407407407407
+4,/opt/dlami/nvme/data/raw/gqa/images/n518912.jpg,How tall is the chair in the bottom of the photo?,0.0195867671289626,0.03571428571428571
+5,/opt/dlami/nvme/data/raw/gqa/images/n435808.jpg,What kind of device is on top of the desk?,-0.15503920500609153,0.008695652173913044
+6,/opt/dlami/nvme/data/raw/gqa/images/n414992.jpg,What is the airplane flying above?,-0.44486349707870704,0.008695652173913044
+7,/opt/dlami/nvme/data/raw/gqa/images/n446242.jpg,What color are the pants?,0.08043871420661378,0.05454545454545454
+8,/opt/dlami/nvme/data/raw/gqa/images/n168412.jpg,Is the ground blue or brown?,0.026119355539956257,0.07407407407407407
+9,/opt/dlami/nvme/data/raw/gqa/images/n23181.jpg,What is around the open window?,0.028407755423620406,0.03571428571428571
+10,/opt/dlami/nvme/data/raw/gqa/images/n23181.jpg,What's around the window?,0.05351129730678001,0.07407407407407407
+11,/opt/dlami/nvme/data/raw/gqa/images/n52544.jpg,Who is standing at the table?,-0.1989198194982278,0.008695652173913044
+12,/opt/dlami/nvme/data/raw/gqa/images/n23181.jpg,Are there drapes to the right of the bed?,0.012701740272663721,0.03571428571428571
+13,/opt/dlami/nvme/data/raw/gqa/images/n578564.jpg,What is hanging above the chalkboard?,-0.3103895477666917,0.017543859649122806
+14,/opt/dlami/nvme/data/raw/gqa/images/n437064.jpg,Is the cake on a platter?,-0.03478978721951637,0.02654867256637168
+15,/opt/dlami/nvme/data/raw/gqa/images/n4777.jpg,Is the person to the right of the cup wearing jeans?,0.05506448722196264,0.05454545454545454
+16,/opt/dlami/nvme/data/raw/gqa/images/n435808.jpg,What device is sitting next to the mouse pad?,-0.2122677920057271,0.02654867256637168
+17,/opt/dlami/nvme/data/raw/gqa/images/n554880.jpg,Does the sweater look open and blue?,0.08401915358654247,0.06422018348623854
+18,/opt/dlami/nvme/data/raw/gqa/images/n151768.jpg,Is the jacket long sleeved and black?,-0.008697685628638928,0.04504504504504504
+19,/opt/dlami/nvme/data/raw/gqa/images/n49438.jpg,Are there beds next to the small outlet?,0.047465722842465474,0.06422018348623854
+20,/opt/dlami/nvme/data/raw/gqa/images/n313060.jpg,On which side of the picture is the leather bag?,-0.16797181140521522,0.06422018348623854
+21,/opt/dlami/nvme/data/raw/gqa/images/n54424.jpg,Is the blue pillow square and large?,0.0333725278342497,0.06422018348623854
+22,/opt/dlami/nvme/data/raw/gqa/images/n200692.jpg,Which color is the cake?,0.06597677810538305,0.008695652173913044
+23,/opt/dlami/nvme/data/raw/gqa/images/n578564.jpg,What is the name of the cooking utensil that is hang from the hook?,-0.15161203937947604,0.03571428571428571
+24,/opt/dlami/nvme/data/raw/gqa/images/n52544.jpg,Where is the skinny person standing?,-0.1809189964644332,0.017543859649122806
+25,/opt/dlami/nvme/data/raw/gqa/images/n546616.jpg,Are the plates on top of an ottoman?,-0.014441324996471413,0.05454545454545454
+26,/opt/dlami/nvme/data/raw/gqa/images/n579256.jpg,Is the freezer near the wall small or large?,0.02576198090307109,0.05454545454545454
+27,/opt/dlami/nvme/data/raw/gqa/images/n546616.jpg,What type of food is to the left of the baby that is sitting atop the woman?,0.07601840515669263,0.07407407407407407
+28,/opt/dlami/nvme/data/raw/gqa/images/n117888.jpg,Is the fence made of cement or aluminum?,0.07827134609671316,0.05454545454545454
+29,/opt/dlami/nvme/data/raw/gqa/images/n525029.jpg,Which side are the white houses on?,0.030880600059938843,0.08411214953271028
+30,/opt/dlami/nvme/data/raw/gqa/images/n315887.jpg,Are both the phone and the coffee cup the same color?,0.09861562228377861,0.04504504504504504
+31,/opt/dlami/nvme/data/raw/gqa/images/n579256.jpg,Are there either any small refrigerators or microwaves in the picture?,-0.05833930029541302,0.04504504504504504
+32,/opt/dlami/nvme/data/raw/gqa/images/n413761.jpg,"How does that car look like, orange or maybe white?",0.06289330040783822,0.017543859649122806
+33,/opt/dlami/nvme/data/raw/gqa/images/n293477.jpg,What color is the book?,0.025648320806049296,0.07407407407407407
+34,/opt/dlami/nvme/data/raw/gqa/images/n130638.jpg,What color is the dirt?,0.09452851989782711,0.10476190476190476
+35,/opt/dlami/nvme/data/raw/gqa/images/n293477.jpg,Is the bag made of leather lying on top of a sofa?,-0.17015231181153836,0.04504504504504504
+36,/opt/dlami/nvme/data/raw/gqa/images/n23181.jpg,What are the drapes around of?,0.05959991661157601,0.05454545454545454
+37,/opt/dlami/nvme/data/raw/gqa/images/n314171.jpg,On which side is the picture?,-0.05773906809699356,0.02654867256637168
+38,/opt/dlami/nvme/data/raw/gqa/images/n115614.jpg,What material is the crosswalk in front of the stores?,0.047911763997658265,0.008695652173913044
+39,/opt/dlami/nvme/data/raw/gqa/images/n296467.jpg,How large are the sprinkles that are sprinkled on the cupcakes?,0.06216727720493624,0.10476190476190476
+40,/opt/dlami/nvme/data/raw/gqa/images/n115614.jpg,What type of material is the crosswalk near the street lamp made of?,0.007878135002695718,0.04504504504504504
+41,/opt/dlami/nvme/data/raw/gqa/images/n274905.jpg,Which kind of clothing is pink?,-0.3717021486404069,0.0
+42,/opt/dlami/nvme/data/raw/gqa/images/n274905.jpg,How is the clothing item that is pink called?,-0.3736769313361845,0.0
+43,/opt/dlami/nvme/data/raw/gqa/images/n274905.jpg,Which kind of clothing is not pink?,-0.28216760258708057,0.008695652173913044
+44,/opt/dlami/nvme/data/raw/gqa/images/n250715.jpg,Is this helicopter on or off?,-0.005393510237725387,0.04504504504504504
+45,/opt/dlami/nvme/data/raw/gqa/images/n16656.jpg,Do you see any cats?,0.03245455814586471,0.06422018348623854
+46,/opt/dlami/nvme/data/raw/gqa/images/n16656.jpg,Is that shoe behind a dog?,0.006864195455929407,0.03571428571428571
+47,/opt/dlami/nvme/data/raw/gqa/images/n274905.jpg,What kind of clothing is sleeveless?,-0.03581118044549998,0.03571428571428571
+48,/opt/dlami/nvme/data/raw/gqa/images/n146522.jpg,Is the field soft and snowy?,-0.020185025896030308,0.11538461538461539
+49,/opt/dlami/nvme/data/raw/gqa/images/n207708.jpg,What fruits are beneath the microwave?,-0.00951369631141152,0.07407407407407407
+50,/opt/dlami/nvme/data/raw/gqa/images/n488874.jpg,Which color is the shirt?,0.08891136866633495,0.0
+51,/opt/dlami/nvme/data/raw/gqa/images/n207708.jpg,What is beneath the microwave?,0.08283595882336633,0.07407407407407407
+52,/opt/dlami/nvme/data/raw/gqa/images/n511913.jpg,On which side of the picture is the chair?,-0.04897330506827981,0.06422018348623854
+53,/opt/dlami/nvme/data/raw/gqa/images/n71728.jpg,Is the happy man to the left or to the right of the woman in the center?,-0.090872506434035,0.08411214953271028
+54,/opt/dlami/nvme/data/raw/gqa/images/n126087.jpg,Who is wearing a wristband?,-0.04658389516579332,0.017543859649122806
+55,/opt/dlami/nvme/data/raw/gqa/images/n207708.jpg,Is there a pear beneath the appliance that looks silver and black?,-0.02452471540759614,0.04504504504504504
+56,/opt/dlami/nvme/data/raw/gqa/images/n97485.jpg,Is this a bed or a cabinet?,-0.022104962184487823,0.02654867256637168
+57,/opt/dlami/nvme/data/raw/gqa/images/n435808.jpg,On which side is the router?,0.09974806834659058,0.04504504504504504
+58,/opt/dlami/nvme/data/raw/gqa/images/n518912.jpg,What is the color of the pants?,-0.008159400564491813,0.04504504504504504
+59,/opt/dlami/nvme/data/raw/gqa/images/n137182.jpg,Who is wearing the shirt?,-0.3219972822157398,0.0
+60,/opt/dlami/nvme/data/raw/gqa/images/n137182.jpg,Who is wearing a shirt?,0.19818531272031928,0.05454545454545454
+61,/opt/dlami/nvme/data/raw/gqa/images/n243701.jpg,What's the man doing?,0.056341568656903325,0.08411214953271028
+62,/opt/dlami/nvme/data/raw/gqa/images/n48494.jpg,Are there rivers or oceans that are not calm?,0.16038408479809763,0.05454545454545454
+63,/opt/dlami/nvme/data/raw/gqa/images/n275148.jpg,What is the picture frame hanging from?,0.07849264653983748,0.07407407407407407
+64,/opt/dlami/nvme/data/raw/gqa/images/n214497.jpg,"How do the cars look like, dense or sparse?",-0.035345352717320234,0.07407407407407407
+65,/opt/dlami/nvme/data/raw/gqa/images/n296467.jpg,What food isn't baked?,0.04703817161313593,0.02654867256637168
+66,/opt/dlami/nvme/data/raw/gqa/images/n256120.jpg,Which kind of vehicle is in front of the flag?,0.017806849489479804,0.03571428571428571
+67,/opt/dlami/nvme/data/raw/gqa/images/n256120.jpg,What is the vehicle that is in front of the flag?,0.03643468645646988,0.07407407407407407
+68,/opt/dlami/nvme/data/raw/gqa/images/n275148.jpg,What is hanging from the wall?,0.09418644018601646,0.07407407407407407
+69,/opt/dlami/nvme/data/raw/gqa/images/n130464.jpg,What's the skateboarder jumping off of?,0.1431107035892874,0.06422018348623854
+70,/opt/dlami/nvme/data/raw/gqa/images/n256120.jpg,Is the van in front of a balloon?,0.05993606457675288,0.08411214953271028
+71,/opt/dlami/nvme/data/raw/gqa/images/n145498.jpg,What is the color of this bench?,0.00745497188300335,0.08411214953271028
+72,/opt/dlami/nvme/data/raw/gqa/images/n501609.jpg,Are the cabinets below the stove wooden and open?,0.04745291343605652,0.05454545454545454
+73,/opt/dlami/nvme/data/raw/gqa/images/n95313.jpg,How is the item of furniture that is plaid called?,0.07826395011375878,0.07407407407407407
+74,/opt/dlami/nvme/data/raw/gqa/images/n151768.jpg,Are the boxes to the right of the man full and square?,-0.053481555162197006,0.06422018348623854
+75,/opt/dlami/nvme/data/raw/gqa/images/n6309.jpg,Is the horse next to the other horse both baby and brown?,0.1942640220965544,0.06422018348623854
+76,/opt/dlami/nvme/data/raw/gqa/images/n477215.jpg,Is the river wide or is it narrow?,-0.31984757964416005,0.0
+77,/opt/dlami/nvme/data/raw/gqa/images/n64959.jpg,What appliance is the refrigerator larger than?,0.08962420221840778,0.05454545454545454
+78,/opt/dlami/nvme/data/raw/gqa/images/n403734.jpg,Is the umbrella in the bottom part of the picture?,-0.04071176916253803,0.03571428571428571
+79,/opt/dlami/nvme/data/raw/gqa/images/n296467.jpg,What is inside the bowl to the right of the beans?,0.12542523720652402,0.04504504504504504
+80,/opt/dlami/nvme/data/raw/gqa/images/n317260.jpg,How clean do you think is the face mask the catcher is wearing?,-0.024680253672524115,0.03571428571428571
+81,/opt/dlami/nvme/data/raw/gqa/images/n570181.jpg,Where is the catcher standing on?,-0.1385468917662005,0.008695652173913044
+82,/opt/dlami/nvme/data/raw/gqa/images/n317260.jpg,What is the color of the glove?,0.01913682536626137,0.02654867256637168
+83,/opt/dlami/nvme/data/raw/gqa/images/n470920.jpg,Does the blanket look soft and white?,-0.04825502461342878,0.02654867256637168
+84,/opt/dlami/nvme/data/raw/gqa/images/n35676.jpg,What color are the drawers?,0.0181475891749246,0.017543859649122806
+85,/opt/dlami/nvme/data/raw/gqa/images/n278312.jpg,Are there refrigerators to the left of the stove?,-0.15091460157756323,0.07407407407407407
+86,/opt/dlami/nvme/data/raw/gqa/images/n88933.jpg,Which kind of clothing is bright?,-0.04876444116284009,0.02654867256637168
+87,/opt/dlami/nvme/data/raw/gqa/images/n571179.jpg,Is there an elephant near the person that is wearing a coat?,-0.03728487677997937,0.04504504504504504
+88,/opt/dlami/nvme/data/raw/gqa/images/n571179.jpg,What is the woman wearing?,-0.19526417724545128,0.017543859649122806
+89,/opt/dlami/nvme/data/raw/gqa/images/n571179.jpg,What do you think is the standing person near the man wearing?,0.06585057254089345,0.04504504504504504
+90,/opt/dlami/nvme/data/raw/gqa/images/n88933.jpg,Which type of clothing is pink?,-0.03756835192959776,0.03571428571428571
+91,/opt/dlami/nvme/data/raw/gqa/images/n566028.jpg,What is the person that is sitting down sitting atop?,-0.1116683304135432,0.017543859649122806
+92,/opt/dlami/nvme/data/raw/gqa/images/n500209.jpg,What's standing on the floor?,0.21078818657078033,0.04504504504504504
+93,/opt/dlami/nvme/data/raw/gqa/images/n531359.jpg,What items of furniture are to the left of the boy?,0.05101639632172091,0.06422018348623854
+94,/opt/dlami/nvme/data/raw/gqa/images/n500209.jpg,What is in front of the wall that is not short?,0.19092845664049463,0.04504504504504504
+95,/opt/dlami/nvme/data/raw/gqa/images/n259949.jpg,How wide is the parking lot made of cement?,-0.06454950931826559,0.06422018348623854
+96,/opt/dlami/nvme/data/raw/gqa/images/n473688.jpg,On which side of the picture is the clean mirror?,-0.06152639042618052,0.03571428571428571
+97,/opt/dlami/nvme/data/raw/gqa/images/n315887.jpg,What is the device in front of the flat computer?,0.19656819883551233,0.03571428571428571
+98,/opt/dlami/nvme/data/raw/gqa/images/n554880.jpg,What is sitting on the floor?,0.28902649316960705,0.10476190476190476
+99,/opt/dlami/nvme/data/raw/gqa/images/n37274.jpg,Is there a blender to the right of the yellow drink?,-0.05254107015568943,0.06422018348623854

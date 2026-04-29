@@ -1,0 +1,101 @@
+idx,image_path,question,spearman,jaccard_top10pct
+0,/opt/dlami/nvme/data/raw/textvqa/images/000000.jpg,what is the brand of this camera?,0.19486867993660376,0.03571428571428571
+1,/opt/dlami/nvme/data/raw/textvqa/images/000001.jpg,what does the small white text spell?,0.13008864478280355,0.07407407407407407
+2,/opt/dlami/nvme/data/raw/textvqa/images/000002.jpg,what kind of beer is this?,0.21893259316293107,0.08411214953271028
+3,/opt/dlami/nvme/data/raw/textvqa/images/000003.jpg,what brand liquor is on the right?,0.10663883502286697,0.02654867256637168
+4,/opt/dlami/nvme/data/raw/textvqa/images/000004.jpg,how long has the drink on the right been aged?,-0.245108517951266,0.008695652173913044
+5,/opt/dlami/nvme/data/raw/textvqa/images/000005.jpg,what number is on the player's jersey?,0.12763278841619052,0.02654867256637168
+6,/opt/dlami/nvme/data/raw/textvqa/images/000006.jpg,what is the time?,-0.09220790194930681,0.017543859649122806
+7,/opt/dlami/nvme/data/raw/textvqa/images/000007.jpg,what brand of watch is that?,-0.35287881738589666,0.0
+8,/opt/dlami/nvme/data/raw/textvqa/images/000008.jpg,who is at the center of all of this?,-0.038249687936733556,0.05454545454545454
+9,/opt/dlami/nvme/data/raw/textvqa/images/000009.jpg,who was the photographer?,0.049616923271263796,0.02654867256637168
+10,/opt/dlami/nvme/data/raw/textvqa/images/000010.jpg,are these switches on or off?,-0.26150219172794237,0.03571428571428571
+11,/opt/dlami/nvme/data/raw/textvqa/images/000011.jpg,what candy bar is down there on the bottom?,0.07134832172328935,0.04504504504504504
+12,/opt/dlami/nvme/data/raw/textvqa/images/000012.jpg,what does the light sign read on the farthest right window?,-0.01518072845290155,0.05454545454545454
+13,/opt/dlami/nvme/data/raw/textvqa/images/000013.jpg,how much for a can of skoal?,0.03596910728517698,0.008695652173913044
+14,/opt/dlami/nvme/data/raw/textvqa/images/000014.jpg,is this denny's?,-0.23882782956238544,0.0
+15,/opt/dlami/nvme/data/raw/textvqa/images/000015.jpg,what color are the letters on this sign?,-0.42064293781679357,0.0
+16,/opt/dlami/nvme/data/raw/textvqa/images/000016.jpg,what brand is the bottle with red label?,0.042109775441118075,0.05454545454545454
+17,/opt/dlami/nvme/data/raw/textvqa/images/000017.jpg,how many percent is shown on the poster?,0.01980417367787511,0.008695652173913044
+18,/opt/dlami/nvme/data/raw/textvqa/images/000018.jpg,how many items can you get for $5?,0.03824970386548795,0.09433962264150944
+19,/opt/dlami/nvme/data/raw/textvqa/images/000019.jpg,how man price tags are on the bottom shelf?,0.07907836810499977,0.05454545454545454
+20,/opt/dlami/nvme/data/raw/textvqa/images/000020.jpg,what is one of the brands being advertised?,-0.050266850607518114,0.02654867256637168
+21,/opt/dlami/nvme/data/raw/textvqa/images/000021.jpg,what year was this taken?,-0.01712959399907135,0.04504504504504504
+22,/opt/dlami/nvme/data/raw/textvqa/images/000022.jpg,what kind of comupter is this?,-0.31651060422465277,0.0
+23,/opt/dlami/nvme/data/raw/textvqa/images/000023.jpg,what does the screen say to do?,-0.21770530825480458,0.008695652173913044
+24,/opt/dlami/nvme/data/raw/textvqa/images/000024.jpg,what is written at the top of the yellow sticker on the fridge?,0.09681340575001739,0.04504504504504504
+25,/opt/dlami/nvme/data/raw/textvqa/images/000025.jpg,what is the year on the calender?,0.037844803512300365,0.06422018348623854
+26,/opt/dlami/nvme/data/raw/textvqa/images/000026.jpg,what is the name of the runner on the left?,0.20742785045774753,0.05454545454545454
+27,/opt/dlami/nvme/data/raw/textvqa/images/000027.jpg,what event is this from?,-0.09113637901630908,0.017543859649122806
+28,/opt/dlami/nvme/data/raw/textvqa/images/000028.jpg,who beamed at him?,-0.059070467124015834,0.04504504504504504
+29,/opt/dlami/nvme/data/raw/textvqa/images/000029.jpg,what is the name of this chapter?,-0.26963000911470736,0.0
+30,/opt/dlami/nvme/data/raw/textvqa/images/000030.jpg,who is the author of the book?,0.1054156610247369,0.06422018348623854
+31,/opt/dlami/nvme/data/raw/textvqa/images/000031.jpg,are these bottles of pepsi?,-0.13398819177195262,0.017543859649122806
+32,/opt/dlami/nvme/data/raw/textvqa/images/000032.jpg,who edited the book?,0.11855541226555555,0.05454545454545454
+33,/opt/dlami/nvme/data/raw/textvqa/images/000033.jpg,what time is it?,0.1104796531625581,0.04504504504504504
+34,/opt/dlami/nvme/data/raw/textvqa/images/000034.jpg,what is the screen name being displayed?,0.14689067178138654,0.04504504504504504
+35,/opt/dlami/nvme/data/raw/textvqa/images/000035.jpg,what does the picture say the other ride is?,-0.41545017517230337,0.008695652173913044
+36,/opt/dlami/nvme/data/raw/textvqa/images/000036.jpg,whats the lowest number yard line that you can see?,-0.2166052112040592,0.0
+37,/opt/dlami/nvme/data/raw/textvqa/images/000037.jpg,what word is handwritten?,-0.038972875159761555,0.03571428571428571
+38,/opt/dlami/nvme/data/raw/textvqa/images/000038.jpg,what is the title of the book?,-0.0341826027506605,0.02654867256637168
+39,/opt/dlami/nvme/data/raw/textvqa/images/000039.jpg,what is the number of the runner in the lead right now?,0.10555959222728298,0.04504504504504504
+40,/opt/dlami/nvme/data/raw/textvqa/images/000040.jpg,what is the number on the runner in middle?,0.11554408543157299,0.07407407407407407
+41,/opt/dlami/nvme/data/raw/textvqa/images/000041.jpg,was the ruler made in 2002?,-0.06600590261850925,0.03571428571428571
+42,/opt/dlami/nvme/data/raw/textvqa/images/000042.jpg,what is the largest measurement we can see on this ruler?,0.07697233124890235,0.08411214953271028
+43,/opt/dlami/nvme/data/raw/textvqa/images/000043.jpg,what type of liquor is displayed?,0.2813005649072195,0.08411214953271028
+44,/opt/dlami/nvme/data/raw/textvqa/images/000044.jpg,what is the name of the vodka?,0.29917927638976216,0.04504504504504504
+45,/opt/dlami/nvme/data/raw/textvqa/images/000045.jpg,what are the brand of cigarettes?,-0.004535743519667918,0.02654867256637168
+46,/opt/dlami/nvme/data/raw/textvqa/images/000046.jpg,what is the gold coin worth?,-0.1212824840412076,0.017543859649122806
+47,/opt/dlami/nvme/data/raw/textvqa/images/000047.jpg,how much is the copper colored coin worth?,-0.1266860909362632,0.017543859649122806
+48,/opt/dlami/nvme/data/raw/textvqa/images/000048.jpg,what word does the license plate say?,0.06176233780379679,0.02654867256637168
+49,/opt/dlami/nvme/data/raw/textvqa/images/000049.jpg,what state is this car from?,-0.008826956004091693,0.02654867256637168
+50,/opt/dlami/nvme/data/raw/textvqa/images/000050.jpg,what's the time next to domingo?,0.10381454326379001,0.11538461538461539
+51,/opt/dlami/nvme/data/raw/textvqa/images/000051.jpg,what monetary value is the blue and purple bill?,0.015894791059856004,0.03571428571428571
+52,/opt/dlami/nvme/data/raw/textvqa/images/000052.jpg,what is the word in blue buble bottom left?,-0.05054339250924309,0.06422018348623854
+53,/opt/dlami/nvme/data/raw/textvqa/images/000053.jpg,what number is the player looking at the children?,-0.2557052297419714,0.0
+54,/opt/dlami/nvme/data/raw/textvqa/images/000054.jpg,who is one of the sponsors?,-0.01709661634958672,0.02654867256637168
+55,/opt/dlami/nvme/data/raw/textvqa/images/000055.jpg,what is written on the man's shirt?,-0.16663599332865667,0.02654867256637168
+56,/opt/dlami/nvme/data/raw/textvqa/images/000056.jpg,what number is the player on the right?,-0.1519971198230247,0.017543859649122806
+57,/opt/dlami/nvme/data/raw/textvqa/images/000057.jpg,what football league is the jacket from on the man pointing?,-0.19204611521858378,0.008695652173913044
+58,/opt/dlami/nvme/data/raw/textvqa/images/000058.jpg,how much is the coin worth?,0.0854571423938681,0.03571428571428571
+59,/opt/dlami/nvme/data/raw/textvqa/images/000059.jpg,what year is the coin?,0.08991709485039835,0.07407407407407407
+60,/opt/dlami/nvme/data/raw/textvqa/images/000060.jpg,what is in the bottles?,-0.029660684098300246,0.017543859649122806
+61,/opt/dlami/nvme/data/raw/textvqa/images/000061.jpg,what is the brand of the bottled drink?,-0.16850679950058906,0.008695652173913044
+62,/opt/dlami/nvme/data/raw/textvqa/images/000062.jpg,what is the date on the text?,-0.3775355537548798,0.0
+63,/opt/dlami/nvme/data/raw/textvqa/images/000063.jpg,what player number is this football player?,-0.3242022923715189,0.017543859649122806
+64,/opt/dlami/nvme/data/raw/textvqa/images/000064.jpg,what color is the number 19 on the player's jersey?,0.017234346890211954,0.09433962264150944
+65,/opt/dlami/nvme/data/raw/textvqa/images/000065.jpg,what company made most of these books?,0.13997919604596512,0.04504504504504504
+66,/opt/dlami/nvme/data/raw/textvqa/images/000066.jpg,what volumes are the last two black  marvel books?,0.11633792926015968,0.05454545454545454
+67,/opt/dlami/nvme/data/raw/textvqa/images/000067.jpg,what is being served?,-0.5101379971463753,0.008695652173913044
+68,/opt/dlami/nvme/data/raw/textvqa/images/000068.jpg,what brand of cocoa is it?,0.27726691652737656,0.06422018348623854
+69,/opt/dlami/nvme/data/raw/textvqa/images/000069.jpg,who wrote this book?,0.1912542004194219,0.08411214953271028
+70,/opt/dlami/nvme/data/raw/textvqa/images/000070.jpg,what does it say in the bottom right corner?,-0.07931581824567471,0.03571428571428571
+71,/opt/dlami/nvme/data/raw/textvqa/images/000071.jpg,who is this congratulations from?,0.10166093698662718,0.04504504504504504
+72,/opt/dlami/nvme/data/raw/textvqa/images/000072.jpg,what is the first name on this list?,0.0968666411846041,0.03571428571428571
+73,/opt/dlami/nvme/data/raw/textvqa/images/000073.jpg,what name is next to number 5?,-0.3049536409961124,0.008695652173913044
+74,/opt/dlami/nvme/data/raw/textvqa/images/000074.jpg,what is the 3 letter word to the left of casa in the text?,0.013259812283828486,0.02654867256637168
+75,/opt/dlami/nvme/data/raw/textvqa/images/000075.jpg,what year was this made?,-0.27634205774662174,0.008695652173913044
+76,/opt/dlami/nvme/data/raw/textvqa/images/000076.jpg,is this a reference book?,0.11475372000423426,0.05454545454545454
+77,/opt/dlami/nvme/data/raw/textvqa/images/000077.jpg,what is the license plate number?,0.15708506013529866,0.13725490196078433
+78,/opt/dlami/nvme/data/raw/textvqa/images/000078.jpg,what is the alcohol content?,0.2969655445253765,0.10476190476190476
+79,/opt/dlami/nvme/data/raw/textvqa/images/000079.jpg,what is the name of this ale?,0.2887477115071669,0.07407407407407407
+80,/opt/dlami/nvme/data/raw/textvqa/images/000080.jpg,what is the beer brand front center?,-0.08912001541385547,0.0
+81,/opt/dlami/nvme/data/raw/textvqa/images/000081.jpg,what is the company name to the left of the coors logo?,-0.254225904087875,0.008695652173913044
+82,/opt/dlami/nvme/data/raw/textvqa/images/000082.jpg,who is usa today's bestselling author?,0.07065689016586896,0.04504504504504504
+83,/opt/dlami/nvme/data/raw/textvqa/images/000083.jpg,what is the name of this bestselling books?,0.11784509701071062,0.03571428571428571
+84,/opt/dlami/nvme/data/raw/textvqa/images/000084.jpg,what is this food place selling?,-0.20272460201716827,0.0
+85,/opt/dlami/nvme/data/raw/textvqa/images/000085.jpg,what is the top word on the sign on the left?,-0.08009246038255627,0.017543859649122806
+86,/opt/dlami/nvme/data/raw/textvqa/images/000086.jpg,what does his jacket say?,-0.08917778272937693,0.02654867256637168
+87,/opt/dlami/nvme/data/raw/textvqa/images/000087.jpg,what brand is in white letters with a red background?,-0.07924670510127906,0.017543859649122806
+88,/opt/dlami/nvme/data/raw/textvqa/images/000088.jpg,what brand of diaper area is this?,0.14145156622915123,0.05454545454545454
+89,/opt/dlami/nvme/data/raw/textvqa/images/000089.jpg,what animal is shown on the changing table?,0.10907214560440691,0.04504504504504504
+90,/opt/dlami/nvme/data/raw/textvqa/images/000090.jpg,what time is it?,0.0842033789512988,0.08411214953271028
+91,/opt/dlami/nvme/data/raw/textvqa/images/000091.jpg,what's the name of the book on the top of the pile?,0.12421608373137202,0.04504504504504504
+92,/opt/dlami/nvme/data/raw/textvqa/images/000092.jpg,what is the title of the green book that is second from the bottom?,0.055963228730679423,0.02654867256637168
+93,/opt/dlami/nvme/data/raw/textvqa/images/000093.jpg,what is the advertisement in the white board?,-0.21774697526076953,0.0
+94,/opt/dlami/nvme/data/raw/textvqa/images/000094.jpg,what is the number for southern homes?,-0.11534848828464127,0.02654867256637168
+95,/opt/dlami/nvme/data/raw/textvqa/images/000095.jpg,what is the brand of the bass drum?,0.04581207191634449,0.05454545454545454
+96,/opt/dlami/nvme/data/raw/textvqa/images/000096.jpg,what is the name of this comic?,0.21658951928882805,0.06422018348623854
+97,/opt/dlami/nvme/data/raw/textvqa/images/000097.jpg,"who wrote the novelet titled ""men must die""?",0.14143136529302447,0.04504504504504504
+98,/opt/dlami/nvme/data/raw/textvqa/images/000098.jpg,what time is displayed on the clock?,0.07557864420207992,0.08411214953271028
+99,/opt/dlami/nvme/data/raw/textvqa/images/000099.jpg,what is this item in the middle?,0.1252359344712032,0.06422018348623854
