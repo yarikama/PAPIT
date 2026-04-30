@@ -29,9 +29,6 @@
 \definecolor{cgreen}{RGB}{213,245,227}
 \definecolor{cgray}{RGB}{240,240,240}
 
-% Macro for placeholder numbers awaiting Phase-5 final eval.
-\newcommand{\TBD}[1][?.??]{\textcolor{red}{#1}}
-
 % ============================================================
 \title{PAPIT: Distilling Mid-Layer LLM Attention into a\\
        Training-Free Image-Token Pruner for LLaVA-1.5}
@@ -242,27 +239,32 @@ $V_{\text{pruned}}=\{h_i\mid s^{\text{gc}}_i\in\mathrm{TopK}(s^{\text{gc}},k)\}$
 \label{sec:method-distill}
 
 Section~\ref{sec:diagnostic} will show that $s^{\text{gc}}$ is essentially
-uncorrelated with the LLM's own attention to image tokens, while the
-LLM's \emph{layer-16} attention is the most useful single-layer signal
-under our pipeline. \textbf{PAPIT-Distill} is a small predictor trained
-to mimic that signal at single-pass cost.
+uncorrelated with the LLM's own attention to image tokens. A
+multi-layer two-pass oracle (Table~\ref{tab:oracle}) confirms that
+the missing signal lives \emph{inside} the LLM, with mid-layer
+attention ($L\!\in\![8,24]$) consistently beating random.
+\textbf{PAPIT-Distill} is a small predictor trained to mimic that
+signal at single-pass cost.
 
 \paragraph{Architecture.}
-A $1.3$M-parameter $\text{MLP}_4$. Each patch feature
+A $1.3$M-parameter $\mathrm{MLP}_4$. Each patch feature
 $h_i\in\mathbb{R}^{1024}$ and the broadcast text embedding
-$T\in\mathbb{R}^{768}$ are projected to a hidden width of $384$,
-concatenated, and passed through three residual GELU blocks before a
-linear scalar head:
+$T\in\mathbb{R}^{768}$ are first projected to a hidden width
+$d{=}384$, concatenated, and passed through three residual
+LayerNorm--Linear--GELU blocks $f_1,f_2,f_3$ followed by a linear
+scalar head $w$:
 \begin{equation}
-  s^{\text{d}}_i \;=\; \mathrm{MLP}_{4}\!\big(
-      W_p h_i \,\Vert\, W_t T
-  \big).
+\begin{aligned}
+  z_i^{(0)} &= [\,W_p h_i \,\Vert\, W_t T\,], \\
+  z_i^{(\ell)} &= z_i^{(\ell-1)} + f_\ell\bigl(z_i^{(\ell-1)}\bigr), \quad \ell=1,2,3, \\
+  s^{\text{d}}_i &= w^\top z_i^{(3)}.
+\end{aligned}
   \label{eq:distill}
 \end{equation}
 
 \paragraph{Supervision.}
-We do a single LLaVA forward pass per training pair, take the layer-$16$
-attention $A^{(16)}\!\in\!\mathbb{R}^{n\times n}$, sum over non-image
+We do a single LLaVA forward pass per training pair, take the layer-$8$
+attention $A^{(8)}\!\in\!\mathbb{R}^{n\times n}$, sum over non-image
 query positions to image keys, head-average, and renormalise to a
 distribution $y\in\Delta^{575}$. We train with KL divergence,
 \begin{equation}
@@ -314,11 +316,13 @@ $1.3$M-parameter $\mathrm{MLP}_4$, trained on cached features from
 $100$K mixed-domain pairs.
 
 \noindent\textbf{Datasets.}
-GQA~\cite{hudson2019gqa} test-dev balanced ($700$ samples for accuracy,
-$100$ for diagnostics), VQA~v2~\cite{goyal2017vqav2} val-balanced
-($700/100$), TextVQA~\cite{singh2019textvqa} val ($700/100$). Accuracy:
-exact match for GQA, VQA soft accuracy
-$\min(\mathrm{count}/3,1)$~\cite{goyal2017vqav2} for the others.
+GQA~\cite{hudson2019gqa} test-dev balanced, VQA~v2~\cite{goyal2017vqav2}
+val-balanced, and TextVQA~\cite{singh2019textvqa} val. Each held-out
+split uses $100$ samples per (dataset, retention) cell for downstream
+accuracy and $100$ samples for diagnostics; binomial standard error
+at $N{=}100$ is $\approx 0.05$. Accuracy: exact match for GQA, VQA
+soft accuracy $\min(\mathrm{count}/3,1)$~\cite{goyal2017vqav2} for the
+others.
 
 \noindent\textbf{Baselines.}
 \textbf{Unpruned} keeps all $576$ tokens. \textbf{Random} samples $k$
@@ -334,12 +338,13 @@ layer-$16$ attention, prune, re-generate.
 \begin{figure}[t]
   \centering
   \includegraphics[width=\columnwidth]{fig_qualitative_GQA.pdf}
-  \caption{\textbf{Real input/output, $k{=}50\%$.} Top: GQA image and
-  PAPIT's per-patch saliency (warm = high). Bottom: PAPIT-CLIP vs.\
-  random patches (black = dropped). PAPIT-CLIP localises on the
-  query-relevant region, yet Sec.~\ref{sec:diagnostic} shows this does
-  \emph{not} translate to LLM-aligned token selection. (Final figure
-  will include the model's answer per selector.)}
+  \caption{\textbf{PAPIT-CLIP localises but does not align}, $k{=}50\%$
+  on a GQA example. Top: image with PAPIT's per-patch saliency (warm =
+  high). Bottom: PAPIT-CLIP-selected vs.\ random patches (black =
+  dropped). PAPIT-CLIP visibly concentrates on the query-relevant
+  region, yet Sec.~\ref{sec:diagnostic} shows this concentration is
+  \emph{statistically uncorrelated} with the patches LLaVA's LLM
+  actually attends to.}
   \label{fig:qualitative}
 \end{figure}
 
@@ -347,11 +352,11 @@ layer-$16$ attention, prune, re-generate.
   \centering
   \includegraphics[width=\textwidth]{fig_pareto.pdf}
   \caption{\textbf{Accuracy--FLOPs Pareto on LLaVA-1.5-7B}, $N{=}100$
-  per dataset. PAPIT-Distill (red diamond) dominates random and
-  PAPIT-CLIP across all retentions and benchmarks; on TextVQA at
-  $k\!=\!25\%$ ($\sim\!10\times$ FLOP reduction) it essentially
-  recovers Unpruned. Annotations on each x-tick give the
-  retention $k$.}
+  per dataset. PAPIT-Distill (red diamond) is on or above the
+  Random/PAPIT-CLIP curve on $7$ of $9$ (dataset, retention) cells; at
+  TextVQA $k\!=\!25\%$ ($\sim\!10\times$ FLOP reduction) it gains
+  $+12.3$ over random and essentially recovers Unpruned. Annotations
+  on each x-tick give the retention $k$.}
   \label{fig:pareto}
 \end{figure*}
 
@@ -403,13 +408,14 @@ Dataset & Method & $k{=}25\%$ & $k{=}50\%$ & $k{=}75\%$ \\
 \label{sec:results-main}
 
 Table~\ref{tab:accuracy} summarises the headline accuracy. Across all
-three benchmarks and three retention ratios, the
-GradCAM-based PAPIT-CLIP scorer is statistically indistinguishable from
-random pruning. The largest gap on TextVQA at $k{=}75\%$ is
-$+0.9$ in PAPIT's favour; on the other eight (dataset, retention) cells
-the gap is within $\pm 1$ accuracy point. Figure~\ref{fig:qualitative}
-shows that PAPIT-CLIP \emph{does} produce visibly localised selections,
-yet this does not translate to a measurable downstream gain.
+three benchmarks and three retention ratios, the GradCAM-based
+PAPIT-CLIP scorer is statistically indistinguishable from --- and
+on TextVQA actively worse than --- random pruning: every (dataset,
+retention) cell falls within $\pm 1$ binomial SE of Random
+($\sigma\!\approx\!0.05$ at $N{=}100$). Figure~\ref{fig:qualitative}
+shows that PAPIT-CLIP \emph{does} produce visibly localised
+selections, yet this does not translate to a measurable downstream
+gain.
 
 \subsection{Why CLIP saliency is uninformative}
 \label{sec:diagnostic}
@@ -500,13 +506,22 @@ The oracle costs an extra full LLaVA forward, defeating the efficiency
 goal. We instead distil it. \textbf{Architecture ablation}
 (Table~\ref{tab:arch}) on the $5$K Scope-A cache picks $\mathrm{MLP}_4$
 as the lightest predictor that beats both $\mathrm{MLP}_2$ and a
-cross-attention block. \textbf{Supervision target ablation} on the
-$100$K cache (val-KL on a $10\%$ held-out split, $\mathrm{MLP}_4$,
-target~$\in\!\{A^{(8)},A^{(16)},A^{(24)},\text{rollout}\}$) finds
-$L{=}16$ minimises val-KL and maximises top-$10\%$ Jaccard; rollout is
-hardest to predict because it aggregates across all $32$
-layers~\cite{abnar2020rollout}. The deployed predictor is therefore
-$\mathrm{MLP}_4$ trained against $A^{(16)}$.
+cross-attention block. \textbf{Supervision target ablation} on a
+$20$K subset of the $100$K cache (val-KL on a $10\%$ held-out split,
+$\mathrm{MLP}_4$, target~$\in\!\{A^{(8)},A^{(16)},A^{(24)},
+\text{rollout}\}$) finds $L{=}8$ minimises val-KL ($0.094$) and
+maximises top-$10\%$ Jaccard; rollout is hardest to predict because
+it aggregates across all $32$ layers~\cite{abnar2020rollout}.
+Critically, downstream accuracy follows distillability rather than
+oracle strength: although Table~\ref{tab:oracle} shows $L{=}16$ is
+the strongest oracle, the $L{=}8$ \emph{predictor} wins the
+downstream ablation across the three benchmarks at
+$N{=}100$ ($+0.030$ over random, vs.\ $+0.024$ for $L{=}16$,
+$+0.021$ for $L{=}24$, and $-0.054$ for rollout — i.e.\ the rollout
+distill is \emph{worse} than random, confirming that a hard-to-learn
+target produces a useless predictor regardless of its oracle
+quality). The deployed predictor is therefore $\mathrm{MLP}_4$
+trained against $A^{(8)}$.
 
 \begin{table}[t]
 \centering
@@ -531,12 +546,14 @@ Cross-attn          & $1.58$M & $0.089$  & $0.61$ \\
 % pending). Inline summary sentence in the §5.4 paragraph below.
 
 \textbf{Downstream accuracy} of the deployed PAPIT-Distill is reported
-in the bottom rows of Table~\ref{tab:accuracy}. The scorer adds
-$\approx1.5$\,ms per image on top of the unmodified ViT forward, vs.\
-$\approx85$\,ms for PAPIT-CLIP (which incurs a CLIP text-encoder forward
-pass and a backward pass for GradCAM). PAPIT-Distill closes the gap
-between PAPIT-CLIP and the (offline-only) Oracle while keeping the
-single-pass deployment story intact.
+in the bottom rows of Table~\ref{tab:accuracy} and visualised in
+Figure~\ref{fig:pareto}. Per the latency benchmark in
+Section~\ref{sec:method}, the scorer adds $0.43$\,ms per image on top
+of the unmodified ViT forward, vs.\ $65$\,ms for PAPIT-CLIP
+(which incurs a CLIP text-encoder forward pass and a backward pass
+for GradCAM). PAPIT-Distill closes the gap between PAPIT-CLIP and the
+(offline-only) Oracle while keeping the single-pass deployment story
+intact.
 
 % ============================================================
 \section{Discussion and Conclusion}
@@ -555,15 +572,18 @@ the question with the image; layer~$31$ has already committed to
 generation rather than visual reading.
 
 \paragraph{Limitations and outlook.}
-Diagnostics use $100$ samples per dataset and headline accuracy uses
-$700$; binomial $\sigma\!\approx\!0.02$ at $N{=}700$, so single-cell
-gaps under $\pm0.04$ are noise. Extending to LLaVA-1.6, Qwen2.5-VL, and
-single-pass FastV-style integration of PAPIT-Distill \emph{inside} the
-LLM are natural next steps. The headline finding --- a $1.3$M-param
-MLP suffices to bridge a training-free, CLIP-derived scorer to one
-that respects what the LLM actually attends to --- is the smallest
-viable fix to a clean negative result, and is the contribution we hope
-generalises beyond LLaVA-1.5.
+Both diagnostics and downstream accuracy are reported at $N{=}100$
+per (dataset, retention) cell; binomial $\sigma\!\approx\!0.05$, so
+single-cell gaps under $\pm 0.10$ are at most $\sim 2\sigma$. The
+TextVQA $k\!=\!25\%$ gain ($+12.3$ over random) is therefore
+$\sim 2.5\sigma$ — large enough to take seriously but worth
+replicating at $N{=}500$+ before publication. Extending to LLaVA-1.6,
+Qwen2.5-VL, and single-pass FastV-style integration of PAPIT-Distill
+\emph{inside} the LLM are natural next steps. The headline finding ---
+a $1.3$M-param MLP suffices to bridge a training-free, CLIP-derived
+scorer to one that respects what the LLM actually attends to --- is
+the smallest viable fix to a clean negative result, and is the
+contribution we hope generalises beyond LLaVA-1.5.
 
 \noindent\textbf{Acknowledgements.}
 We used GitHub Copilot for autocomplete and Claude (Anthropic) as a
