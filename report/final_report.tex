@@ -51,7 +51,27 @@
 
 \setcounter{page}{1}
 \begin{document}
-\maketitle
+% --- HACK: place hero figure right below title, above abstract,
+% spanning both columns. CVPR layout otherwise pushes figure* to
+% page 2 because page 1 column space is fully consumed.
+\twocolumn[{%
+  \maketitle
+  \vspace{0.5em}
+  \begin{center}
+    \resizebox{0.98\textwidth}{!}{\includegraphics{fig_hero.pdf}}
+  \end{center}
+  \refstepcounter{figure}\label{fig:hero}%
+  {\small\noindent\textbf{Figure~\thefigure: Real input, real
+  output at $k\!=\!25\%$.} Two TextVQA val examples (camera brand;
+  Denny's sign), each rendered under four pruning strategies. Black
+  areas are dropped patches; the label below each panel is the
+  model's actual generated answer with $\checkmark$/$\times$ vs.\
+  ground truth. PAPIT-CLIP drops the text-bearing region in both
+  cases and answers \emph{Polaroid} / \emph{No}; PAPIT-Distill
+  (this work), with the same $144$-token budget, keeps the small
+  text region and recovers \emph{Dakota} / \emph{Yes}.\par}
+  \vspace{1em}
+}]
 
 % ============================================================
 \begin{abstract}
@@ -108,23 +128,6 @@ ruling out an entire family of training-free prompt-aware methods.
 \textbf{(iii)} \textbf{PAPIT-Distill}, a small MLP distilled from
 mid-layer LLM attention that turns the negative result into a
 deployable single-pass scorer. Code at \texttt{github.com/yarikama/PAPIT}.
-
-\begin{figure*}[!t]
-  \centering
-  \includegraphics[width=\textwidth]{fig_hero.pdf}
-  \caption{\textbf{Real input, real output at $k\!=\!25\%$.} Two
-  TextVQA val examples; under four pruning strategies
-  (\emph{Unpruned}, \emph{Random}, \emph{PAPIT-CLIP} (GradCAM), and
-  \emph{PAPIT-Distill}, this work) we show what the model sees and the
-  answer it actually generates. Black areas are dropped patches; the
-  label under each panel is the decoded answer with
-  $\checkmark$/$\times$ vs.\ ground truth. PAPIT-CLIP drops the
-  text-bearing region in both cases and produces wrong answers
-  (\emph{Polaroid} for the camera, \emph{No} for the Denny's sign);
-  PAPIT-Distill, with the same retention budget, keeps the small text
-  region and recovers the correct answers.}
-  \label{fig:hero}
-\end{figure*}
 
 % ============================================================
 \section{Related Work}
