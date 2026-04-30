@@ -19,7 +19,8 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning, fit, backgrounds, calc}
 \usepackage[breaklinks=true,bookmarks=false]{hyperref}
-\usepackage{dblfloatfix}   % allow [b]-positioned figure* (page-bottom 2-col floats)
+\usepackage{stfloats}      % allow [!b] figure* on page 1 (preferred over dblfloatfix)
+\fnbelowfloat              % footnote below floats (cosmetic, stfloats default)
 
 \cvprfinalcopy
 \def\cvprPaperID{****}
@@ -51,27 +52,22 @@
 
 \setcounter{page}{1}
 \begin{document}
-% --- HACK: place hero figure right below title, above abstract,
-% spanning both columns. CVPR layout otherwise pushes figure* to
-% page 2 because page 1 column space is fully consumed.
-\twocolumn[{%
-  \maketitle
-  \vspace{0.5em}
-  \begin{center}
-    \resizebox{0.98\textwidth}{!}{\includegraphics{fig_hero.pdf}}
-  \end{center}
-  \refstepcounter{figure}\label{fig:hero}%
-  {\small\noindent\textbf{Figure~\thefigure: Real input, real
-  output at $k\!=\!25\%$.} Two TextVQA val examples (camera brand;
-  Denny's sign), each rendered under four pruning strategies. Black
-  areas are dropped patches; the label below each panel is the
-  model's actual generated answer with $\checkmark$/$\times$ vs.\
-  ground truth. PAPIT-CLIP drops the text-bearing region in both
-  cases and answers \emph{Polaroid} / \emph{No}; PAPIT-Distill
-  (this work), with the same $144$-token budget, keeps the small
-  text region and recovers \emph{Dakota} / \emph{Yes}.\par}
-  \vspace{1em}
-}]
+\maketitle
+
+\begin{figure*}[!b]
+  \centering
+  \includegraphics[width=\textwidth]{fig_hero.pdf}
+  \caption{\textbf{Real input, real output at $k\!=\!25\%$.} Two
+  TextVQA val examples (camera brand; Denny's sign), each rendered
+  under four pruning strategies. Black areas are dropped patches; the
+  label below each panel is the model's actual generated answer with
+  $\checkmark$/$\times$ vs.\ ground truth. PAPIT-CLIP drops the
+  text-bearing region in both cases and answers \emph{Polaroid} /
+  \emph{No}; PAPIT-Distill (this work), with the same $144$-token
+  budget, keeps the small text region and recovers \emph{Dakota} /
+  \emph{Yes}.}
+  \label{fig:hero}
+\end{figure*}
 
 % ============================================================
 \begin{abstract}
