@@ -75,15 +75,22 @@ class PAPITLlavaRunner:
     ) -> None:
         from transformers import AutoProcessor, LlavaForConditionalGeneration
 
-        self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+        if device is None:
+            if torch.cuda.is_available():
+                device = "cuda"
+            elif getattr(torch.backends.mps, "is_available", lambda: False)():
+                device = "mps"
+            else:
+                device = "cpu"
+        self.device = device
         self.config = config or PAPITConfig(device=self.device)
 
         # --- LLaVA ---------------------------------------------------------
-        dtype = torch.float16 if self.device == "cuda" else torch.float32
-        load_kwargs: dict[str, Any] = dict(
-            torch_dtype=dtype,
-            device_map="auto" if self.device == "cuda" else None,
-        )
+        # fp16 on accelerators (cuda / mps), fp32 on CPU.
+        dtype = torch.float16 if self.device in ("cuda", "mps") else torch.float32
+        load_kwargs: dict[str, Any] = dict(torch_dtype=dtype)
+        if self.device == "cuda":
+            load_kwargs["device_map"] = "auto"
         if attn_implementation is not None:
             load_kwargs["attn_implementation"] = attn_implementation
         self.llava: LlavaForConditionalGeneration = (
@@ -91,6 +98,8 @@ class PAPITLlavaRunner:
                 llava_model_id, **load_kwargs
             ).eval()
         )
+        if self.device == "mps":
+            self.llava = self.llava.to("mps")
         self.processor = AutoProcessor.from_pretrained(llava_model_id)
 
         # --- CLIP (text encoder + projections only) ------------------------
