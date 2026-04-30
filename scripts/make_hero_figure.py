@@ -32,13 +32,23 @@ PATCH_PX = 336 // GRID
 N_PATCHES = GRID * GRID
 
 HERO = [
+    # Row 1: aggressive (k=25%) and moderate (k=50%)
     {"dataset": "textvqa", "retention": 0.25,
-     "question_substr": "brand of this camera",
-     "method_short": "TextVQA k=25%: camera brand"},
+     "question_substr": "brand of this camera"},
     {"dataset": "textvqa", "retention": 0.25,
-     "question_substr": "is this denny's",
-     "method_short": "TextVQA k=25%: is this Denny's"},
+     "question_substr": "is this denny's"},
+    {"dataset": "textvqa", "retention": 0.5,
+     "question_substr": "name of the runner"},
+    # Row 2: moderate (k=50%) and light (k=75%)
+    {"dataset": "vqa_v2", "retention": 0.5,
+     "question_substr": "What is the man wearing on his head"},
+    {"dataset": "gqa", "retention": 0.75,
+     "question_substr": "side of the picture is the leather bag"},
+    {"dataset": "vqa_v2", "retention": 0.75,
+     "question_substr": "animal print does that chair resemble"},
 ]
+N_ROWS = 3
+N_PER_ROW = 2
 
 METHOD_ORDER = ["unpruned", "random", "papit_clip", "papit_distill"]
 METHOD_LABEL = {
@@ -135,11 +145,11 @@ def render_panel(ax, image_pil: Image.Image, mask: np.ndarray | None,
     for s in ax.spines.values():
         s.set_visible(False)
     if label:
-        ax.set_title(label, fontsize=7, pad=2)
+        ax.set_title(label, fontsize=8, pad=2)
     color = "#1A8043" if correct else "#C0392B"
     mark = "✓" if correct else "✗"
-    ax.text(0.5, -0.04, f"{mark} {answer}", transform=ax.transAxes,
-            ha="center", va="top", fontsize=7.5, color=color)
+    ax.text(0.5, -0.05, f"{mark} {answer}", transform=ax.transAxes,
+            ha="center", va="top", fontsize=8, color=color)
 
 
 def main():
@@ -163,36 +173,32 @@ def main():
     rows = [find_hero_row(args.csv_dir, h["dataset"], h["question_substr"],
                           h.get("retention", args.retention)) for h in HERO]
 
-    # Single-row layout: 2 examples × 4 methods = 8 panels, with a
-    # visible gap between the two example groups. Total height ~1.5 in,
-    # which fits page-1 bottom of a CVPR 2-column letter page when the
-    # paper text overflows to the next column / page.
+    # 2-row × 3-example × 4-methods grid = 24 panels.
     n_examples = len(rows)
     n_methods = len(METHOD_ORDER)
-    n_cols = n_examples * n_methods
-    # Width ratios: ones for normal panels, larger gap between examples
-    # implemented by inserting a "gap" column (we'll hide its frame).
-    fig, axes_full = plt.subplots(
-        1, n_cols, figsize=(7.4, 1.55),
-        gridspec_kw={"wspace": 0.02},
+    assert n_examples == N_ROWS * N_PER_ROW
+    n_cols = N_PER_ROW * n_methods
+    fig, axes_grid = plt.subplots(
+        N_ROWS, n_cols, figsize=(7.4, 4.5),
+        gridspec_kw={"wspace": 0.02, "hspace": 0.22},
     )
-    # axes_full has shape (n_cols,). Reshape into (n_examples, n_methods)
-    # for indexing convenience.
-    axes = np.array(axes_full).reshape(n_examples, n_methods)
-    # Adjust subplots to leave a small gap between the two examples.
-    fig.subplots_adjust(left=0.005, right=0.995, top=0.78, bottom=0.18)
-    # Manually shift example 2 (cols 4..7) to the right by a small amount.
-    GAP = 0.025
-    for c in range(n_methods, n_cols):
-        bb = axes_full[c].get_position()
-        axes_full[c].set_position(
-            [bb.x0 + GAP, bb.y0, bb.width, bb.height]
-        )
-    for c in range(n_methods):
-        bb = axes_full[c].get_position()
-        axes_full[c].set_position(
-            [bb.x0 - GAP, bb.y0, bb.width, bb.height]
-        )
+    # Index as axes[ex_idx, method_idx]: flatten (row, group) → ex_idx.
+    axes = np.empty((n_examples, n_methods), dtype=object)
+    for r in range(N_ROWS):
+        for g in range(N_PER_ROW):
+            ex_idx = r * N_PER_ROW + g
+            for m in range(n_methods):
+                axes[ex_idx, m] = axes_grid[r, g * n_methods + m]
+    fig.subplots_adjust(left=0.060, right=0.995, top=0.92, bottom=0.05)
+    # Push the 2nd group in each row to leave a gap (where its row labels sit).
+    GAP = 0.030
+    for r in range(N_ROWS):
+        for g in range(N_PER_ROW):
+            shift = (g - 0.5) * 2 * GAP  # group 0 → -GAP, group 1 → +GAP
+            for m in range(n_methods):
+                ax = axes_grid[r, g * n_methods + m]
+                bb = ax.get_position()
+                ax.set_position([bb.x0 + shift, bb.y0, bb.width, bb.height])
 
     for r_idx, (row, hero) in enumerate(zip(rows, HERO)):
         # Pull the image fresh from the HF parquet by question match.
@@ -236,21 +242,32 @@ def main():
             label = METHOD_LABEL[method]
             render_panel(ax, img, mask, label, ans, correct)
 
-    # Centred caption above each example group, drawn after layout.
+    # Question above each group; dataset / k below; k colour by retention.
+    K_COLOR = {0.25: "#C0392B", 0.5: "#B7791F", 0.75: "#2E5AAC"}
     fig.canvas.draw()
     for r_idx, (row, hero) in enumerate(zip(rows, HERO)):
         ax_first = axes[r_idx, 0]
         ax_last  = axes[r_idx, -1]
         b0 = ax_first.get_position(); b1 = ax_last.get_position()
         cx = 0.5 * (b0.x0 + b1.x1)
-        cy = b0.y1 + 0.07
-        question = row["question"]
-        question_short = question[:46] + ("..." if len(question) > 46 else "")
+        question_short = row["question"].strip()
         ret = float(hero.get("retention", 0.25))
-        cap = (f'{hero["dataset"].upper()} $k\\!=\\!{int(ret*100)}\\%$   '
-               f'Q: “{question_short}”')
-        fig.text(cx, cy, cap, ha="center", va="bottom",
-                 fontsize=8.5, fontweight="medium")
+        ds_label = {"vqa_v2": "VQAv2"}.get(hero["dataset"], hero["dataset"].upper())
+        kcol = K_COLOR.get(ret, "#444444")
+        # Question stays above the panels (centred on the group).
+        fig.text(cx, b0.y1 + 0.040, f'Q: “{question_short}”',
+                 ha="center", va="bottom",
+                 fontsize=10, fontweight="medium")
+        # Dataset and k vertically stacked, rotated 90°, on the LEFT of the group.
+        gy = 0.5 * (b0.y0 + b0.y1)
+        gx = b0.x0 - 0.012
+        fig.text(gx, gy, ds_label, ha="right", va="center",
+                 rotation=90, fontsize=10,
+                 color="#444444")
+        fig.text(gx - 0.018, gy, f'$k\\!=\\!{int(ret*100)}\\%$',
+                 ha="right", va="center",
+                 rotation=90, fontsize=10,
+                 color=kcol, fontweight="bold")
     args.out.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(args.out, bbox_inches="tight", pad_inches=0.06, dpi=200)
     print(f"wrote {args.out}")

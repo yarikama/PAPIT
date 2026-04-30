@@ -20,6 +20,8 @@ from pathlib import Path
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+plt.rcParams["pdf.fonttype"] = 42  # vector (Type 42), not bitmap (Type 3)
+plt.rcParams["ps.fonttype"]  = 42
 import numpy as np
 import pandas as pd
 import torch
@@ -50,21 +52,39 @@ def parse_args():
     return p.parse_args()
 
 # ── Qualitative examples ──────────────────────────────────────────────────────
-# Edit to change which images appear.
-# TextVQA: data/raw/textvqa/train_val_images/<id>.jpg
-# GQA:     data/raw/gqa/images/<id>.jpg
-EXAMPLES = [
-    (
-        str(ROOT / "data/raw/gqa/images/2349976.jpg"),
-        "What color is the jersey the boy is wearing?",
-        "black",
-    ),
-    (
-        str(ROOT / "data/raw/gqa/images/2371845.jpg"),
-        "What vegetable is to the right of the tomato?",
-        "lettuce",
-    ),
+# GQA images fetched from HF parquet by question substring so the
+# script doesn't depend on the (volatile) raw image cache.
+GQA_EXAMPLES = [
+    ("What color are the pants",  "red"),
+    ("side of the picture is the leather bag",  "left"),
 ]
+
+
+def _fetch_gqa_image_by_question(question_substr: str):
+    """Return (PIL.Image, full_question_str) for the first GQA testdev
+    sample whose question contains the substring."""
+    import io, os
+    import pandas as pd
+    from huggingface_hub import hf_hub_download
+    os.environ.setdefault("HF_HOME", "/opt/dlami/nvme/hf_cache")
+    inst = hf_hub_download("lmms-lab/GQA",
+        "testdev_balanced_instructions/testdev-00000-of-00001.parquet",
+        repo_type="dataset")
+    imgs = hf_hub_download("lmms-lab/GQA",
+        "testdev_balanced_images/testdev-00000-of-00001.parquet",
+        repo_type="dataset")
+    dq = pd.read_parquet(inst)
+    di = pd.read_parquet(imgs).drop_duplicates("id").set_index("id")
+    m = dq[dq["question"].str.contains(question_substr, case=False, regex=False)]
+    if len(m) == 0:
+        raise RuntimeError(f"no gqa match for {question_substr!r}")
+    iid = str(m.iloc[0]["imageId"])
+    field = di.loc[iid, "image"]
+    img_bytes = field["bytes"] if isinstance(field, dict) else field
+    return Image.open(io.BytesIO(img_bytes)).convert("RGB"), m.iloc[0]["question"]
+
+
+EXAMPLES = []  # populated lazily from GQA_EXAMPLES at run-time
 
 RETENTION = 0.50
 
@@ -108,13 +128,17 @@ def gen_qualitative(device: str, output_dir: Path) -> None:
     config = PAPITConfig(retention_ratio=RETENTION, anchor_strategy="global_mean", device=device)
     runner = PAPITLlavaRunner(config=config, device=device)
 
-    n = len(EXAMPLES)
+    # Build examples from HF on first call.
+    examples = []
+    for substr, answer in GQA_EXAMPLES:
+        img, q = _fetch_gqa_image_by_question(substr)
+        examples.append((img, q, answer))
+    n = len(examples)
     plt.rcParams.update({"font.size": FONT})
     # Layout: 2 rows × (n*2) cols — examples side by side
     fig, axes = plt.subplots(2, n * 2, figsize=(7 * n, 5))
 
-    for ex_idx, (img_path, prompt, answer) in enumerate(EXAMPLES):
-        image = Image.open(img_path).convert("RGB")
+    for ex_idx, (image, prompt, answer) in enumerate(examples):
 
         print(f"  [{ex_idx+1}/{n}] {prompt!r}")
         out       = runner.generate(image, prompt)
