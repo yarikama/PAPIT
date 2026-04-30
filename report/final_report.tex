@@ -58,14 +58,9 @@
   \centering
   \includegraphics[width=\textwidth]{fig_hero.pdf}
   \caption{\textbf{Real input, real output at $k\!=\!25\%$.} Two
-  TextVQA val examples (camera brand; Denny's sign), each rendered
-  under four pruning strategies. Black areas are dropped patches; the
-  label below each panel is the model's actual generated answer with
-  $\checkmark$/$\times$ vs.\ ground truth. PAPIT-CLIP drops the
-  text-bearing region in both cases and answers \emph{Polaroid} /
-  \emph{No}; PAPIT-Distill (this work), with the same $144$-token
-  budget, keeps the small text region and recovers \emph{Dakota} /
-  \emph{Yes}.}
+  TextVQA cases where PAPIT-Distill answers correctly while
+  PAPIT-CLIP drops the text region and fails. Black = pruned
+  patches.}
   \label{fig:hero}
 \end{figure*}
 
