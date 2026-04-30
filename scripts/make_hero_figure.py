@@ -36,20 +36,8 @@ HERO = [
      "question_substr": "brand of this camera",
      "method_short": "TextVQA k=25%: camera brand"},
     {"dataset": "textvqa", "retention": 0.25,
-     "question_substr": "the picture say the other ride",
-     "method_short": "TextVQA k=25%: ride text"},
-    {"dataset": "textvqa", "retention": 0.25,
-     "question_substr": "written on the man's shirt",
-     "method_short": "TextVQA k=25%: shirt text"},
-    {"dataset": "textvqa", "retention": 0.25,
-     "question_substr": "color are the letters",
-     "method_short": "TextVQA k=25%: letter color"},
-    {"dataset": "gqa", "retention": 0.25,
-     "question_substr": "color of the pants",
-     "method_short": "GQA k=25%: pants color"},
-    {"dataset": "gqa", "retention": 0.75,
-     "question_substr": "device is sitting next to the mouse pad",
-     "method_short": "GQA k=75%: device next to mouse"},
+     "question_substr": "is this denny's",
+     "method_short": "TextVQA k=25%: is this Denny's"},
 ]
 
 METHOD_ORDER = ["unpruned", "random", "papit_clip", "papit_distill"]
@@ -142,12 +130,16 @@ def render_panel(ax, image_pil: Image.Image, mask: np.ndarray | None,
     img_arr = np.asarray(img).astype(np.float32) / 255.0
     if mask is not None:
         img_arr = img_arr * mask[..., None]
-    ax.imshow(img_arr)
+    ax.imshow(img_arr, aspect="equal")
     ax.set_xticks([]); ax.set_yticks([])
-    ax.set_title(label, fontsize=9)
+    for s in ax.spines.values():
+        s.set_visible(False)
+    if label:
+        ax.set_title(label, fontsize=8.5, pad=2)
     color = "#1A8043" if correct else "#C0392B"
     mark = "✓" if correct else "✗"
-    ax.set_xlabel(f"{mark} {answer}", fontsize=9, color=color, labelpad=4)
+    ax.text(0.5, -0.04, f"{mark} {answer}", transform=ax.transAxes,
+            ha="center", va="top", fontsize=8.5, color=color)
 
 
 def main():
@@ -171,8 +163,14 @@ def main():
     rows = [find_hero_row(args.csv_dir, h["dataset"], h["question_substr"],
                           h.get("retention", args.retention)) for h in HERO]
 
+    # Tight layout: panels touch horizontally (wspace≈0), vertical
+    # space only for the row caption above + answer text below each
+    # row's images. figsize tuned so the whole figure fits page-1
+    # bottom of a CVPR 2-column letter page.
     fig, axes = plt.subplots(len(rows), len(METHOD_ORDER),
-                             figsize=(11.5, 3.0 * len(rows)))
+                             figsize=(7.4, 1.95 * len(rows) + 0.25),
+                             gridspec_kw={"wspace": 0.015,
+                                          "hspace": 0.55})
 
     for r_idx, (row, hero) in enumerate(zip(rows, HERO)):
         # Pull the image fresh from the HF parquet by question match —
@@ -223,16 +221,22 @@ def main():
             label = METHOD_LABEL[method] if r_idx == 0 else ""
             render_panel(ax, img, mask, label, ans, correct)
 
-        # Add row label on leftmost panel: dataset + retention + question
+    # Render row captions AFTER axes are laid out so we can centre them
+    # across each row using actual figure-coordinate positions.
+    fig.canvas.draw()
+    for r_idx, (row, hero) in enumerate(zip(rows, HERO)):
         ax_first = axes[r_idx, 0] if len(rows) > 1 else axes[0]
-        row_lab = f'{hero["dataset"].upper()}  k={int(ret*100)}%\n"{question_short}"'
-        ax_first.text(-0.08, 0.5, row_lab, transform=ax_first.transAxes,
-                      ha="right", va="center", rotation=90, fontsize=8)
-
-    fig.suptitle(
-        "PAPIT-Distill keeps the patches the LLM actually needs",
-        fontsize=11, y=1.0)
-    fig.tight_layout(rect=[0.02, 0, 1, 1])
+        ax_last  = axes[r_idx, -1] if len(rows) > 1 else axes[-1]
+        b0 = ax_first.get_position(); b1 = ax_last.get_position()
+        cx = 0.5 * (b0.x0 + b1.x1)
+        cy = b0.y1 + 0.012
+        question = row["question"]
+        question_short = question[:64] + ("..." if len(question) > 64 else "")
+        ret = float(hero.get("retention", 0.25))
+        cap = (f'{hero["dataset"].upper()}  $k\\!=\\!{int(ret*100)}\\%$   '
+               f'Q: “{question_short}”')
+        fig.text(cx, cy, cap, ha="center", va="bottom",
+                 fontsize=9, fontweight="medium")
     args.out.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(args.out, bbox_inches="tight", pad_inches=0.06, dpi=200)
     print(f"wrote {args.out}")

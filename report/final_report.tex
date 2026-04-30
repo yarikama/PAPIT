@@ -19,6 +19,7 @@
 \usepackage{tikz}
 \usetikzlibrary{arrows.meta, positioning, fit, backgrounds, calc}
 \usepackage[breaklinks=true,bookmarks=false]{hyperref}
+\usepackage{dblfloatfix}   % allow [b]-positioned figure* (page-bottom 2-col floats)
 
 \cvprfinalcopy
 \def\cvprPaperID{****}
@@ -108,20 +109,20 @@ ruling out an entire family of training-free prompt-aware methods.
 mid-layer LLM attention that turns the negative result into a
 deployable single-pass scorer. Code at \texttt{github.com/yarikama/PAPIT}.
 
-\begin{figure*}[t]
+\begin{figure*}[!t]
   \centering
   \includegraphics[width=\textwidth]{fig_hero.pdf}
-  \caption{\textbf{Real input, real output at $k\!=\!25\%$.} A
-  TextVQA val example; under four pruning strategies (\emph{Unpruned},
-  \emph{Random}, \emph{PAPIT-CLIP} (GradCAM), and \emph{PAPIT-Distill},
-  this work) we show what the model sees and the answer it actually
-  generates. Black areas are dropped patches; the label under each
-  panel is the decoded answer with $\checkmark$/$\times$ vs.\ ground
-  truth. Random and CLIP-based selection drop the text-bearing
-  region of the camera and produce plausible-but-wrong answers
-  (\emph{Canon}, \emph{Polaroid}); PAPIT-Distill, with the same
-  retention budget, keeps the small text region and recovers
-  \emph{Dakota}.}
+  \caption{\textbf{Real input, real output at $k\!=\!25\%$.} Two
+  TextVQA val examples; under four pruning strategies
+  (\emph{Unpruned}, \emph{Random}, \emph{PAPIT-CLIP} (GradCAM), and
+  \emph{PAPIT-Distill}, this work) we show what the model sees and the
+  answer it actually generates. Black areas are dropped patches; the
+  label under each panel is the decoded answer with
+  $\checkmark$/$\times$ vs.\ ground truth. PAPIT-CLIP drops the
+  text-bearing region in both cases and produces wrong answers
+  (\emph{Polaroid} for the camera, \emph{No} for the Denny's sign);
+  PAPIT-Distill, with the same retention budget, keeps the small text
+  region and recovers the correct answers.}
   \label{fig:hero}
 \end{figure*}
 
