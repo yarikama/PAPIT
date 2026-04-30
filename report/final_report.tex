@@ -111,6 +111,23 @@ ruling out an entire family of training-free prompt-aware methods.
 mid-layer LLM attention that turns the negative result into a
 deployable single-pass scorer. Code at \texttt{github.com/yarikama/PAPIT}.
 
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=\textwidth]{fig_hero.pdf}
+  \caption{\textbf{Real input, real output at $k\!=\!25\%$.} Two
+  TextVQA val examples; for each row we show what the model sees
+  under four pruning strategies: \emph{Unpruned}, \emph{Random},
+  \emph{PAPIT-CLIP} (GradCAM), and \emph{PAPIT-Distill} (this work).
+  Black areas are dropped patches. The label under each panel is the
+  model's actual generated answer with $\checkmark$/$\times$ vs.\
+  ground truth. Both random and CLIP-based selection drop the
+  text-bearing region and produce plausible-but-wrong answers
+  (\emph{Canon}, \emph{Polaroid} on the camera; \emph{1} on the
+  jersey). PAPIT-Distill, with the same retention budget, keeps the
+  small text region and recovers the correct answer.}
+  \label{fig:hero}
+\end{figure*}
+
 % ============================================================
 \section{Related Work}
 
