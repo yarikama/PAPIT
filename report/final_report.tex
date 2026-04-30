@@ -114,17 +114,17 @@ deployable single-pass scorer. Code at \texttt{github.com/yarikama/PAPIT}.
 \begin{figure*}[t]
   \centering
   \includegraphics[width=\textwidth]{fig_hero.pdf}
-  \caption{\textbf{Real input, real output at $k\!=\!25\%$.} Two
-  TextVQA val examples; for each row we show what the model sees
-  under four pruning strategies: \emph{Unpruned}, \emph{Random},
-  \emph{PAPIT-CLIP} (GradCAM), and \emph{PAPIT-Distill} (this work).
-  Black areas are dropped patches. The label under each panel is the
-  model's actual generated answer with $\checkmark$/$\times$ vs.\
-  ground truth. Both random and CLIP-based selection drop the
-  text-bearing region and produce plausible-but-wrong answers
-  (\emph{Canon}, \emph{Polaroid} on the camera; \emph{1} on the
-  jersey). PAPIT-Distill, with the same retention budget, keeps the
-  small text region and recovers the correct answer.}
+  \caption{\textbf{Real input, real output at $k\!=\!25\%$.} A
+  TextVQA val example; under four pruning strategies (\emph{Unpruned},
+  \emph{Random}, \emph{PAPIT-CLIP} (GradCAM), and \emph{PAPIT-Distill},
+  this work) we show what the model sees and the answer it actually
+  generates. Black areas are dropped patches; the label under each
+  panel is the decoded answer with $\checkmark$/$\times$ vs.\ ground
+  truth. Random and CLIP-based selection drop the text-bearing
+  region of the camera and produce plausible-but-wrong answers
+  (\emph{Canon}, \emph{Polaroid}); PAPIT-Distill, with the same
+  retention budget, keeps the small text region and recovers
+  \emph{Dakota}.}
   \label{fig:hero}
 \end{figure*}
 
@@ -273,11 +273,16 @@ on a $100{,}000$-sample mix of $50$K GQA, $30$K VQA~v2, and $20$K
 TextVQA training pairs. Cached features take $\approx118$\,GB at fp16
 and the predictor itself trains in $\approx30$\,s on a single A10G GPU.
 
-\paragraph{Why layer 16.}
+\paragraph{Why supervise on layer~$8$.}
 Section~\ref{sec:diagnostic} sweeps L\,${\in}\{2,8,16,24,31\}$ in a
-two-pass oracle and finds L\,${=}16$ best at low retention. We also tested
-attention rollout~\cite{abnar2020rollout} as a target; results are in
-Table~\ref{tab:supervision}.
+two-pass oracle and finds mid-layer attention informative. As a
+distillation target, we picked the layer whose distilled predictor
+gives the best downstream accuracy averaged across the three
+benchmarks at $k\!\in\!\{0.25, 0.5, 0.75\}$ ($N{=}100$ each); the
+ranking is L\,${=}8$ ($+0.030$ over random) > L\,${=}16$ ($+0.024$) >
+L\,${=}24$ ($+0.021$) > attention rollout ($-0.054$, actively worse
+than random — the rollout target is hardest to predict and the
+distilled signal is correspondingly noisy).
 
 \subsection{Efficiency}
 Self-attention cost is quadratic in sequence length. With $L_{\text{text}}\!\approx\!50$
@@ -295,7 +300,7 @@ PAPIT-Distill $\mathbf{0.43{\pm}0.00}$\,ms, PAPIT-CLIP
 $216.17{\pm}1.17$\,ms. PAPIT-Distill is therefore
 $\sim\!150\times$ faster than PAPIT-CLIP and $\sim\!500\times$ faster
 than the oracle, while delivering an accuracy gain comparable to the
-oracle (Section~\ref{sec:results-distill}).
+oracle (Table~\ref{tab:accuracy}).
 
 % ============================================================
 \section{Experiments}

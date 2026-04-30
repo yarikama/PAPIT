@@ -32,12 +32,24 @@ PATCH_PX = 336 // GRID
 N_PATCHES = GRID * GRID
 
 HERO = [
-    {"dataset": "textvqa", "idx": None,
+    {"dataset": "textvqa", "retention": 0.25,
      "question_substr": "brand of this camera",
-     "method_short": "Brand of camera"},
-    {"dataset": "textvqa", "idx": None,
-     "question_substr": "number is the player",
-     "method_short": "Player number"},
+     "method_short": "TextVQA k=25%: camera brand"},
+    {"dataset": "textvqa", "retention": 0.25,
+     "question_substr": "the picture say the other ride",
+     "method_short": "TextVQA k=25%: ride text"},
+    {"dataset": "textvqa", "retention": 0.25,
+     "question_substr": "written on the man's shirt",
+     "method_short": "TextVQA k=25%: shirt text"},
+    {"dataset": "textvqa", "retention": 0.25,
+     "question_substr": "color are the letters",
+     "method_short": "TextVQA k=25%: letter color"},
+    {"dataset": "gqa", "retention": 0.25,
+     "question_substr": "color of the pants",
+     "method_short": "GQA k=25%: pants color"},
+    {"dataset": "gqa", "retention": 0.75,
+     "question_substr": "device is sitting next to the mouse pad",
+     "method_short": "GQA k=75%: device next to mouse"},
 ]
 
 METHOD_ORDER = ["unpruned", "random", "papit_clip", "papit_distill"]
@@ -79,23 +91,39 @@ def fetch_hero_image(dataset: str, question_substr: str) -> Image.Image:
     if dataset == "textvqa":
         pq = hf_hub_download("lmms-lab/textvqa",
             "data/validation-00000-of-00003.parquet", repo_type="dataset")
+        df = pd.read_parquet(pq)
+        m = df[df["question"].str.contains(question_substr, case=False, regex=False)]
+        if len(m) == 0:
+            raise RuntimeError(f"no textvqa match for {question_substr!r}")
+        field = m.iloc[0]["image"]
     elif dataset == "gqa":
-        pq = hf_hub_download("lmms-lab/GQA",
+        # Question in instructions parquet, image bytes in images parquet,
+        # joined on imageId.
+        inst = hf_hub_download("lmms-lab/GQA",
+            "testdev_balanced_instructions/testdev-00000-of-00001.parquet",
+            repo_type="dataset")
+        imgs = hf_hub_download("lmms-lab/GQA",
             "testdev_balanced_images/testdev-00000-of-00001.parquet",
             repo_type="dataset")
+        dq = pd.read_parquet(inst)
+        di = pd.read_parquet(imgs).drop_duplicates("id").set_index("id")
+        m = dq[dq["question"].str.contains(question_substr, case=False, regex=False)]
+        if len(m) == 0:
+            raise RuntimeError(f"no gqa match for {question_substr!r}")
+        iid = str(m.iloc[0]["imageId"])
+        if iid not in di.index:
+            raise RuntimeError(f"gqa imageId {iid} missing from images parquet")
+        field = di.loc[iid, "image"]
     elif dataset == "vqa_v2":
         pq = hf_hub_download("lmms-lab/VQAv2",
             "data/validation-00000-of-00068.parquet", repo_type="dataset")
+        df = pd.read_parquet(pq)
+        m = df[df["question"].str.contains(question_substr, case=False, regex=False)]
+        if len(m) == 0:
+            raise RuntimeError(f"no vqav2 match for {question_substr!r}")
+        field = m.iloc[0]["image"]
     else:
         raise ValueError(f"Unknown dataset {dataset}")
-    df = pd.read_parquet(pq)
-    qcol = "question" if "question" in df.columns else None
-    if qcol is None:
-        raise RuntimeError(f"no question column in {pq}")
-    m = df[df[qcol].str.contains(question_substr, case=False, regex=False)]
-    if len(m) == 0:
-        raise RuntimeError(f"no parquet match for {question_substr!r} in {dataset}")
-    field = m.iloc[0]["image"]
     img_bytes = field["bytes"] if isinstance(field, dict) else field
     return Image.open(io.BytesIO(img_bytes)).convert("RGB")
 
@@ -141,10 +169,10 @@ def main():
     predictor = build_predictor(args.predictor, device)
 
     rows = [find_hero_row(args.csv_dir, h["dataset"], h["question_substr"],
-                          args.retention) for h in HERO]
+                          h.get("retention", args.retention)) for h in HERO]
 
     fig, axes = plt.subplots(len(rows), len(METHOD_ORDER),
-                             figsize=(11.5, 3.2 * len(rows)))
+                             figsize=(11.5, 3.0 * len(rows)))
 
     for r_idx, (row, hero) in enumerate(zip(rows, HERO)):
         # Pull the image fresh from the HF parquet by question match —
@@ -165,12 +193,13 @@ def main():
         with torch.no_grad():
             s_distill = predictor(patch_for_proj.unsqueeze(0).float(),
                                   text_emb.unsqueeze(0).float())[0]
+        # Per-hero retention
+        ret = float(hero.get("retention", args.retention))
+        k = int(round(576 * ret))
         # Random with eval-time seed (idx of row in CSV, not iloc but original idx)
         seed = int(row["idx"])
         gen = torch.Generator(); gen.manual_seed(seed)
-        rand_indices = torch.randperm(576, generator=gen)[:int(round(576 * args.retention))]
-
-        k = int(round(576 * args.retention))
+        rand_indices = torch.randperm(576, generator=gen)[:k]
         topk_clip    = torch.topk(s_clip,    k).indices
         topk_distill = torch.topk(s_distill, k).indices
 
@@ -194,15 +223,15 @@ def main():
             label = METHOD_LABEL[method] if r_idx == 0 else ""
             render_panel(ax, img, mask, label, ans, correct)
 
-        # Add row label (question) on the leftmost panel
+        # Add row label on leftmost panel: dataset + retention + question
         ax_first = axes[r_idx, 0] if len(rows) > 1 else axes[0]
-        ax_first.text(-0.08, 0.5, f'Q: "{question_short}"', transform=ax_first.transAxes,
-                      ha="right", va="center", rotation=90, fontsize=9)
+        row_lab = f'{hero["dataset"].upper()}  k={int(ret*100)}%\n"{question_short}"'
+        ax_first.text(-0.08, 0.5, row_lab, transform=ax_first.transAxes,
+                      ha="right", va="center", rotation=90, fontsize=8)
 
     fig.suptitle(
-        f"PAPIT-Distill keeps the patches the LLM actually needs "
-        f"(retention $k\\!=\\!{int(args.retention*100)}\\%$)",
-        fontsize=11, y=1.02)
+        "PAPIT-Distill keeps the patches the LLM actually needs",
+        fontsize=11, y=1.0)
     fig.tight_layout(rect=[0.02, 0, 1, 1])
     args.out.parent.mkdir(parents=True, exist_ok=True)
     fig.savefig(args.out, bbox_inches="tight", pad_inches=0.06, dpi=200)
