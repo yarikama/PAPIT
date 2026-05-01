@@ -19,6 +19,7 @@ data/
 
 # Python build artifacts
 *.egg-info/
+.venv/
 
 # Editor / claude
-.claude/scheduled_tasks.lock
+.claude/
