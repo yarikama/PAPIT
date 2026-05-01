@@ -1,55 +1,38 @@
 # 30-second AWS demo
 
-A copy-pasteable script that runs PAPIT-Distill end-to-end on a single
-TextVQA "Dakota camera" example, prints the four method answers, and
-saves a 4-panel comparison PNG. Designed for the 5-minute video.
+Three copy-pasteable shell blocks that run PAPIT-Distill end-to-end on a
+single TextVQA "Dakota camera" example, print the four method answers,
+and save a 4-panel PNG. Designed for the 5-minute submission video.
 
 ## Prerequisites
 
 - AWS instance is **running** (g5.2xlarge with the EBS volume that has
   `~/PAPIT/outputs/aws_artifacts/mlp4_attn_L8_20k.pt`).
-- `aws` SSH alias is configured locally.
+- The `aws` SSH alias is configured locally.
 
 If you need to start the instance, do it from the AWS console first.
 
-## Step 1 — fetch a known-good test image (10 s)
+## Step 1 — fetch a known-good test image (≈ 10 s)
 
-The hero figure pipeline already pulls TextVQA images from HF parquet.
-We reuse that to grab the Dakota camera frame on the fly:
+Reuses [`scripts/fetch_demo_image.py`](../scripts/fetch_demo_image.py)
+which pulls TextVQA val from the HF parquet by question substring:
 
 ```bash
-ssh aws bash -lc '
-cd ~/PAPIT && export HF_HOME=/opt/dlami/nvme/hf_cache &&
-PYTHONPATH=. uv run python -c "
-import io
-from huggingface_hub import hf_hub_download
-import pandas as pd
-from PIL import Image
-pq = hf_hub_download(\"lmms-lab/textvqa\",
-    \"data/validation-00000-of-00003.parquet\", repo_type=\"dataset\")
-df = pd.read_parquet(pq)
-m = df[df.question.str.contains(\"brand of this camera\", case=False)]
-field = m.iloc[0][\"image\"]
-buf = field[\"bytes\"] if isinstance(field, dict) else field
-Image.open(io.BytesIO(buf)).convert(\"RGB\").save(\"/tmp/dakota.jpg\")
-print(\"saved /tmp/dakota.jpg\")
-"
-'
+ssh aws 'export PATH="$HOME/.local/bin:$PATH" HF_HOME=/opt/dlami/nvme/hf_cache &&
+    cd ~/PAPIT && PYTHONPATH=. uv run python scripts/fetch_demo_image.py \
+        --dataset textvqa --question "brand of this camera" \
+        --out /tmp/dakota.jpg'
 ```
 
 ## Step 2 — run the demo (≈ 20 s on A10G)
 
 ```bash
-ssh aws bash -lc '
-cd ~/PAPIT && export PATH="$HOME/.local/bin:$PATH" &&
-export HF_HOME=/opt/dlami/nvme/hf_cache &&
-PYTHONPATH=. uv run papit /tmp/dakota.jpg "what is the brand of this camera?" \
-    --retention 0.25 \
-    --generate \
-    --predictor ~/PAPIT/outputs/aws_artifacts/mlp4_attn_L8_20k.pt \
-    --save-viz /tmp/demo.png \
-    --device cuda
-'
+ssh aws 'export PATH="$HOME/.local/bin:$PATH" HF_HOME=/opt/dlami/nvme/hf_cache &&
+    cd ~/PAPIT && PYTHONPATH=. uv run papit /tmp/dakota.jpg \
+        "what is the brand of this camera?" \
+        --retention 0.25 --generate \
+        --predictor outputs/aws_artifacts/mlp4_attn_L8_20k.pt \
+        --save-viz /tmp/demo.png --device cuda'
 ```
 
 Expected stdout:
@@ -68,8 +51,7 @@ k:        25% (144/576 patches)
 ## Step 3 — pull the visualisation back (1 s)
 
 ```bash
-scp aws:/tmp/demo.png .
-open demo.png
+scp aws:/tmp/demo.png . && open demo.png
 ```
 
 `demo.png` is a 4-panel side-by-side: Unpruned / Random / PAPIT-CLIP /
@@ -92,15 +74,35 @@ Different example, different *k*:
 
 ```bash
 # GQA "leather bag side" at k=75%
-ssh aws "cd ~/PAPIT && PYTHONPATH=. uv run papit /tmp/bag.jpg \
-    'On which side of the picture is the leather bag?' \
-    --retention 0.75 --generate \
-    --predictor outputs/aws_artifacts/mlp4_attn_L8_20k.pt \
-    --save-viz /tmp/demo_bag.png --device cuda"
+ssh aws 'export PATH="$HOME/.local/bin:$PATH" HF_HOME=/opt/dlami/nvme/hf_cache &&
+    cd ~/PAPIT && PYTHONPATH=. uv run python scripts/fetch_demo_image.py \
+        --dataset gqa --question "side of the picture is the leather bag" \
+        --out /tmp/bag.jpg'
+ssh aws 'export PATH="$HOME/.local/bin:$PATH" HF_HOME=/opt/dlami/nvme/hf_cache &&
+    cd ~/PAPIT && PYTHONPATH=. uv run papit /tmp/bag.jpg \
+        "On which side of the picture is the leather bag?" \
+        --retention 0.75 --generate \
+        --predictor outputs/aws_artifacts/mlp4_attn_L8_20k.pt \
+        --save-viz /tmp/demo_bag.png --device cuda'
 ```
 
 Single-method (faster, ~5 s):
 
 ```bash
-papit ... --generate --method papit_distill --predictor ... --device cuda
+ssh aws '... uv run papit ... --generate --method papit_distill \
+    --predictor ... --device cuda'
 ```
+
+## Troubleshooting
+
+- **`uv: command not found`** — the login shell didn't pick up
+  `~/.local/bin`. Always export `PATH="$HOME/.local/bin:$PATH"` at the
+  start of the ssh command (the blocks above already do this).
+- **`bash: -c: option requires an argument`** — caused by trying to
+  pass multi-line python to `bash -lc` over ssh. We avoid this by
+  putting the fetch logic in a real script (`scripts/fetch_demo_image.py`)
+  and using single-line ssh invocations.
+- **`predictor not found`** — the EBS path is
+  `outputs/aws_artifacts/mlp4_attn_L8_20k.pt`. The NVMe copy at
+  `/opt/dlami/nvme/predictors_a2/` is volatile and will be gone after
+  any instance stop.
