@@ -42,13 +42,9 @@ python scripts/prepare_datasets.py gqa \
 python scripts/run_eval.py                              # all datasets
 python scripts/run_eval.py --dataset gqa                # GQA only
 python scripts/run_eval.py --max-samples 100 --retention 0.25 0.5 0.75
-
-# Launch notebooks
-jupyter lab notebooks/demo.ipynb    # interactive walkthrough
-jupyter lab notebooks/eval.ipynb    # full evaluation pipeline
 ```
 
-There is no test suite, Makefile, or linter configured. Validation is done through the evaluation notebooks and scripts.
+There is no test suite, Makefile, or linter configured. Validation is done through the evaluation scripts.
 
 ## Architecture
 
