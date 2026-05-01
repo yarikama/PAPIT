@@ -10,6 +10,8 @@ image takes 0.43 ms and at *k*=25% retention recovers near-unpruned
 TextVQA accuracy.
 
 📄 Paper: [`report/PAPIT.pdf`](report/PAPIT.pdf)
+🎥 5-min walkthrough: [YouTube](https://youtu.be/LIKLcf7pN7E) · [Google Drive](https://drive.google.com/file/d/19uzhvj-3BEnP4Gv6LNXSwUOrvJJySTaI/view?usp=drive_link)
+💻 Code: <https://github.com/yarikama/PAPIT>
 
 ---
 
