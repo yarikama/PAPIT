@@ -2,7 +2,7 @@
 
 Snapshot date: 2026-04-29.
 Author: this is a planning doc, not a status report. For per-experiment
-results see `outputs/EXPERIMENT_LOG.md` and the per-CSV files in `outputs/`.
+results see `docs/experiment_log.md` and the per-CSV files in `outputs/`.
 
 ---
 
@@ -189,7 +189,7 @@ Assuming today is 2026-04-29 and Scope C cache + Phase 3+4 finishes by
 | File | Role |
 |---|---|
 | `report/final_report.tex` | the paper draft |
-| `outputs/EXPERIMENT_LOG.md` | historical scoring-method log |
+| `docs/experiment_log.md` | historical scoring-method log |
 | `outputs/alignment_*.csv` | per-sample ρ + Jaccard for §7 |
 | `outputs/fastv_oracle_multilayer.csv` | per-sample multi-layer oracle |
 | `outputs/distill_eval_gqa.csv` | Scope-A 100-sample eval |
