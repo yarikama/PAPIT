@@ -33,7 +33,8 @@
 
 % ============================================================
 \title{PAPIT: Prompt-Aware Pruning for Image Tokens\\
-       in Efficient Multimodal Inference}
+       in Efficient Multimodal Inference%
+       \thanks{Code: \url{https://github.com/yarikama/PAPIT}}}
 
 \author{Chao Hsuan Ho\\
 Rice University\\
@@ -223,8 +224,9 @@ oracle (Table~\ref{tab:accuracy}).
 \label{sec:experiments}
 
 \noindent\textbf{Models.}
-LLaVA-1.5-7B (\texttt{llava-hf/llava-1.5-7b-hf}) at fp16, with its
-native CLIP ViT-L/14 vision tower (\texttt{openai/clip-vit-large-patch14})
+LLaVA-1.5-7B (\texttt{llava-hf/llava-1.5-7b-hf}\footnote{\url{https://huggingface.co/llava-hf/llava-1.5-7b-hf}})
+at fp16, with its native CLIP ViT-L/14 vision tower
+(\texttt{openai/clip-vit-large-patch14}\footnote{\url{https://huggingface.co/openai/clip-vit-large-patch14}})
 re-used for both LLM input and PAPIT scoring. PAPIT-Distill predictor:
 $1.3$M-parameter $\mathrm{MLP}_4$, trained on cached features from
 $100$K mixed-domain pairs.
