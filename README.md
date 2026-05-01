@@ -9,7 +9,7 @@ attention into a single-pass image-token pruner: scoring a 576-patch
 image takes 0.43 ms and at *k*=25% retention recovers near-unpruned
 TextVQA accuracy.
 
-📄 Paper: [`report/final_report.pdf`](report/final_report.pdf)
+📄 Paper: [`report/PAPIT.pdf`](report/PAPIT.pdf)
 
 ---
 
@@ -134,7 +134,7 @@ scripts/
   make_pareto.py           paper Fig 2 (accuracy-FLOPs Pareto)
 
 report/
-  final_report.tex / .pdf  4-page paper
+  PAPIT.tex / .pdf  4-page paper
   references.bib
   fig_*.pdf                vector figures
 ```
