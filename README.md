@@ -1,95 +1,162 @@
-# PAPIT
-**Prompt-Aware Pruning for Image Tokens**
+# PAPIT: Prompt-Aware Pruning for Image Tokens in Efficient Multimodal Inference
 
-> Chao Hsuan Ho (ch218) · Heng Jui Hsu (hh83) · Kerstin Sun (ks256)
+> Chao Hsuan Ho (ch218) · Heng Jui Hsu (hh83) · Kerstin Sun (ks256) · Rice University · COMP 646
 
----
+LLaVA-1.5-7B feeds 576 image patch tokens through every self-attention
+layer, making inference cost quadratic in visual sequence length.
+**PAPIT-Distill** is a 1.3M-parameter MLP that distils LLaVA's mid-layer
+attention into a single-pass image-token pruner: scoring a 576-patch
+image takes 0.43 ms and at *k*=25% retention recovers near-unpruned
+TextVQA accuracy.
 
-## Motivation
-
-Modern Multimodal Large Language Models (MLLMs) face a significant computational bottleneck when processing high-resolution images — the resulting explosion of visual tokens leads to prohibitive latency and high inference costs. While much of visual data is often redundant or task-irrelevant noise (e.g., background scenery when the task is counting fingers), standard **Global Pruning** techniques discard information indiscriminately, risking the loss of critical details.
-
-Furthermore, existing pruning strategies frequently lack **intent-awareness**, posing a risk where safety-critical elements — such as pedestrians or hazard signs — are accidentally removed simply because they were not explicitly mentioned in the user's prompt.
-
-This project develops a system that:
-1. **Dynamically selects visual tokens** based on semantic relevance to the user's prompt
-2. **Retains positional structure** through spatial anchoring after pruning
-
-This ensures that the pursuit of efficiency does not come at the expense of task accuracy.
+📄 Paper: [`report/final_report.pdf`](report/final_report.pdf)
 
 ---
 
-## Architecture
+## Headline numbers
 
+LLaVA-1.5-7B downstream accuracy at 100 samples / cell
+(`lmms-lab` test-dev / val splits, σ ≈ 0.05):
+
+| Dataset | *k*  | Random | PAPIT-CLIP | **PAPIT-Distill** | Unpruned |
+| ------- | ---- | ------ | ---------- | ----------------- | -------- |
+| TextVQA | 25%  | 23.7   | 20.0       | **36.0** (+12.3)  | 36.7     |
+| GQA     | 50%  | 52.0   | 52.0       | **56.0**          | 57.0     |
+| VQA v2  | 75%  | 82.0   | 82.7       | **85.0**          | 83.3     |
+
+Scoring latency on g5.2xlarge (A10G, retention 0.5):
+
+| Method                 | ms / image |
+| ---------------------- | ---------- |
+| Random                 | 0.07       |
+| **PAPIT-Distill**      | **0.43**   |
+| PAPIT-CLIP (GradCAM)   | 65.23      |
+| Two-pass Oracle (L=16) | 216.17     |
+
+Distill is **~150× faster** than PAPIT-CLIP and **~500× faster** than the
+oracle it learns from, while matching the oracle's downstream accuracy.
+
+---
+
+## What's actually here
+
+The headline result above is the *third* of three findings — the first
+two are why distillation was necessary at all:
+
+1. **PAPIT-CLIP (training-free)** — GradCAM on LLaVA's own CLIP ViT.
+   Inserts a top-*k* between the ViT and the MLP projector. *Result:*
+   only matches random pruning, sometimes worse (VQAv2 *k*=25%, −9.4 pt).
+2. **Alignment diagnostic** — Spearman ρ(PAPIT-CLIP, LLM attention)
+   ≈ 0 on every benchmark; top-10% Jaccard *below* uniform-random.
+   Rules out the entire family of training-free CLIP-aligned scorers.
+3. **PAPIT-Distill** — 1.3M-param MLP₄ trained with KL against LLaVA's
+   layer-8 attention. Single-pass at deploy. Selected over L∈{16, 24,
+   rollout} by downstream-accuracy ablation: distillability beats
+   oracle strength.
+
+---
+
+## Pipeline
+
+```text
+Image  →  LLaVA ViT (frozen)  →  Patch features  H ∈ ℝ^(576×1024)
+Prompt →  CLIP text encoder    →  Text embedding  T ∈ ℝ^(768)
+                                       ↓
+                  scorer:  s ∈ ℝ^576  (PAPIT-CLIP or PAPIT-Distill)
+                                       ↓
+                          Top-k + 1 anchor (mean) token
+                                       ↓
+                      LLaVA MLP projector  →  LLaVA LLM  →  Answer
 ```
-Raw Image  →  ViT  →  Patch Tokens  V = {v1 ... vn}
-Raw Text   →  CLIP Text Encoder  →  Text Embedding T
-                          ↓
-             Cross-Modal Cosine Similarity  →  Saliency Map
-                          ↓
-             TopK/TopP Selection + Spatial Anchoring
-                          ↓
-             V_pruned  →  MLP Projection  →  LLaVA  →  Response
+
+LLM weights are unmodified; pruning happens between ViT and projector.
+
+---
+
+## Setup
+
+```bash
+uv sync
+uv sync --extra llava   # accelerate for LLaVA
+uv sync --extra ocr     # EasyOCR (optional)
 ```
 
-### Stage 1 — Feature Extraction
+Or with pip: `pip install -e ".[llava,ocr]"`.
 
-| Modality | Input | Process | Output |
-|---|---|---|---|
-| Vision | Raw RGB image | ViT: divide image into N patches and project to embeddings | Patch Tokens `V = {v1 ... vn}` |
-| Text | Raw text query | Pretrained Transformer (CLIP Text Encoder) | Text Embedding `T` |
+Apple Silicon (MPS) is auto-detected; otherwise CUDA, then CPU.
 
-### Stage 2 — Cross-Modal Scoring & Pruning
+---
 
-1. **Cosine Similarity Scoring**: Compute dot product between `T` and every token in `V` to produce a Saliency Map
-2. **TopK / TopP Selection**: Retain the most prompt-relevant tokens (`k ∈ {25%, 50%, 75%}` of `n`)
-3. **Spatial Anchoring**: Preserve positional structure of surviving tokens
-4. **Re-packing**: Compact the reduced token set into `V_pruned`
+## Reproduce the paper numbers
 
-### Stage 3 — LLM Inference
+The deployed predictor (5.1 MB) is checked in and runs on a single
+g5.2xlarge A10G:
 
-- **Modality Alignment**: Project `V_pruned` into LLaVA's embedding space via a lightweight MLP adapter
-- Perform final task (VQA, object detection, segmentation, etc.)
+```bash
+# 1) Single-image inference
+papit path/to/image.jpg "What color is the car?" \
+    --retention 0.5 --device cuda
+
+# 2) Reproduce Table 1 (downstream accuracy, N=100)
+python scripts/run_eval.py --max-samples 100 --retention 0.25 0.5 0.75
+
+# 3) Reproduce hero figure (Fig 1, paper)
+python scripts/make_hero_figure.py \
+    --predictor outputs/mlp4_attn_L8_20k.pt \
+    --out report/fig_hero.pdf
+```
+
+Pre-trained artifact:
+
+- `outputs/mlp4_attn_L8_20k.pt` — MLP₄ predictor (target = layer-8 attn,
+  20K mixed-domain training pairs, val_kl 0.094, top-10% Jaccard 0.60).
+
+---
+
+## Code map
+
+```text
+papit/
+  core/        config + stateless pruning logic
+  integration/ LLaVA hook (extracts pre-projector features, splices
+               pruned tokens back into inputs_embeds)
+  benchmark/   accuracy + efficiency runners (LLaVA + BLIP)
+  data/        GQA / VQA v2 / TextVQA loaders → unified DataFrame
+  ocr/         EasyOCR-backed text-region forced retention
+  risk/        safety/jailbreak keyword overrides
+
+scripts/
+  train_distill.py         train MLP predictor on cached features
+  build_distill_cache_*.py cache LLaVA forward features for training
+  run_eval.py              full LLaVA accuracy benchmark
+  make_hero_figure.py      paper Fig 1
+  gen_qualitative_fig.py   paper Fig 3 (GradCAM diagnostic)
+  make_pareto.py           paper Fig 2 (accuracy-FLOPs Pareto)
+
+report/
+  final_report.tex / .pdf  4-page paper
+  references.bib
+  fig_*.pdf                vector figures
+```
 
 ---
 
 ## Datasets
 
-### GQA
-Complex questions requiring multi-step spatial and semantic reasoning. Used to evaluate how well prompt-aware pruning preserves task-relevant patches under complex reasoning demands.
+| Dataset               | Use                | Why                                                                       |
+| --------------------- | ------------------ | ------------------------------------------------------------------------- |
+| GQA test-dev balanced | Accuracy + oracle  | Multi-step spatial / semantic reasoning                                   |
+| VQA v2 val-balanced   | Accuracy           | Standard VQA baseline                                                     |
+| TextVQA val           | Accuracy           | Stress test for query-aware pruning — text patches are small but critical |
 
-### VQA v2
-The standard visual question answering benchmark with broad image and question diversity. Used as the primary comparison baseline — results are directly comparable to published LLaVA and pruning literature.
-
-### TextVQA
-Questions that require reading text embedded in images (e.g., signs, labels, packaging). Text regions typically occupy only a small number of patches but are critical to answering the query — a direct stress test of prompt-awareness: if the saliency scoring is effective, text-related patches should be retained even under aggressive pruning ratios.
-
----
-
-## Evaluation Plan
-
-We compare PAPIT against an unpruned LLaVA baseline and a global (random) pruning baseline:
-
-| Dataset | Motivation | Metrics |
-|---|---|---|
-| GQA | Complex spatial & semantic reasoning | VQA accuracy, FLOPs, latency |
-| VQA v2 | Standard benchmark, broad comparison base | VQA accuracy, token retention rate |
-| TextVQA | Text-in-image queries; small but query-critical patches | VQA accuracy, patch recall on text regions |
-
-We sweep the TopK retention ratio (`k ∈ {25%, 50%, 75%}`) and report the **accuracy–efficiency Pareto curve** to characterize the trade-off between task performance and computational savings.
+All three loaded from `lmms-lab/{GQA,VQAv2,textvqa}` on Hugging Face.
 
 ---
 
-## Future Work
+## Acknowledgements
 
-As an extension, we plan to add a **Risk Awareness module** — a safety prototype matcher that overrides efficiency-driven pruning to:
-- Retain safety-critical patches (e.g., hazard signs, pedestrians) even when not mentioned in the prompt
-- Neutralize instruction-laden patches embedded in jailbreak images
-
-This decouples *task relevance* from *safety relevance*, ensuring efficient pruning does not accidentally remove safety-critical content.
-
-| Threat Scenario | Defense Mechanism |
-|---|---|
-| Sensitive image content | Safety prototype masking |
-| Adversarial / malicious query | Intent-risk alignment detection |
-| Jailbreak image (embedded instructions) | Token neutralization |
+Built on top of LLaVA-1.5 ([Liu et al. 2024](https://arxiv.org/abs/2310.03744)),
+CLIP ([Radford et al. 2021](https://arxiv.org/abs/2103.00020)), and
+Grad-CAM ([Selvaraju et al. 2017](https://arxiv.org/abs/1610.02391)).
+Code assistance: GitHub Copilot and Claude (Anthropic). All experimental
+design and analysis are the authors'.
