@@ -16,3 +16,9 @@ ch218-local/
 .DS_Store
 __pycache__/
 data/
+
+# Python build artifacts
+*.egg-info/
+
+# Editor / claude
+.claude/scheduled_tasks.lock
