@@ -24,7 +24,7 @@ ssh aws 'export PATH="$HOME/.local/bin:$PATH" HF_HOME=/opt/dlami/nvme/hf_cache &
         --out /tmp/dakota.jpg'
 ```
 
-## Step 2 — run the demo (≈ 20 s on A10G)
+## Step 2 — run the demo (≈ 20 s on A10G; first run also downloads LLaVA-1.5-7B ~13 GB)
 
 ```bash
 ssh aws 'export PATH="$HOME/.local/bin:$PATH" HF_HOME=/opt/dlami/nvme/hf_cache &&
@@ -42,10 +42,10 @@ Image:    /tmp/dakota.jpg
 Question: what is the brand of this camera?
 k:        25% (144/576 patches)
 
-  unpruned       → Dakota
-  random         → Canon
-  papit_clip     → Polaroid
-  papit_distill  → Dakota
+  unpruned       → Dakota digital
+  random         → Delta
+  papit_clip     → Nikon
+  papit_distill  → Dakota digital
 ```
 
 ## Step 3 — pull the visualisation back (1 s)

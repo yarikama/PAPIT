@@ -115,17 +115,16 @@ def _generate_demo(args) -> None:
     for name, idx in selections.items():
         print(f"  [{name}] generating …")
         if name == "unpruned":
-            out = runner.generate_unpruned(image, args.prompt, max_new_tokens=32)
+            raw = runner.generate_unpruned(image, args.prompt, max_new_tokens=32)
         else:
-            out = runner._generate_with_indices(
-                image, args.prompt, idx, max_new_tokens=32
-            ) if hasattr(runner, "_generate_with_indices") else _generate_with_indices(
+            out = _generate_with_indices(
                 runner, image, args.prompt, idx, patch_for_proj, inputs
             )
+            raw = out.answer
         answers[name] = (
-            out.answer.split("ASSISTANT:")[-1].strip()
-            if "ASSISTANT:" in out.answer
-            else out.answer.strip()
+            raw.split("ASSISTANT:")[-1].strip()
+            if "ASSISTANT:" in raw
+            else raw.strip()
         )
 
     print()
